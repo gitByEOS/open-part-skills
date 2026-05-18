@@ -1,0 +1,12 @@
+{
+  "name": "webfetch-plus-skill",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "webfetch-plus": "../../bin/webfetch-plus.mjs"
+  },
+  "dependencies": {
+    "cloakbrowser": "0.3.28",
+    "playwright-core": "1.60.0"
+  }
+}

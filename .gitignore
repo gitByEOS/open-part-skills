@@ -1,0 +1,7 @@
+node_modules/
+runtime/current/
+runtime/runs/
+.DS_Store
+.claude/
+!README.md
+!SKILL.md
