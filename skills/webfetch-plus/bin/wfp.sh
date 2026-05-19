@@ -3,23 +3,17 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILL_ROOT="$(dirname "$SCRIPT_DIR")"
-INPUT_FILE="$SKILL_ROOT/runtime/.wfp_input"
 
-if [ ! -f "$INPUT_FILE" ]; then
-  echo "[wfp] Error: no input file at $INPUT_FILE"
+# 检测依赖
+if [ ! -d "$SKILL_ROOT/runtime/node/node_modules" ]; then
+  npm install --prefix "$SKILL_ROOT/runtime/node" --quiet 2>/dev/null
+fi
+
+URL_AND_ARGS="${1:-$(cat)}"
+
+if [ -z "$URL_AND_ARGS" ]; then
+  echo "[wfp] Usage: bash bin/wfp.sh '<url>' or echo '<url>' | bash bin/wfp.sh"
   exit 1
 fi
 
-read -r URL < "$INPUT_FILE"
-
-if [ -z "$URL" ]; then
-  echo "[wfp] Error: URL is empty"
-  exit 1
-fi
-
-EXTRA_ARGS=()
-while IFS= read -r line; do
-  [ -n "$line" ] && EXTRA_ARGS+=("$line")
-done < <(tail -n +2 "$INPUT_FILE")
-
-cd "$SKILL_ROOT" && exec node runtime/webfetch-plus.mjs "$URL" "${EXTRA_ARGS[@]}"
+cd "$SKILL_ROOT" && exec node runtime/webfetch-plus.mjs $URL_AND_ARGS
