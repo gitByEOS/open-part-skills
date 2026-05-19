@@ -1,6 +1,6 @@
 # Agent Skills
 
-EOS. 开放的部 Skills，可用于 Claude Code、Cursor 等工具。
+EOS. 开放的部分 Skills，可用于 Claude Code、Cursor、CodeX 等工具。
 
 ## 安装
 
@@ -14,6 +14,7 @@ npx skills add https://github.com/eos/open-part-skills
 |------|------|------|----------|
 | [webfetch-plus](./skills/webfetch-plus/SKILL.md) | 使用 Browser 抓取普通 WebFetch 失败的网页，输出适合大模型阅读的正文文本 | 1.0.1 | 2026-05-19 |
 | [testcase](./skills/testcase/SKILL.md) | 通过本skill的规则来完善用户测试用例的完整性和有效性 | 1.0.0 | 2026-05-19 |
+| [vite-plus](./skills/vite-plus/SKILL.md) | 最新适合 Agent 开发的 Web 前端工具链，一体化开发/构建/测试/格式化 | 1.0.0 | 2026-05-19 |
 
 ## 许可
 
