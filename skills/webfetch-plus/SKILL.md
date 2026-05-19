@@ -1,9 +1,9 @@
 ---
 name: webfetch-plus
-version: 1.0.1
+version: 1.0.2
 description: 使用 Browser 抓取普通 WebFetch 失败的网页内容，并输出适合大模型阅读的正文文本。当用户明确提到 webfetch-plus 或使用 webfetch 失败时使用
 license: MIT
-repository: https://github.com/eos/open-part-skills
+repository: https://github.com/gitByEOS/open-part-skills
 dependencies:
   - cloakbrowser@0.3.28
   - playwright-core@1.60.0
@@ -50,10 +50,10 @@ echo "https://example.com" > "$WFP_PATH/runtime/.wfp_input"
 bash "$WFP_PATH/bin/wfp.sh" &
 ```
 
-脚本默认写入固定运行目录，stdout 只打印结果文件路径：
+脚本默认写入运行目录，stdout 只打印结果文件路径：
 
 ```text
-runtime/current/page_1.md
+runtime/runs/new/page_1.md
 ```
 
 ## 多个 URL
@@ -83,7 +83,8 @@ bash "$WFP_PATH/bin/wfp.sh" &
 | `--retries <1-3>` | 最多尝试次数，默认 3 |
 | `--selector <css>` | 只抽取指定 CSS 选择器内容 |
 | `--format <markdown|text|html>` | 输出格式，默认 `markdown` |
-| `--task <n>` | 任务标识，隔离输出文件为 `page_{n}.md` 等，默认 1。多个任务可并行写入 `runtime/current/` 互不覆盖 |
+| `--task <n>` | 任务标识，隔离输出文件为 `page_{n}.md` 等，默认 1。多个任务可并行写入 `runtime/runs/new/` 互不覆盖 |
+| `--stealth` | 使用 CloakBrowser 定制的 Chromium 增强反 WAF 能力 |
 
 ## 执行规则
 

@@ -3,7 +3,7 @@ name: testcase
 version: 1.0.0
 description: 通过本skill的规则来完善用户测试用例的完整性和有效性。当用户需要补充或完善测试用例时使用
 license: MIT
-repository: https://github.com/eos/open-part-skills
+repository: https://github.com/gitByEOS/open-part-skills
 ---
 
 # testcase
