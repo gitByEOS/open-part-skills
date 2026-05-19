@@ -5,3 +5,8 @@ runtime/runs/
 .claude/
 !README.md
 !SKILL.md
+
+# webfetch-plus runtime
+runs/
+browser/
+.wfp_*

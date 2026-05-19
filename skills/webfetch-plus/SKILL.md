@@ -1,6 +1,6 @@
 ---
 name: webfetch-plus
-version: 1.0.0
+version: 1.0.1
 description: 使用 Browser 抓取普通 WebFetch 失败的网页内容，并输出适合大模型阅读的正文文本。当用户明确提到 webfetch-plus 或使用 webfetch 失败时使用
 license: MIT
 repository: https://github.com/eos/open-part-skills
@@ -27,26 +27,47 @@ cd "$WFP_PATH" && npm ci --prefix runtime/node
 
 ## 抓取网页
 
-基础用法：
+写入 URL 到输入文件，再执行固定命令：
 
 ```bash
-cd "$WFP_PATH" && node bin/webfetch-plus.mjs "https://example.com"
+echo "https://example.com" > "$WFP_PATH/runtime/.wfp_input"
+bash "$WFP_PATH/bin/wfp.sh"
 ```
 
-脚本默认写入固定运行目录，并在 stdout 只打印结果文件路径：
+需要参数时追加到文件：
+
+```bash
+echo "https://example.com" > "$WFP_PATH/runtime/.wfp_input"
+echo "--wait" >> "$WFP_PATH/runtime/.wfp_input"
+echo "3000" >> "$WFP_PATH/runtime/.wfp_input"
+bash "$WFP_PATH/bin/wfp.sh"
+```
+
+后台运行不阻塞，末尾加 `&`：
+
+```bash
+echo "https://example.com" > "$WFP_PATH/runtime/.wfp_input"
+bash "$WFP_PATH/bin/wfp.sh" &
+```
+
+脚本默认写入固定运行目录，stdout 只打印结果文件路径：
 
 ```text
 runtime/current/page_1.md
 ```
 
+## 多个 URL
+
+依次覆盖写入，后台执行：
+
 ```bash
-cd "$WFP_PATH" && node bin/webfetch-plus.mjs "https://example.com" --out /tmp/page.md 	# 指定输出文件
-cd "$WFP_PATH" && node bin/webfetch-plus.mjs "https://example.com" --output-dir /tmp/webfetch-plus-runs # 指定隔离目录
-cd "$WFP_PATH" && node bin/webfetch-plus.mjs "https://example.com" --archive 			# 需要保留历史结果
-cd "$WFP_PATH" && node bin/webfetch-plus.mjs "https://example.com" --wait 3000 			# 等待动态内容
-cd "$WFP_PATH" && node bin/webfetch-plus.mjs "https://example.com" --selector main      # 只抓指定区域
-cd "$WFP_PATH" && node bin/webfetch-plus.mjs "https://example.com" --task 2             # 并行抓取，隔离输出
+echo "https://a.com" > "$WFP_PATH/runtime/.wfp_input"
+bash "$WFP_PATH/bin/wfp.sh" &
+echo "https://b.com" > "$WFP_PATH/runtime/.wfp_input"
+bash "$WFP_PATH/bin/wfp.sh" &
 ```
+
+注意：多个 URL 快速写入同一文件会有竞争，需要指定不同 `--task` 并错开写入时间。
 
 ## 参数
 
