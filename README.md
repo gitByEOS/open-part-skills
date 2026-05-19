@@ -5,7 +5,7 @@ EOS. 开放的部分 Skills，可用于 Claude Code、Cursor、CodeX 等工具�
 ## 安装
 
 ```bash
-npx skills add https://github.com/eos/open-part-skills
+npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 ```
 
 ## Skills
