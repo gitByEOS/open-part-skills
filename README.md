@@ -2,6 +2,8 @@
 
 EOS. 开放的部分 Skills，可用于 Claude Code、Cursor、CodeX 等工具。
 
+AI交流群：**1105239118**，有新内容更新会在里边通知，也可以提一些建议或者想法
+
 ## 安装
 
 ```bash
