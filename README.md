@@ -20,6 +20,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [switch-chat](./skills/switch-chat/SKILL.md) | 切换会话交接任务时使用，生成可快速编辑网页，让新会话能无缝继承工作 | 1.0.0 | 2026-05-19 |
 | [git-review](./skills/git-review/SKILL.md) | 审查指定范围内的 Git 提交，按作者和 commit 汇总风险，输出过程记录与可视化安全审查报告 | 1.0.0 | 2026-05-27 |
 | [memory-graph](./skills/memory-graph/SKILL.md) | 开发了一套 Agent 外挂记忆，关联历史记忆、沉淀会话记忆、提供 web-ui 查看或管理记忆 | 0.2.1 | 2026-05-29 |
+| [blog-narrator](./skills/blog-narrator/SKILL.md) | 把博客 Markdown 导出为带语音逐行披露演示 HTML，支持Edge TTS，可自行拓展其他TTS | 1.0.2 | 2026-05-29 |
 
 ## 许可
 
