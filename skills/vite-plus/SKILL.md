@@ -1,8 +1,7 @@
 ---
 name: vite-plus
-version: 1.0.0
 description: 最新适合 Agent 开发的 Web 前端工具链。当需要开发 Vite+ 项目、执行 vp 命令或配置 Vite+ 工具链时使用此技能
-license: MIT
+version: 1.0.0
 repository: https://github.com/gitByEOS/open-part-skills
 ---
 

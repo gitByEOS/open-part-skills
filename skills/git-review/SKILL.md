@@ -1,8 +1,9 @@
 ---
 name: git-review
-version: 1.0.0
 description: 审查指定范围内的 Git 提交，按作者和 commit 汇总风险，输出过程记录与可视化安全审查报告。当用户需要审查 Git 提交风险或生成安全审查报告时使用
-license: MIT
+version: 1.0.0
+dependencies:
+  - python3
 repository: https://github.com/gitByEOS/open-part-skills
 ---
 

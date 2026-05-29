@@ -1,8 +1,9 @@
 ---
 name: memory-graph
-version: 0.2.1
 description: 使用全局 MemoryGraph 作为 Agent 外挂记忆图谱，使用 link 关联历史记忆；使用 patch 根据会话沉淀为记忆；用户主动写入记忆时使用 apply；需要查看或管理记忆时 look
-license: MIT
+version: 0.2.1
+dependencies:
+  - node
 repository: https://github.com/gitByEOS/open-part-skills
 ---
 

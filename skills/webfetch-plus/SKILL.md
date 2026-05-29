@@ -1,12 +1,12 @@
 ---
 name: webfetch-plus
-version: 1.0.3
 description: 使用 Browser 抓取普通 WebFetch 失败的网页内容，并输出适合大模型阅读的正文文本。当用户明确提到 webfetch-plus 或使用 webfetch 失败时使用
-license: MIT
-repository: https://github.com/gitByEOS/open-part-skills
+version: 1.0.3
 dependencies:
+  - node
   - cloakbrowser@0.3.28
   - playwright-core@1.60.0
+repository: https://github.com/gitByEOS/open-part-skills
 ---
 
 # WebFetch Plus

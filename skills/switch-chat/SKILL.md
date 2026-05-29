@@ -1,8 +1,7 @@
 ---
 name: switch-chat
-version: 1.0.0
 description: 当用户需要切换会话并交接任务时使用，生成可视化交接文档，确保新会话能无缝继承工作目标
-license: MIT
+version: 1.0.0
 dependencies:
   - python3
 repository: https://github.com/gitByEOS/open-part-skills
