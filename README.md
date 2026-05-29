@@ -19,6 +19,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [vite-plus](./skills/vite-plus/SKILL.md) | 最新的适合 Agent 开发 Web 前端工具链，一体化开发/构建/测试/发布/格式化 | 1.0.0 | 2026-05-19 |
 | [switch-chat](./skills/switch-chat/SKILL.md) | 切换会话交接任务时使用，生成可快速编辑网页，让新会话能无缝继承工作 | 1.0.0 | 2026-05-19 |
 | [git-review](./skills/git-review/SKILL.md) | 审查指定范围内的 Git 提交，按作者和 commit 汇总风险，输出过程记录与可视化安全审查报告 | 1.0.0 | 2026-05-27 |
+| [memory-graph](./skills/memory-graph/SKILL.md) | 开发了一套 Agent 外挂记忆，关联历史记忆、沉淀会话记忆、提供 web-ui 查看或管理记忆 | 0.2.1 | 2026-05-29 |
 
 ## 许可
 
