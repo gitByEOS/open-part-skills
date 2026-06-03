@@ -22,6 +22,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [memory-graph](./skills/memory-graph/SKILL.md) | 开发了一套 Agent 外挂记忆，关联历史记忆、沉淀会话记忆、提供 web-ui 查看或管理记忆 | 0.2.1 | 2026-05-29 |
 | [blog-narrator](./skills/blog-narrator/SKILL.md) | 把博客 Markdown 导出为带语音逐行披露演示 HTML，支持Edge TTS，可自行拓展其他TTS | 1.0.2 | 2026-05-29 |
 | [cc-claude](./skills/cc-claude/SKILL.md) | 让 Claude Code 支持自定义渠道和大模型选择，核心思路就是套一层脚本写进env再启动claude | 1.0.0 | 2026-06-01 |
+| [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过支持fzf 搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
 
 ## 许可
 
