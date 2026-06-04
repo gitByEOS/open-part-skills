@@ -12,6 +12,8 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 
 ## Skills
 
+[![skills.sh](https://skills.sh/b/gitByEOS/open-part-skills)](https://skills.sh/gitByEOS/open-part-skills)
+
 | 技能 | 说明 | 版本 | 上次更新 |
 |------|------|------|----------|
 | [webfetch-plus](./skills/webfetch-plus/SKILL.md) | 使用 Browser 抓取普通 WebFetch 失败的网页，输出适合大模型阅读的正文文本 | 1.0.3 | 2026-05-19 |
