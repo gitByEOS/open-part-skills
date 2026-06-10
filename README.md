@@ -28,6 +28,12 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.0 | 2026-06-04 |
 | [mock-ollama](./skills/mock-ollama/SKILL.md) | 启动 mock-ollama 服务，模拟 Ollama API 代理到真实 LLM，监控请求响应数据并提供 Dashboard | 1.0.0 | 2026-06-09 |
 
+## MCPs
+
+| 服务 | 说明 | 如何使用 |
+|------|------|------|
+| [agents-chat-mcp](https://github.com/gitByEOS/agents-chat-room) | 把 Agent 接入聊天室，从而实现跨设备、跨项目协作的最小架构 |[文档](https://github.com/gitByEOS/agents-chat-room#readme) |
+
 ## 许可
 
 MIT
