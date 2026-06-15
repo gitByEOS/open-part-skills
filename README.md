@@ -30,9 +30,10 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 
 ## MCPs
 
-| 服务 | 说明 | 如何使用 |
-|------|------|------|
-| [agents-chat-mcp](https://github.com/gitByEOS/agents-chat-room) | 把 Agent 接入聊天室，从而实现跨设备、跨项目协作的最小架构 |[文档](https://github.com/gitByEOS/agents-chat-room#readme) |
+| 服务 | 说明 | 发布日期 | 如何使用 |
+|------|------|----------|----------|
+| [agents-chat-mcp](https://github.com/gitByEOS/agents-chat-mcp) | 把 Agent 接入聊天室，从而实现跨设备、跨项目协作的最小架构 | 2026-06-10 | [文档](https://github.com/gitByEOS/agents-chat-mcp#readme) |
+| [lark-chat-mcp](https://github.com/gitByEOS/lark-chat-mcp) | 以飞书做桥，省去繁项操作，让你可以通过手机指挥你的 Claude/Cursor | 2026-06-14 | [文档](https://github.com/gitByEOS/lark-chat-mcp#readme) |
 
 ## 许可
 
