@@ -25,7 +25,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [blog-narrator](./skills/blog-narrator/SKILL.md) | 把博客 Markdown 导出为带语音逐行披露演示 HTML，支持Edge TTS，可自行拓展其他TTS | 1.0.2 | 2026-05-29 |
 | [cc-claude](./skills/cc-claude/SKILL.md) | 让 Claude Code 支持自定义渠道和大模型选择; 已经迁移到 [gitByEOS/Clash](https://github.com/gitByEOS/Clash) | 1.0.0 | 2026-06-01 |
 | [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过 fzf 支持搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
-| [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.0 | 2026-06-04 |
+| [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.2 | 2026-06-15 |
 | [mock-ollama](./skills/mock-ollama/SKILL.md) | 启动 mock-ollama 服务，模拟 Ollama API 代理到真实 LLM，监控请求响应数据并提供 Dashboard | 1.0.0 | 2026-06-09 |
 
 ## MCPs

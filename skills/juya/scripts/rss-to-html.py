@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 import html as html_mod
 
-RSS_URL = "https://imjuya.github.io/juya-ai-daily/rss.xml"
+RSS_URL = "https://daily.juya.uk/rss.xml"
 
 # 字体栈
 FONT_BODY = "'Noto Serif CJK SC', 'Source Han Serif SC', 'Songti SC', 'STSong', 'SimSun', serif"
@@ -303,12 +303,15 @@ def section_css():
     }}
 
     .section-body li {{
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
       padding: 10px 14px;
       margin: 6px 0;
       background: #faf7f0;
       border-left: 3px solid #d4c5a9;
       border-radius: 0 3px 3px 0;
-      line-height: 1.9;
+      line-height: 1.75;
       transition: background 0.15s;
     }}
 
@@ -318,14 +321,62 @@ def section_css():
 
     .section-body li::before {{
       content: "◆";
+      flex-shrink: 0;
       color: #b5443a;
-      font-size: 0.45em;
-      vertical-align: middle;
-      margin-right: 10px;
+      font-size: 0.5em;
+      line-height: 1;
+      transform: translateY(-0.08em);
     }}
 
     .section-body li a {{
       font-weight: 600;
+    }}
+
+    .section-body ul.ref-links {{
+      list-style: none;
+      padding: 12px 16px;
+      margin: 16px 0;
+      background: #faf7f0;
+      border-left: 3px solid #d4c5a9;
+      border-radius: 0 3px 3px 0;
+    }}
+
+    .section-body ul.ref-links li {{
+      display: block;
+      padding: 5px 0;
+      margin: 0;
+      background: none;
+      border: none;
+      border-radius: 0;
+      line-height: 1.7;
+    }}
+
+    .section-body ul.ref-links li::before {{
+      content: none;
+      display: none;
+    }}
+
+    .section-body ul.ref-links li:hover {{
+      background: none;
+    }}
+
+    .section-body ul.ref-links a {{
+      font-weight: normal;
+      word-break: break-all;
+    }}
+
+    .section-body p.ref-link {{
+      margin: 12px 0;
+      padding: 10px 14px;
+      background: #faf7f0;
+      border-left: 3px solid #d4c5a9;
+      border-radius: 0 3px 3px 0;
+      line-height: 1.7;
+    }}
+
+    .section-body p.ref-link a {{
+      word-break: break-all;
+      font-weight: normal;
     }}
 
     .section-body code {{
@@ -492,20 +543,103 @@ def render_section(section_title, section_body, idx):
     """
 
 
-def render_footer():
+def render_footer(source_label="橘鸦Juya AI早报 RSS", source_link=RSS_URL, source_link_text="RSS订阅"):
     return f"""
   <div class="footer">
     <p class="footer-quote">本页面由 <a href="https://github.com/gitByEOS/open-part-skills" target="_blank">EOS.juya skill</a> 生成</p>
     <p class="footer-info">
-      来源：橘鸦Juya AI早报 RSS |
+      来源：{source_label} |
       <a href="https://space.bilibili.com/285286947">B站主页</a> |
-      <a href="{html_mod.escape(RSS_URL)}">RSS订阅</a>
+      <a href="{html_mod.escape(source_link)}">{source_link_text}</a>
     </p>
     <p class="footer-info" style="margin-top:8px; font-size:0.78em;">
       内容由AI辅助创作，可能存在幻觉和错误，请以原始出处为准
     </p>
   </div>
     """
+
+
+def render_toc_script():
+    return """
+  <script>
+  (function() {
+    var links = document.querySelectorAll('.toc-link');
+    var blocks = document.querySelectorAll('.section-block');
+    var bar = document.querySelector('.toc-inner');
+
+    if (!links.length || !bar) return;
+
+    links.forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      });
+    });
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var idx = entry.target.id.split('-')[1];
+        var link = document.querySelector('.toc-link[href="#section-' + idx + '"]');
+        if (!link) return;
+        if (entry.isIntersecting) {
+          links.forEach(function(l) { l.classList.remove('active'); });
+          link.classList.add('active');
+          link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      });
+    }, { rootMargin: '-56px 0px -60% 0px', threshold: 0 });
+
+    blocks.forEach(function(block) { observer.observe(block); });
+  })();
+  </script>
+    """
+
+
+def render_item_html(item_xml, source_label=None, source_link=None, source_link_text=None):
+    """将单个 RSS item XML 渲染为早茶风格 HTML 全文"""
+    if source_label is None:
+        source_label = "橘鸦Juya AI早报 RSS"
+        source_link = RSS_URL
+        source_link_text = "RSS订阅"
+
+    title, issue_no, html_content, date_str = extract_item_fields(item_xml)
+    if not date_str:
+        date_str = datetime.now().strftime('%Y-%m-%d')
+
+    sections = parse_sections(html_content)
+    if len(sections) > 1:
+        sections = sections[1:]
+
+    toc_items = ""
+    for idx, (sec_title, _) in enumerate(sections):
+        toc_items += f'<a class="toc-link" href="#section-{idx}">{sec_title}</a>\n'
+
+    body_parts = [render_cover(title, date_str, issue_no)]
+    body_parts.append(
+        f'<div class="toc-bar"><div class="toc-inner">'
+        f'<a class="toc-brand" href="https://github.com/gitByEOS/open-part-skills" target="_blank">EOS.Skill</a>'
+        f'<span class="toc-divider">│</span>{toc_items}</div></div>'
+    )
+    body_parts.append('<div class="sections-wrapper">')
+    for idx, (sec_title, sec_body) in enumerate(sections):
+        body_parts.append(render_section(sec_title, sec_body, idx))
+    body_parts.append('</div>')
+    body_parts.append(render_footer(source_label, source_link, source_link_text))
+    body_parts.append(render_toc_script())
+
+    return f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>橘鸦AI早报 {date_str}</title>
+  <style>
+    {section_css()}
+  </style>
+</head>
+<body>
+  {''.join(body_parts)}
+</body>
+</html>"""
 
 
 def find_item_by_date(rss_content, target_date):
@@ -575,85 +709,11 @@ def main():
             sys.exit(1)
         item_xml = item_match.group(1)
 
-    title, issue_no, html_content, date_str = extract_item_fields(item_xml)
+    _, _, _, date_str = extract_item_fields(item_xml)
     if not date_str:
         date_str = datetime.now().strftime('%Y-%m-%d')
 
-    # 切分章节
-    sections = parse_sections(html_content)
-
-    # 去掉第一个 section（intro 内容已在 cover 中展示，避免重复）
-    if len(sections) > 1:
-        sections = sections[1:]
-
-    # 构建 TOC 条目
-    toc_items = ""
-    for idx, (sec_title, _) in enumerate(sections):
-        toc_items += f'<a class="toc-link" href="#section-{idx}">{sec_title}</a>\n'
-
-    # 构建 body
-    body_parts = [render_cover(title, date_str, issue_no)]
-    body_parts.append(f'<div class="toc-bar"><div class="toc-inner"><a class="toc-brand" href="https://github.com/gitByEOS/open-part-skills" target="_blank">EOS.Skill</a><span class="toc-divider">│</span>{toc_items}</div></div>')
-
-    body_parts.append('<div class="sections-wrapper">')
-    for idx, (sec_title, sec_body) in enumerate(sections):
-        body_parts.append(render_section(sec_title, sec_body, idx))
-    body_parts.append('</div>')
-
-    body_parts.append(render_footer())
-
-    # TOC 自动跟随滚动脚本
-    js_toc = """
-  <script>
-  (function() {
-    var links = document.querySelectorAll('.toc-link');
-    var blocks = document.querySelectorAll('.section-block');
-    var bar = document.querySelector('.toc-inner');
-
-    if (!links.length || !bar) return;
-
-    // 点击 TOC 链接时自动水平滚动到可视区域
-    links.forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      });
-    });
-
-    // IntersectionObserver 高亮当前可见 section
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        var idx = entry.target.id.split('-')[1];
-        var link = document.querySelector('.toc-link[href="#section-' + idx + '"]');
-        if (!link) return;
-        if (entry.isIntersecting) {
-          links.forEach(function(l) { l.classList.remove('active'); });
-          link.classList.add('active');
-          // 自动将 active TOC link 滚动到可视区域
-          link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }
-      });
-    }, { rootMargin: '-56px 0px -60% 0px', threshold: 0 });
-
-    blocks.forEach(function(block) { observer.observe(block); });
-  })();
-  </script>
-    """
-    body_parts.append(js_toc)
-
-    full_html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>橘鸦AI早报 {date_str}</title>
-  <style>
-    {section_css()}
-  </style>
-</head>
-<body>
-  {''.join(body_parts)}
-</body>
-</html>"""
+    full_html = render_item_html(item_xml)
 
     output_file = os.path.join(output_dir, f"juya-{date_str}.html")
     with open(output_file, 'w', encoding='utf-8') as f:
