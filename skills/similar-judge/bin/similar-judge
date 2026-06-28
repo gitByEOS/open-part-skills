@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+# similar-judge：调 git word-diff 拿差异原文，python 算行/词级相似度并序列化
+# 用法: similar-judge <产物> <目标> [--text]
+#   默认输出 JSON（供 agent 消费）
+#   --text 输出人类可读文本（调试用）
+set -u
+
+usage() {
+  cat >&2 <<EOF
+用法: similar-judge <产物> <目标> [--text]
+  默认输出 JSON（供 agent 消费）
+  --text 输出人类可读文本（调试用）
+EOF
+}
+
+mode="json"
+product=""
+target=""
+
+for arg in "$@"; do
+  case "$arg" in
+    --text) mode="text" ;;
+    -h|--help) usage; exit 0 ;;
+    -*)
+      usage
+      exit 1
+      ;;
+    *)
+      if [ -z "$product" ]; then
+        product="$arg"
+      elif [ -z "$target" ]; then
+        target="$arg"
+      else
+        usage
+        exit 1
+      fi
+      ;;
+  esac
+done
+
+if [ -z "$product" ] || [ -z "$target" ]; then
+  usage
+  exit 1
+fi
+
+# git diff --no-index: 旧在前 (target=基准), 新在后 (product=对照)
+# 默认 -w 忽略空白差异（行尾空格、缩进变动），只关注内容差异
+# 退出码: 0=相同, 1=有差异(正常), 128+ =错误
+rc=0
+diff_text=$(git diff --no-index --word-diff --color=never -w -- "$target" "$product" 2>&1) || rc=$?
+if [ "$rc" -gt 1 ]; then
+  printf '%s\n' "$diff_text" >&2
+  exit "$rc"
+fi
+
+# numstat 行格式: <added> <deleted> <path>，同步 -w 保持口径一致
+numstat=$(git diff --no-index --numstat -w -- "$target" "$product" 2>/dev/null | head -n1) || true
+added=$(printf '%s' "$numstat" | awk '{print $1}')
+deleted=$(printf '%s' "$numstat" | awk '{print $2}')
+[ -z "$added" ] && added=0
+[ -z "$deleted" ] && deleted=0
+
+# diff 原文经 stdin 喂给 python，python 代码用 -c 单引号内嵌（python 内部字符串全用双引号）
+# 参数顺序：先产物，后目标，与入口一致
+printf '%s' "$diff_text" | python3 -c '
+import sys, json, re, difflib
+
+_WORD_RE = re.compile(r"\w+|\W+", re.UNICODE)
+_HEADER_PREFIXES = ("diff --git ", "index ", "--- a/", "--- /dev/null", "+++ b/", "+++ /dev/null", "@@ ")
+
+def strip_header(text):
+    return "\n".join(line for line in text.splitlines() if not line.startswith(_HEADER_PREFIXES))
+
+def normalize_ws(text):
+    """规整化空白：每行连续空白压缩成单空格并 strip，与 git -w 口径对齐"""
+    return "\n".join(re.sub(r"\s+", " ", line).strip() for line in text.splitlines())
+
+def line_ratio(a, b):
+    return difflib.SequenceMatcher(None, a.splitlines(), b.splitlines(), autojunk=False).ratio()
+
+def word_ratio(a, b):
+    # 词切分后过滤纯空白 token，忽略空白差异
+    ta = [t for t in _WORD_RE.findall(a) if not t.isspace()]
+    tb = [t for t in _WORD_RE.findall(b) if not t.isspace()]
+    return difflib.SequenceMatcher(None, ta, tb, autojunk=False).ratio()
+
+product_path, target_path, added_s, deleted_s, mode = sys.argv[1:6]
+added = int(added_s)
+deleted = int(deleted_s)
+
+with open(target_path, encoding="utf-8") as f:
+    target_text = f.read()
+with open(product_path, encoding="utf-8") as f:
+    product_text = f.read()
+
+# 规整化空白后算 ratio，与 git -w 默认口径对齐
+target_norm = normalize_ws(target_text)
+product_norm = normalize_ws(product_text)
+
+diff_text = strip_header(sys.stdin.read())
+line_sim = line_ratio(target_norm, product_norm)
+word_sim = word_ratio(target_norm, product_norm)
+target_lines = len(target_text.splitlines())
+product_lines = len(product_text.splitlines())
+diff_chars = len(diff_text)
+
+if mode == "text":
+    print(f"line_sim_ratio: {line_sim:.4f} | word_sim_ratio: {word_sim:.4f} | target: {target_lines} | product: {product_lines} | added: {added} | deleted: {deleted} | diff_chars: {diff_chars}")
+    print()
+    sys.stdout.write(diff_text.rstrip("\n") + "\n")
+else:
+    out = {
+        "line_sim_ratio": round(line_sim, 4),
+        "word_sim_ratio": round(word_sim, 4),
+        "target_lines": target_lines,
+        "product_lines": product_lines,
+        "added_lines": added,
+        "deleted_lines": deleted,
+        "diff_chars": diff_chars,
+        "diff": diff_text,
+    }
+    print(json.dumps(out, ensure_ascii=False, indent=2))
+' "$product" "$target" "$added" "$deleted" "$mode"

@@ -30,6 +30,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [fetch-what-say](./skills/fetch-what-say/SKILL.md) |把网站媒体或本地视频，提取文本内容并生成摘要 | 1.0.0 | 2026-06-20 |
 | [holiday-of-12306](./skills/holiday-of-12306/SKILL.md) | 生成全年 12306 节假日抢票日历，又忘记抢票了！使用 Skill 一次性解决掉 | 1.0.0 | 2026-06-21 |
 | [voice-clone](./skills/voice-clone/SKILL.md) | 使用 Confucius4-TTS Gradio API 做参考音色克隆和文本转语音 | 1.0.0 | 2026-06-23 |
+| [similar-judge](./skills/similar-judge/SKILL.md) | 对比两份文本差异，输出相似度与词级差异 JSON，供 agent 程序化量化产物与目标的文本差距，可以用来循环迭代提示词 | 1.0.0 | 2026-06-28 |
 
 ## MCPs
 
