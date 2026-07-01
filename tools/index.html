@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EOS.在线工具箱</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-bg: #e4e6ea;
+      --sidebar-bg-deep: #d8dbe0;
+      --sidebar-border: #c4c9d1;
+      --sidebar-text: #3d4349;
+      --sidebar-text-dim: #6b7280;
+      --sidebar-hover: rgba(255, 255, 255, 0.55);
+      --sidebar-active-bg: #e9eaef;
+      --sidebar-active-text: #4338ca;
+      --sidebar-accent: #6366f1;
+      --content-bg: #0e0e11;
+    }
+    body { height: 100vh; margin: 0; overflow: hidden; background: var(--content-bg); }
+    .sidebar {
+      height: 100vh;
+      width: 180px;
+      min-width: 180px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: "kern";
+      background:
+        linear-gradient(165deg, #eceef1 0%, var(--sidebar-bg) 38%, var(--sidebar-bg-deep) 100%);
+      border-right: none;
+      box-shadow: 4px 0 24px rgba(15, 23, 42, 0.06);
+      transition: width 0.28s cubic-bezier(0.22, 0.9, 0.28, 1), min-width 0.28s cubic-bezier(0.22, 0.9, 0.28, 1), border-color 0.18s ease, box-shadow 0.28s ease;
+    }
+    .sidebar.collapsed { width: 0; min-width: 0; box-shadow: none; }
+    .sidebar-header {
+      position: relative;
+      z-index: 3;
+      width: 180px;
+      min-width: 180px;
+      height: 48px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      border-bottom: none;
+      background: transparent;
+      overflow: hidden;
+      flex-shrink: 0;
+      filter: drop-shadow(0 6px 10px rgba(30, 27, 75, 0.28));
+    }
+    .sidebar-header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 0 2px,
+        radial-gradient(circle at 50% 130%, rgba(99, 102, 241, 0.35), transparent 60%),
+        linear-gradient(135deg, #1e1b4b 0%, #312e81 52%, #1e1b4b 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .sidebar-header > * {
+      position: relative;
+      z-index: 2;
+    }
+    .sidebar-brand-icon {
+      filter: drop-shadow(0 1px 6px rgba(99, 102, 241, 0.55));
+    }
+    .sidebar-header-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+      color: #f8fafc;
+      text-shadow: 0 2px 16px rgba(99, 102, 241, 0.5);
+    }
+    .sidebar-header-title .brand-mark {
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      font-family: "SF Pro Display", "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: #f8fafc;
+    }
+    .sidebar-header-title,
+    .sidebar-nav-wrap {
+      transition: opacity 0.18s ease, transform 0.24s cubic-bezier(0.22, 0.9, 0.28, 1);
+      white-space: nowrap;
+    }
+    .sidebar-nav-wrap {
+      position: relative;
+      z-index: 1;
+      width: 180px;
+      min-width: 180px;
+      flex: 1;
+      min-height: 0;
+      margin-top: -1px;
+      padding: 0 0 48px;
+      background: linear-gradient(180deg, #dcdee3 0%, var(--sidebar-bg) 14px, var(--sidebar-bg) 100%);
+      border-right: 1px solid var(--sidebar-border);
+      box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
+    }
+    .sidebar-nav-wrap::before {
+      content: "";
+      position: absolute;
+      top: -8px;
+      left: 0;
+      right: 0;
+      height: 20px;
+      pointer-events: none;
+      z-index: 1;
+      background: linear-gradient(
+        180deg,
+        rgba(30, 27, 75, 0.26) 0%,
+        rgba(30, 27, 75, 0.12) 38%,
+        rgba(15, 23, 42, 0.04) 72%,
+        transparent 100%
+      );
+    }
+    .sidebar-nav-wrap .nav {
+      position: relative;
+      z-index: 0;
+    }
+    .sidebar.collapsed .sidebar-header-title,
+    .sidebar.collapsed .sidebar-nav-wrap {
+      opacity: 0;
+      transform: translateX(-12px);
+      pointer-events: none;
+    }
+    .sidebar-toggle {
+      position: fixed;
+      left: 8px;
+      bottom: 10px;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      border: 1px solid var(--sidebar-border);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #f5f6f8 0%, #dfe2e8 100%);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+    }
+    .sidebar-toggle:hover {
+      background: linear-gradient(180deg, #fafbfc 0%, #e8ebf0 100%);
+      border-color: #b8bec8;
+    }
+    .sidebar-toggle-icon { width: 18px; height: 18px; display: block; transition: transform 0.18s ease, opacity 0.18s ease; opacity: 0.72; }
+    .sidebar-toggle-open-icon { transform: rotate(90deg); }
+    .sidebar-toggle-home-icon { display: none; }
+    .sidebar.collapsed .sidebar-toggle {
+      left: 8px;
+      bottom: 10px;
+      z-index: 10;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+    .sidebar.collapsed .sidebar-toggle-open-icon { display: none; }
+    .sidebar.collapsed .sidebar-toggle-home-icon { width: 24px; height: 24px; display: block; }
+    .sidebar .nav-link {
+      cursor: pointer;
+      padding: 10px 14px;
+      border-radius: 0;
+      margin-bottom: 0;
+      transition: background 0.15s ease, color 0.15s ease;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--sidebar-text);
+      font-weight: 500;
+      border: none;
+      border-bottom: 1px solid rgba(196, 201, 209, 0.35);
+      text-decoration: none;
+    }
+    .sidebar .nav-link:hover {
+      background: rgba(255, 255, 255, 0.45);
+      color: var(--sidebar-text);
+    }
+    .sidebar .nav-link.active {
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.14) 0%, rgba(99, 102, 241, 0.05) 42%, var(--sidebar-active-bg) 100%);
+      color: var(--sidebar-active-text);
+      font-weight: 600;
+      border-bottom-color: rgba(196, 201, 209, 0.35);
+      box-shadow: inset 3px 0 0 var(--sidebar-accent);
+    }
+    .content-area {
+      height: 100vh;
+      overflow: hidden !important;
+      padding: 0;
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      background: var(--content-bg);
+    }
+    .tab-content {
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      height: 100%;
+      overflow: hidden !important;
+      background: var(--content-bg);
+    }
+    .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
+    .tab-content iframe { width: 100%; height: 100%; border: none; display: block; background: var(--content-bg); }
+  </style>
+</head>
+<body>
+  <div class="d-flex" style="width: 100%; height: 100vh; overflow: hidden;">
+    <div class="sidebar d-flex flex-column">
+      <div class="sidebar-header">
+        <img src="res/icons/tool.svg" width="24" height="24" class="sidebar-brand-icon me-2" alt="">
+        <h5 class="sidebar-header-title"><span class="brand-mark">EOS.</span>工具箱</h5>
+      </div>
+      <div class="sidebar-nav-wrap flex-grow-1 overflow-auto">
+        <nav class="nav flex-column" id="tool-nav"></nav>
+      </div>
+      <button id="sidebar-toggle" class="sidebar-toggle" type="button" title="收起侧边栏" aria-label="收起侧边栏">
+        <img class="sidebar-toggle-icon sidebar-toggle-open-icon" src="res/icons/menu_pos.png" alt="">
+        <img class="sidebar-toggle-icon sidebar-toggle-home-icon" src="res/icons/tool.svg" alt="">
+      </button>
+    </div>
+    <div class="content-area" id="tool-panels"></div>
+  </div>
+
+  <script>
+    // 新增工具：在此追加一项即可出现在侧边栏
+    const TOOLS = [
+      { id: 'emoj', label: 'EMOJ 大全', path: 'emoj/index.html' },
+      { id: 'video-compressor', label: '视频压缩', path: 'video-compressor/index.html' }
+    ];
+
+    function resolveToolPath(rel) {
+      let path = location.pathname;
+      if (!path.endsWith('/')) {
+        path = path.endsWith('.html')
+          ? path.slice(0, path.lastIndexOf('/') + 1)
+          : path + '/';
+      }
+      return new URL(rel, location.origin + path).href;
+    }
+
+    function loadTabIframe(content) {
+      const iframe = content.querySelector('iframe');
+      if (!iframe) return;
+      const pending = iframe.getAttribute('data-src');
+      if (!pending) return;
+      iframe.src = resolveToolPath(pending);
+      iframe.removeAttribute('data-src');
+    }
+
+    function buildShell() {
+      const nav = document.getElementById('tool-nav');
+      const panels = document.getElementById('tool-panels');
+      TOOLS.forEach((tool, index) => {
+        const link = document.createElement('a');
+        link.className = 'nav-link' + (index === 0 ? ' active' : '');
+        link.href = '#' + tool.id;
+        link.setAttribute('data-tab', tool.id);
+        link.textContent = tool.label;
+        nav.appendChild(link);
+
+        const panel = document.createElement('div');
+        panel.id = tool.id;
+        panel.className = 'tab-content' + (index === 0 ? ' active' : '');
+        panel.innerHTML = '<iframe data-src="' + tool.path + '"></iframe>';
+        panels.appendChild(panel);
+      });
+      loadTabIframe(panels.querySelector('.tab-content.active'));
+    }
+
+    buildShell();
+  </script>
+  <script src="js/ui-utils.js"></script>
+  <script>
+    UIUtils.initTabs();
+
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+
+    function updateSidebarToggle() {
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      const title = isCollapsed ? '展开侧边栏' : '收起侧边栏';
+      sidebarToggle.title = title;
+      sidebarToggle.setAttribute('aria-label', title);
+      sidebarToggle.setAttribute('aria-pressed', isCollapsed ? 'true' : 'false');
+    }
+
+    sidebarToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('collapsed');
+      updateSidebarToggle();
+    });
+    updateSidebarToggle();
+  </script>
+</body>
+</html>

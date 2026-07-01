@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp" />
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
+    <title>视频压缩</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg: #0e0e11;
+        --surface: #1a1a20;
+        --surface-hover: #222228;
+        --border: #2a2a32;
+        --border-active: #4a4a58;
+        --text: #e8e8ed;
+        --text-dim: #888890;
+        --accent: #6c5ce7;
+        --accent-hover: #7c6cf7;
+        --success: #2ecc71;
+        --warning: #f39c12;
+        --radius: 12px;
+        --radius-sm: 8px;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        min-height: 100vh;
+      }
+
+      .page-shell {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 32px 24px 80px;
+      }
+
+      /* Header */
+      .app-header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .app-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .app-header .subtitle {
+        font-size: 14px;
+        color: var(--text-dim);
+      }
+
+      /* Controls */
+      .control-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .control-grid {
+        display: flex;
+        gap: 16px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 140px;
+      }
+      .field span {
+        font-size: 12px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .field select, .field input {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 12px;
+        border-radius: var(--radius-sm);
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .field select:focus, .field input:focus {
+        border-color: var(--accent);
+      }
+
+      /* Drop zone */
+      .drop-zone {
+        background: var(--surface);
+        border: 2px dashed var(--border);
+        border-radius: var(--radius);
+        padding: 48px 24px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 20px;
+        position: relative;
+      }
+      .drop-zone:hover, .drop-zone.drag-over {
+        border-color: var(--accent);
+        background: var(--surface-hover);
+      }
+      .drop-zone.drag-over { transform: scale(1.01); }
+      .drop-zone strong { display: block; font-size: 16px; margin-bottom: 4px; }
+      .drop-zone span { font-size: 13px; color: var(--text-dim); }
+      .drop-zone input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      /* File list */
+      .file-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+      .file-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+      }
+      .file-card .file-info { display: flex; flex-direction: column; gap: 4px; }
+      .file-card .file-name {
+        font-weight: 500;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+      }
+      .file-card .file-meta {
+        font-size: 12px;
+        color: var(--text-dim);
+        display: flex;
+        gap: 12px;
+      }
+      .file-card .file-meta .size-before { text-decoration: line-through; }
+      .file-card .file-meta .size-after { color: var(--success); font-weight: 600; }
+      .file-card .file-meta .savings { color: var(--accent); }
+
+      .file-card .progress-wrap {
+        grid-column: 1 / -1;
+        height: 4px;
+        background: var(--bg);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .file-card .progress-bar {
+        height: 100%;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.3s;
+        border-radius: 2px;
+      }
+      @keyframes progress-stripe {
+        from { background-position: 18px 0; }
+        to { background-position: 0 0; }
+      }
+      .file-card .progress-bar.striped {
+        background-image: linear-gradient(
+          -45deg,
+          rgba(255,255,255,0.26) 25%,
+          transparent 25%,
+          transparent 50%,
+          rgba(255,255,255,0.26) 50%,
+          rgba(255,255,255,0.26) 75%,
+          transparent 75%,
+          transparent
+        );
+        background-size: 18px 18px;
+        animation: progress-stripe 0.45s linear infinite;
+      }
+
+      /* Running state highlight */
+      .file-card.card-running {
+        border-color: #3498db55;
+        background: #3498db08;
+      }
+
+      /* Disable remove button during compression */
+      .btn-remove:disabled {
+        opacity: 0.25;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      .file-card .file-actions { display: flex; gap: 8px; }
+
+      .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover { background: var(--accent-hover); }
+      .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+      .btn-sm { padding: 6px 12px; font-size: 12px; }
+      .btn-success { background: var(--accent); color: #fff; }
+      .btn-success:hover { background: var(--accent-hover); }
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+      .btn-outline:hover { background: var(--surface-hover); border-color: var(--border-active); }
+      .btn-remove {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+      }
+      .btn-remove:hover { border-color: #e74c3c; color: #e74c3c; }
+
+      /* Actions bar */
+      .actions-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .actions-bar .count {
+        font-size: 13px;
+        color: var(--text-dim);
+        margin-left: auto;
+      }
+
+      /* Status */
+      .status-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .status-pending { background: var(--border); color: var(--text-dim); }
+      .status-running { background: #3498db22; color: #3498db; }
+      .status-done { background: #3498db22; color: #3498db; }
+      .status-error { background: #e74c3c22; color: #e74c3c; }
+
+      /* Empty state */
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-dim);
+      }
+      .empty-state .icon { font-size: 40px; display: block; margin-bottom: 8px; }
+
+      /* COEP warning */
+      .warning-bar {
+        background: #f39c1222;
+        border: 1px solid #f39c1244;
+        color: var(--warning);
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        font-size: 13px;
+        margin-bottom: 20px;
+        display: none;
+      }
+      .warning-bar a { color: var(--warning); text-decoration: underline; }
+
+      /* Responsive */
+      @media (max-width: 600px) {
+        .page-shell { padding: 20px 16px 60px; }
+        .control-grid { flex-direction: column; }
+        .field { min-width: 100%; }
+        .file-card { grid-template-columns: 1fr; }
+        .file-card .file-actions { justify-content: flex-end; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="app-header">
+        <h1>视频压缩</h1>
+        <p class="subtitle">在本机浏览器实现视频压缩，无任何数据上传</p>
+      </header>
+
+      <div id="warning-bar" class="warning-bar">
+        当前环境未启用多线程隔离，已自动切换为单线程压缩。
+      </div>
+
+      <section class="control-panel">
+        <div class="control-grid">
+          <label class="field" for="quality">
+            <span>质量</span>
+            <select id="quality">
+              <option value="1">网络 (CRF 26)</option>
+              <option value="2" selected>平衡 (CRF 23)</option>
+              <option value="3">高质 (CRF 20)</option>
+              <option value="4">无损 (CRF 18)</option>
+            </select>
+          </label>
+          <label class="field" for="resolution">
+            <span>分辨率</span>
+            <select id="resolution">
+              <option value="480">480p</option>
+              <option value="720">720p</option>
+              <option value="1080" selected>1080p</option>
+              <option value="0">原始</option>
+            </select>
+          </label>
+          <label class="field" for="format">
+            <span>输出格式</span>
+            <select id="format">
+              <option value="mp4" selected>MP4 (H.264)</option>
+              <option value="webm">WebM (VP8)</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <div id="drop-zone" class="drop-zone" role="button" tabindex="0"
+           aria-label="拖拽视频文件到这里或点击选择">
+        <strong>拖入视频文件</strong>
+        <span>支持 MP4, MOV, AVI, MKV, WebM 等格式</span>
+        <input id="file-input" type="file" accept="video/*,.mp4,.mov,.avi,.mkv,.webm,.flv,.wmv" multiple />
+      </div>
+
+      <div id="file-list" class="file-list"></div>
+
+      <div id="actions-bar" class="actions-bar" style="display:none;">
+        <button id="compress-all" class="btn btn-primary" type="button">开始压缩</button>
+        <button id="download-all" class="btn btn-success" type="button" style="display:none;">全部下载</button>
+        <span id="file-count" class="count"></span>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.min.js"></script>
+    <script>
+    (() => {
+      'use strict';
+
+      // --- Worker cross-origin fix ---
+      // COOP/COEP blocks cross-origin Workers. We intercept the constructor
+      // and replace cross-origin URLs with a same-origin Blob URL that
+      // imports the remote script via importScripts (which uses CORS, not COOP).
+      {
+        const OrigWorker = window.Worker;
+        window.Worker = function(url, options) {
+          const href = url?.href || String(url || '');
+          const isCrossOrigin = href.startsWith('http') && !href.startsWith(location.origin);
+          if (isCrossOrigin) {
+            const blob = new Blob(
+              [`importScripts("${href}");`],
+              { type: 'application/javascript' }
+            );
+            url = URL.createObjectURL(blob);
+          }
+          return new OrigWorker(url, options);
+        };
+        window.Worker.prototype = OrigWorker.prototype;
+      }
+
+      const { FFmpeg } = FFmpegWASM;
+
+      // --- COEP check ---
+      // core-mt 在大文件转码时会产生 48B 假输出，固定使用单线程 core。
+      const canUseMultiThread = false;
+      if (!canUseMultiThread) {
+        document.getElementById('warning-bar').style.display = 'block';
+      }
+
+      // --- State ---
+      const files = []; // { id, file, name, size, status, resultBlob, outputExt, error, progress }
+      let compressing = false;
+      let idCounter = 0;
+      const blobURLCache = new Map();
+      const MAX_FFMPEG_THREADS = 3;
+      const MAX_PARALLEL_FILES = 3;
+      const ffmpegThreadCount = canUseMultiThread ? MAX_FFMPEG_THREADS : 1;
+      const parallelFileCount = canUseMultiThread ? MAX_PARALLEL_FILES : 1;
+
+      const $dropZone = document.getElementById('drop-zone');
+      const $fileInput = document.getElementById('file-input');
+      const $fileList = document.getElementById('file-list');
+      const $actionsBar = document.getElementById('actions-bar');
+      const $compressAll = document.getElementById('compress-all');
+      const $downloadAll = document.getElementById('download-all');
+      const $fileCount = document.getElementById('file-count');
+
+      // --- Init FFmpeg ---
+      async function toBlobURL(url, mimeType) {
+        if (blobURLCache.has(url)) return blobURLCache.get(url);
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`资源加载失败: ${url}`);
+        let blob = await response.blob();
+        if (url.endsWith('/ffmpeg-core.js')) {
+          // 上游 core 会对空值调用 startsWith，先在本地 Blob 中修正。
+          const patched = (await blob.text())
+            .replace(
+              'function printErr(message){if(!message.startsWith(',
+              'function printErr(message){message=String(message||"");if(!message.startsWith('
+            )
+            .replace(
+              'catch(e){if(!e.message.startsWith("Aborted")){throw e}}',
+              'catch(e){var message=String(e&&e.message||e||"");if(!message.startsWith("Aborted")){throw e}}'
+            )
+            .replace(
+              'function isDataURI(filename){return filename.startsWith(dataURIPrefix)}',
+              'function isDataURI(filename){filename=String(filename||"");return filename.startsWith(dataURIPrefix)}'
+            )
+            .replace(
+              'function isFileURI(filename){return filename.startsWith("file://")}',
+              'function isFileURI(filename){filename=String(filename||"");return filename.startsWith("file://")}'
+            );
+          blob = new Blob([patched], { type: mimeType });
+        }
+        const blobURL = URL.createObjectURL(new Blob([blob], { type: mimeType }));
+        blobURLCache.set(url, blobURL);
+        return blobURL;
+      }
+
+      async function createFFmpeg() {
+        const ffmpeg = new FFmpeg();
+        const packageName = canUseMultiThread ? 'core-mt' : 'core';
+        const baseURL = `https://cdn.jsdelivr.net/npm/@ffmpeg/${packageName}@0.12.6/dist/umd`;
+        const options = {
+          coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+          wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+        };
+        if (canUseMultiThread) {
+          options.workerURL = await toBlobURL(`${baseURL}/ffmpeg-core.worker.js`, 'text/javascript');
+        }
+        await ffmpeg.load(options);
+        return ffmpeg;
+      }
+
+      // --- Parse FFmpeg log for frame progress ---
+      function parseFrameTime(line) {
+        const m = line.match(/frame=\s*(\d+)/);
+        if (!m) return null;
+        return parseInt(m[1]);
+      }
+
+      // --- File handling ---
+      function addFiles(fileList) {
+        for (const f of fileList) {
+          if (!f.type.startsWith('video/') && !/\.(mp4|mov|avi|mkv|webm|flv|wmv)$/i.test(f.name)) continue;
+          const id = ++idCounter;
+          files.push({ id, file: f, name: f.name, size: f.size, status: 'pending', resultBlob: null, outputExt: null, error: null, progress: 0, totalFrames: 0 });
+        }
+        renderList();
+      }
+
+      function removeFile(id) {
+        if (compressing) return;
+        const idx = files.findIndex(f => f.id === id);
+        if (idx !== -1) files.splice(idx, 1);
+        renderList();
+      }
+
+      // --- Drop zone ---
+      let dragDepth = 0;
+      function isFileDrag(e) {
+        return Array.from(e.dataTransfer?.types || []).includes('Files');
+      }
+      function setPageDragOver(active) {
+        $dropZone.classList.toggle('drag-over', active);
+      }
+      document.addEventListener('dragenter', e => {
+        if (!isFileDrag(e)) return;
+        e.preventDefault();
+        dragDepth++;
+        setPageDragOver(true);
+      });
+      document.addEventListener('dragover', e => {
+        if (!isFileDrag(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      });
+      document.addEventListener('dragleave', e => {
+        if (!isFileDrag(e)) return;
+        dragDepth = Math.max(0, dragDepth - 1);
+        if (dragDepth === 0) setPageDragOver(false);
+      });
+      document.addEventListener('drop', e => {
+        if (!isFileDrag(e)) return;
+        e.preventDefault();
+        dragDepth = 0;
+        setPageDragOver(false);
+        addFiles(e.dataTransfer.files);
+      });
+      $fileInput.addEventListener('change', () => {
+        addFiles($fileInput.files);
+        $fileInput.value = '';
+      });
+
+      // --- Render ---
+      function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1048576).toFixed(1) + ' MB';
+      }
+
+      function renderList() {
+        if (files.length === 0) {
+          $fileList.innerHTML = '';
+          $actionsBar.style.display = 'none';
+          return;
+        }
+
+        $actionsBar.style.display = 'flex';
+        const doneCount = files.filter(f => f.status === 'done').length;
+        $fileCount.textContent = `${doneCount} / ${files.length} 完成`;
+
+        const allDone = doneCount === files.length && files.length > 0;
+        if (allDone) {
+          $downloadAll.style.display = 'inline-block';
+          $compressAll.textContent = '清空列表';
+          $compressAll.className = 'btn btn-outline';
+          $compressAll.disabled = false;
+        } else {
+          $downloadAll.style.display = 'none';
+          $compressAll.textContent = compressing ? '压缩中...' : '开始压缩';
+          $compressAll.className = compressing ? 'btn btn-primary' : 'btn btn-primary';
+        }
+
+        $compressAll.disabled = compressing;
+
+        $fileList.innerHTML = files.map(f => {
+          const isRunning = f.status === 'running';
+          const statusClass = `status-${f.status}`;
+          const statusText = { pending: '等待中', running: '压缩中', done: '已完成', error: '失败' }[f.status];
+          let metaHtml = '';
+          if (f.status === 'done' && f.resultBlob) {
+            const afterSize = f.resultBlob.size;
+            const savings = ((1 - afterSize / f.size) * 100).toFixed(1);
+            metaHtml = `
+              <span class="size-before">${formatSize(f.size)}</span>
+              <span>&rarr;</span>
+              <span class="size-after">${formatSize(afterSize)}</span>
+              <span class="savings">-${savings}%</span>`;
+          } else if (isRunning) {
+            metaHtml = `<span>${f.progress}%</span>`;
+          } else {
+            metaHtml = `<span>${formatSize(f.size)}</span>`;
+          }
+
+          let actionHtml = '';
+          if (f.status === 'done' && f.resultBlob) {
+            actionHtml = `<button class="btn btn-success btn-sm" onclick="window._dl(${f.id})">下载</button>`;
+          } else if (f.status === 'error') {
+            actionHtml = `<span style="color:#e74c3c;font-size:12px;">${f.error || '失败'}</span>`;
+            actionHtml += `<button class="btn btn-remove btn-sm" onclick="window._rm(${f.id})">×</button>`;
+          } else if (f.status === 'pending') {
+            actionHtml = `<button class="btn btn-remove btn-sm" onclick="window._rm(${f.id})">×</button>`;
+          }
+          // running: no remove button
+
+          return `
+            <div class="file-card ${isRunning ? 'card-running' : ''}" id="card-${f.id}">
+              <div class="file-info">
+                <span class="file-name">${f.name}</span>
+                <div class="file-meta">${metaHtml}</div>
+              </div>
+              <div class="file-actions">
+                ${isRunning || f.status === 'error' ? `<span class="status-badge ${statusClass}">${statusText}</span>` : ''}
+                ${actionHtml}
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar ${isRunning ? 'striped' : ''}" id="progress-${f.id}" style="width: ${isRunning && f.progress > 0 ? f.progress + '%' : isRunning ? '10%' : f.status === 'done' ? '100%' : '0%'}"></div>
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      // --- Compress ---
+      // Browser WASM is slower, use faster presets
+      const CRF_MAP = { 1: 26, 2: 23, 3: 20, 4: 18 };
+      const PRESET_MAP = { 1: 'ultrafast', 2: 'superfast', 3: 'veryfast', 4: 'faster' };
+
+      // Update progress bar and meta text in-place (no full re-render)
+      function updateProgress(id, percent) {
+        const item = files.find(f => f.id === id);
+        const bar = document.getElementById(`progress-${id}`);
+        const meta = document.querySelector(`#card-${id} .file-meta`);
+        if (item) item.progress = percent;
+        if (bar) {
+          bar.style.width = percent + '%';
+          // Keep striped animation throughout compression
+        }
+        if (meta) meta.textContent = `${percent}%`;
+      }
+
+      function updateMetaText(id, text) {
+        const meta = document.querySelector(`#card-${id} .file-meta`);
+        if (meta) meta.textContent = text;
+      }
+
+      async function countVideoFrames(ff, inputName, itemId) {
+        let totalFrames = 0;
+        const probeHandler = ({ message }) => {
+          const frame = parseFrameTime(message);
+          if (frame && frame > totalFrames) {
+            totalFrames = frame;
+            updateMetaText(itemId, `统计帧数: ${totalFrames}`);
+          }
+        };
+
+        ff.on('log', probeHandler);
+        try {
+          await ff.exec(['-i', inputName, '-map', '0:v:0', '-c:v', 'copy', '-an', '-f', 'null', '-']);
+          return totalFrames;
+        } finally {
+          ff.off('log', probeHandler);
+        }
+      }
+
+      function getDownloadName(item) {
+        const ext = item.outputExt || 'mp4';
+        const baseName = item.name.replace(/\.[^.]+$/, '');
+        return `${baseName}_compressed.${ext}`;
+      }
+
+      async function compressFile(item) {
+        const itemRef = files.find(f => f.id === item.id);
+        if (!itemRef) return;
+
+        itemRef.status = 'running';
+        itemRef.progress = 0;
+        renderList();
+
+        let ff = null;
+        let logHandler = null;
+
+        try {
+          ff = await createFFmpeg();
+          const inputName = 'input' + item.id;
+          const ext = document.getElementById('format').value;
+          const outputName = `output_${item.id}.${ext}`;
+
+          await ff.writeFile(inputName, new Uint8Array(await itemRef.file.arrayBuffer()));
+
+          updateMetaText(item.id, '统计帧数...');
+          const totalFrames = await countVideoFrames(ff, inputName, item.id);
+          updateProgress(item.id, 0);
+          window._debugLog && window._debugLog(`totalFrames=${totalFrames}`);
+
+          // Step 2: compress, tracking frame progress
+          const quality = document.getElementById('quality').value;
+          const resolution = parseInt(document.getElementById('resolution').value);
+          const crf = CRF_MAP[quality];
+          const preset = PRESET_MAP[quality];
+
+          let args = ['-threads', String(ffmpegThreadCount), '-i', inputName];
+
+          if (resolution > 0) {
+            args.push('-vf', `scale=-2:${resolution}:flags=lanczos`);
+          }
+
+          if (ext === 'webm') {
+            args.push('-c:v', 'libvpx', '-deadline', 'good', '-cpu-used', '4',
+                        '-crf', String(crf), '-b:v', '0',
+                        '-pix_fmt', 'yuv420p', '-c:a', 'libopus');
+          } else {
+            args.push('-c:v', 'libx264', '-profile:v', 'main', '-crf', String(crf),
+                        '-preset', preset, '-pix_fmt', 'yuv420p',
+                        '-movflags', '+faststart', '-c:a', 'aac');
+          }
+
+          args.push('-y', outputName);
+
+          // Track frame progress from FFmpeg log
+          let prevFrame = 0;
+          logHandler = ({ message }) => {
+            const m = message.match(/frame=\s*(\d+)/);
+            if (m) {
+              const frame = parseInt(m[1]);
+              if (frame > prevFrame) {
+                prevFrame = frame;
+                if (totalFrames > 0) {
+                  const pct = Math.min(99, Math.floor((frame / totalFrames) * 100));
+                  updateProgress(item.id, pct);
+                }
+              }
+            }
+          };
+          ff.on('log', logHandler);
+
+          await ff.exec(args);
+
+          const data = await ff.readFile(outputName);
+          const blob = new Blob([data.buffer], { type: `video/${ext === 'webm' ? 'webm' : 'mp4'}` });
+          itemRef.resultBlob = blob;
+          itemRef.outputExt = ext;
+          itemRef.status = 'done';
+          itemRef.progress = 100;
+
+          await ff.deleteFile(inputName).catch(() => {});
+          await ff.deleteFile(outputName).catch(() => {});
+        } catch (err) {
+          const errorMessage = err?.stack || err?.message || String(err);
+          console.error('压缩失败:', errorMessage);
+          itemRef.error = errorMessage.split('\n')[0];
+          itemRef.status = 'error';
+        } finally {
+          if (ff && logHandler) ff.off('log', logHandler);
+          if (ff) ff.terminate();
+        }
+
+        renderList();
+      }
+
+      async function runParallel(items, limit, task) {
+        let nextIndex = 0;
+        const workerCount = Math.min(limit, items.length);
+        const workers = Array.from({ length: workerCount }, async () => {
+          while (nextIndex < items.length) {
+            const current = items[nextIndex++];
+            await task(current);
+          }
+        });
+        await Promise.all(workers);
+      }
+
+      $compressAll.addEventListener('click', async () => {
+        // Check if we're in "clear list" mode (all done)
+        const allDone = files.length > 0 && files.every(f => f.status === 'done');
+        if (allDone) {
+          files.length = 0;
+          renderList();
+          return;
+        }
+
+        const pending = files.filter(f => f.status === 'pending' || f.status === 'error');
+        if (pending.length === 0) return;
+        compressing = true;
+        renderList();
+
+        await runParallel(pending, parallelFileCount, compressFile);
+
+        compressing = false;
+        renderList();
+      });
+
+      $downloadAll.addEventListener('click', () => {
+        const done = files.filter(f => f.status === 'done' && f.resultBlob);
+        for (const f of done) {
+          const url = URL.createObjectURL(f.resultBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = getDownloadName(f);
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      });
+
+      // --- Global handlers for inline buttons ---
+      window._dl = (id) => {
+        const item = files.find(f => f.id === id);
+        if (!item || !item.resultBlob) return;
+        const url = URL.createObjectURL(item.resultBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = getDownloadName(item);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      window._rm = (id) => removeFile(id);
+    })();
+    </script>
+  </body>
+</html>
