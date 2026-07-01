@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'tools/**'
+      - 'skills/**'
       - '.github/workflows/deploy-tools-pages.yml'
   workflow_dispatch:
 
@@ -26,6 +27,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tools/skill-matrix/package-lock.json
+      - name: Build Skills matrix (light)
+        run: npm ci && npm run build
+        working-directory: tools/skill-matrix
       - uses: actions/upload-pages-artifact@v3
         with:
           path: tools

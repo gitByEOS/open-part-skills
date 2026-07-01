@@ -1,0 +1,529 @@
+/* ═══════════════════════════════════════════════
+   theme-light.css - Stripe 金融科技风格
+   ═══════════════════════════════════════════════ */
+
+.theme-light {
+  /* ── Stripe 品牌色 ── */
+  --color-stripe-purple: #533afd;
+  --color-deep-navy: #061b31;
+  --color-pure-white: #ffffff;
+  --color-brand-dark: #1c1e54;
+  --color-dark-navy: #0d253d;
+  --color-ruby: #ea2261;
+  --color-purple-hover: #4434d4;
+  --color-purple-light: #b9b9f9;
+  --color-purple-mid: #665efd;
+  --color-label: #273951;
+  --color-body: #64748d;
+  --color-border: #e5edf5;
+  --color-border-soft: #d6d9fc;
+
+  /* ── 差异化色调 ── */
+  --tint-rule: #273951;
+  --tint-rule-soft: rgba(39, 57, 81, 0.08);
+  --tint-rule-border: rgba(39, 57, 81, 0.18);
+  --tint-skill: #6366f1;
+  --tint-skill-soft: rgba(99, 102, 241, 0.06);
+  --tint-skill-border: rgba(99, 102, 241, 0.18);
+  --tint-soul: #8b5cf6;
+  --tint-soul-secondary: #10b981;
+  --tint-soul-soft: rgba(139, 92, 246, 0.08);
+  --tint-soul-border: rgba(139, 92, 246, 0.25);
+
+  /* ── 通用阴影 ── */
+  --shadow-stripe-blue: rgba(50, 50, 93, 0.25);
+  --shadow-dark-blue: rgba(3, 3, 39, 0.25);
+  --shadow-black: rgba(0, 0, 0, 0.1);
+  --shadow-card:
+    0 4px 6px var(--shadow-black),
+    0 10px 30px var(--shadow-stripe-blue),
+    0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover:
+    0 8px 16px var(--shadow-black),
+    0 20px 50px var(--shadow-stripe-blue),
+    0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-modal:
+    0 20px 60px var(--shadow-dark-blue),
+    0 8px 24px var(--shadow-black);
+  --transition-fast: 200ms ease;
+
+  color: var(--color-body);
+  background: var(--color-pure-white);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    system-ui,
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01" 1;
+}
+
+.theme-light button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* ── Shell ── */
+.theme-light .shell {
+  padding: 16px 32px 72px;
+  background: var(--color-pure-white);
+}
+
+.theme-light .shell::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 240px;
+  content: "";
+  background:
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 0 8px,
+    radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.3), transparent 60%),
+    radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15), transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(124, 58, 237, 0.12), transparent 50%),
+    linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
+  pointer-events: none;
+}
+
+/* ── 魔法光标（隐藏）── */
+.theme-light .pointerGlow,
+.theme-light .magicCursor {
+  display: none;
+}
+
+/* ── Hero ── */
+.theme-light .hero {
+  width: 100%;
+  margin: 0 auto 48px;
+  padding: 48px 24px 0;
+  background: transparent;
+}
+
+.theme-light .hero::before {
+  display: none;
+}
+
+.theme-light .eyebrow {
+  margin: 0 0 16px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.theme-light h1 {
+  margin: 0;
+  font-size: 3.2rem;
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: #f8fafc;
+  text-shadow: 0 2px 20px rgba(99, 102, 241, 0.4);
+}
+
+.theme-light .heroText {
+  max-width: 640px;
+  margin: 24px auto 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.13rem;
+  line-height: 1.6;
+  font-weight: 300;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Card Grid ── */
+.theme-light .cardGrid {
+  gap: 18px;
+  padding: 24px 24px 80px;
+}
+
+/* ── Showcase Card ── */
+.theme-light .showcaseCard {
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-pure-white);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.theme-light .showcaseCard:hover {
+  border-color: var(--color-border-soft);
+  box-shadow: var(--shadow-card-hover);
+  --lift: -4px;
+  --scale: 1.01;
+}
+
+.theme-light .showcaseCard.rule,
+.theme-light .showcaseCard.skill {
+  background: var(--color-pure-white);
+  border-color: var(--color-border);
+}
+
+.theme-light .showcaseCard.soul {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(16, 185, 129, 0.02) 100%);
+  border-color: rgba(139, 92, 246, 0.25);
+  border-width: 1px;
+}
+
+.theme-light .showcaseCard.soul::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 0%, var(--tint-soul-soft), transparent 70%);
+}
+
+/* ── Card Tag ── */
+.theme-light .cardTag {
+  top: 16px;
+  right: -24px;
+  width: 90px;
+  padding: 4px 0;
+  border: none;
+  border-radius: 0;
+  background: var(--color-stripe-purple);
+  color: var(--color-pure-white);
+}
+
+.theme-light .cardTag.hot {
+  background: linear-gradient(135deg, #ea2261, #f97316);
+}
+
+/* 细腻差异化: 所有 new 标签蓝绿渐变 */
+.theme-light .cardTag.new {
+  background: linear-gradient(135deg, #8b5cf6, #10b981);
+}
+
+.theme-light .cardTagSparkle {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.theme-light .cardTag.hot .cardTagSparkle {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Orb ── */
+.theme-light .orb {
+  width: 42px;
+  height: 42px;
+  font-weight: 500;
+  color: var(--color-pure-white);
+  box-shadow: 0 2px 6px rgba(83, 58, 253, 0.2);
+}
+
+.theme-light .orb.rule {
+  background: linear-gradient(135deg, var(--tint-rule), var(--color-dark-navy));
+  border: none;
+}
+
+.theme-light .orb.skill {
+  background: linear-gradient(135deg, var(--tint-skill), var(--color-purple-mid));
+  border: none;
+}
+
+.theme-light .orb.soul {
+  background: var(--tint-soul);
+  border: none;
+}
+
+.theme-light .showcaseCard:hover .orb {
+  transform: scale(1.06);
+}
+
+.theme-light .showcaseCard.rule:hover .orb {
+  box-shadow: 0 4px 12px var(--tint-rule-soft);
+}
+
+.theme-light .showcaseCard.skill:hover .orb {
+  box-shadow: 0 4px 12px var(--tint-skill-soft);
+}
+
+.theme-light .showcaseCard.soul:hover .orb {
+  box-shadow: 0 4px 12px var(--tint-soul-soft);
+}
+
+/* ── Card Header & Body ── */
+.theme-light .cardHeader h2 {
+  font-weight: 400;
+  color: var(--color-deep-navy);
+  letter-spacing: -0.01em;
+}
+
+.theme-light .cardBody {
+  color: var(--color-body);
+  line-height: 1.55;
+}
+
+.theme-light .showcaseCard.rule .cardHeader h2 {
+  color: var(--tint-rule);
+}
+
+.theme-light .showcaseCard.skill .cardHeader h2 {
+  color: var(--tint-skill);
+}
+
+.theme-light .showcaseCard.soul .cardHeader h2 {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #10b981 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 500;
+}
+
+.theme-light .showcaseCard.rule .cardBody {
+  opacity: 0.7;
+}
+
+.theme-light .showcaseCard.skill .cardBody {
+  opacity: 0.85;
+}
+
+.theme-light .showcaseCard.soul .cardBody {
+  opacity: 0.78;
+}
+
+/* ── Buttons by Type ── */
+.theme-light .showcaseCard.rule .magicBtn {
+  background: var(--tint-rule);
+}
+
+.theme-light .showcaseCard.rule .magicBtn:hover {
+  background: var(--color-deep-navy);
+}
+
+.theme-light .showcaseCard.skill .magicBtn {
+  background: var(--tint-skill);
+}
+
+.theme-light .showcaseCard.skill .magicBtn:hover {
+  background: var(--color-stripe-purple);
+}
+
+.theme-light .showcaseCard.soul .magicBtn {
+  background: var(--tint-soul);
+}
+
+.theme-light .showcaseCard.soul .magicBtn:hover {
+  background: var(--tint-soul);
+  opacity: 0.9;
+}
+
+/* ── Code ── */
+.theme-light code {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #f6f9fc;
+  color: var(--color-deep-navy);
+  font-size: 0.72rem;
+}
+
+/* ── Magic Button ── */
+.theme-light .magicBtn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  background: var(--color-stripe-purple);
+  color: var(--color-pure-white);
+  font-size: 0.88rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.theme-light .magicBtn:hover {
+  background: var(--color-purple-hover);
+  transform: translateY(-1px);
+}
+
+.theme-light .magicBtn:active {
+  background: var(--color-purple-hover);
+}
+
+/* ── Modal ── */
+.theme-light .modalBackdrop {
+  backdrop-filter: blur(12px);
+  background: rgba(6, 27, 49, 0.6);
+}
+
+.theme-light .detailModal {
+  gap: 20px;
+  height: 82vh;
+  padding: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-pure-white);
+  box-shadow: var(--shadow-modal);
+}
+
+.theme-light .detailType {
+  border-radius: 8px;
+  padding: 6px 14px;
+  background: rgba(83, 58, 253, 0.08);
+  color: var(--color-stripe-purple);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.theme-light .detailModal.rule .detailType {
+  background: var(--tint-rule-soft);
+  color: var(--tint-rule);
+}
+
+.theme-light .detailModal.skill .detailType {
+  background: var(--tint-skill-soft);
+  color: var(--tint-skill);
+}
+
+.theme-light .detailModal.soul .detailType {
+  background: var(--tint-soul-soft);
+  color: var(--tint-soul);
+}
+
+.theme-light .documentPreview {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: #f6f9fc;
+  scrollbar-color: var(--color-stripe-purple) transparent;
+}
+
+.theme-light .documentPreview code {
+  padding: 20px;
+  border: 0;
+  background: transparent;
+  color: var(--color-deep-navy);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.theme-light .documentPreview::-webkit-scrollbar-thumb {
+  background: var(--color-stripe-purple);
+  opacity: 0.4;
+}
+
+.theme-light .documentPreview::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.theme-light .detailModal.rule .documentPreview::-webkit-scrollbar-thumb {
+  background: var(--tint-rule);
+}
+
+.theme-light .detailModal.skill .documentPreview::-webkit-scrollbar-thumb {
+  background: var(--tint-skill);
+}
+
+.theme-light .detailModal.soul .documentPreview::-webkit-scrollbar-thumb {
+  background: var(--tint-soul);
+}
+
+.theme-light .modalCommand .magicBtn {
+  border: none;
+  padding: 10px 0;
+  background: transparent;
+  color: var(--color-stripe-purple);
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.theme-light .modalCommand .magicBtn:hover {
+  color: var(--color-purple-hover);
+  background: transparent;
+}
+
+.theme-light .detailModal.rule .modalCommand .magicBtn {
+  color: var(--tint-rule);
+}
+
+.theme-light .detailModal.skill .modalCommand .magicBtn {
+  color: var(--tint-skill);
+}
+
+.theme-light .detailModal.soul .modalCommand .magicBtn {
+  color: var(--tint-soul);
+}
+
+.theme-light .closeButton {
+  position: fixed;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .closeButton:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: scale(1.06);
+}
+
+/* ── Menu ── */
+.theme-light .menuButton {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.theme-light .menuPanel {
+  border: 1px solid var(--color-border);
+  background: var(--color-pure-white);
+  box-shadow:
+    0 8px 32px rgba(50, 50, 93, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .menuDivider {
+  background: var(--color-border);
+}
+
+.theme-light .menuItem {
+  background: transparent;
+  color: var(--color-deep-navy);
+}
+
+.theme-light .menuItem:hover:not(.disabled) {
+  background: rgba(83, 58, 253, 0.06);
+}
+
+.theme-light .menuItem.active {
+  background: rgba(83, 58, 253, 0.12);
+  color: var(--color-stripe-purple);
+}
+
+.theme-light .menuItem.disabled {
+  color: var(--color-body);
+  opacity: 0.5;
+}
+
+.theme-light .menuItemValue {
+  color: var(--color-stripe-purple);
+}
+
+/* ── Responsive ── */
+@media (max-width: 620px) {
+  .theme-light .shell {
+    padding: 0;
+  }
+
+  .theme-light .hero {
+    padding: 80px 20px 50px;
+  }
+
+  .theme-light .cardGrid {
+    padding: 0 16px 60px;
+  }
+
+  .theme-light .showcaseCard {
+    min-height: 280px;
+  }
+
+  .theme-light .detailModal {
+    padding: 20px;
+  }
+}

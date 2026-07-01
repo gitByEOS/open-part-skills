@@ -1,0 +1,473 @@
+/* ═══════════════════════════════════════════════
+   base.css - 共享布局和结构
+   ═══════════════════════════════════════════════ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+.modalOpen body {
+  overflow: hidden;
+}
+
+button {
+  color: inherit;
+  font: inherit;
+}
+
+.shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.hero,
+.cardGrid {
+  position: relative;
+  z-index: 1;
+}
+
+.hero {
+  text-align: center;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  width: min(1160px, 100%);
+  margin: 0 auto;
+}
+
+.showcaseCard {
+  --lift: 0px;
+  --scale: 1;
+  position: relative;
+  display: grid;
+  min-height: 320px;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+  transform: translate3d(0, var(--lift), 0) scale(var(--scale));
+}
+
+.cardTag {
+  position: absolute;
+  top: 14px;
+  right: -28px;
+  z-index: 99;
+  width: 96px;
+  padding: 5px 0;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(45deg);
+}
+
+.cardTagSparkle {
+  position: absolute;
+  font-size: 0.52rem;
+  line-height: 1;
+  transform: translate(-50%, -50%) scale(0);
+  --sparkle-scale: 1.35;
+  animation: newBadgeSparkle 2s ease-in-out infinite;
+}
+
+.cardTagSparkle::before {
+  content: "★";
+}
+
+.cardTagSparkle:nth-of-type(2) { animation-delay: 0.45s; }
+.cardTagSparkle:nth-of-type(3) { animation-delay: 0.9s; }
+.cardTagSparkle:nth-of-type(4) { animation-delay: 1.35s; }
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.showcaseCard.withTag .cardHeader {
+  padding-right: 20px;
+}
+
+.orb {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.9rem;
+  font-weight: 800;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cardHeader h2,
+.detailModal h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.cardBody {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.cardFooter,
+.modalCommand {
+  display: grid;
+  gap: 10px;
+}
+
+code {
+  overflow: hidden;
+  padding: 8px 10px;
+  border-radius: 14px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.magicBtn {
+  border-radius: 999px;
+  padding: 8px 12px;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.magicBtn:active {
+  transform: translateY(0);
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  z-index: 10;
+  place-items: center;
+  padding: 24px;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  animation: fadeIn 160ms ease;
+}
+
+.detailModal {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 16px;
+  width: min(1080px, 94vw);
+  height: 80vh;
+  overflow: hidden;
+  contain: layout paint style;
+  isolation: isolate;
+  border-radius: 30px;
+  animation: bloom 200ms ease;
+}
+
+.detailHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding-right: 72px;
+}
+
+.detailType {
+  display: inline-flex;
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.documentPreview {
+  min-height: 0;
+  margin: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  contain: layout paint style;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 18px;
+  scrollbar-width: thin;
+}
+
+.documentPreview code {
+  display: block;
+  overflow: visible;
+  padding: 18px;
+  border-radius: 0;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  text-overflow: clip;
+  white-space: pre-wrap;
+}
+
+.documentPreview::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.documentPreview::-webkit-scrollbar-track {
+  background: rgba(1, 6, 14, 0.36);
+}
+
+.modalCommand {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-right: 10px;
+}
+
+.modalCommand code {
+  overflow: hidden;
+}
+
+.modalCommand .magicBtn {
+  padding: 8px 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.closeButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  pointer-events: auto;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.closeButton:hover {
+  transform: scale(1.05);
+}
+
+/* ── 菜单 ── */
+.menuWrapper {
+  position: fixed;
+  top: 24px;
+  right: 32px;
+  z-index: 100;
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 8px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.menuButton::before,
+.menuButton::after,
+.menuButton span {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.menuButton:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.menuPanel {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  z-index: 200;
+  min-width: 120px;
+  padding: 3px 0;
+  border-radius: 5px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  animation: menuSlide 200ms ease;
+}
+
+.menuSection {
+  padding: 0;
+}
+
+.menuSectionLabel {
+  padding: 0;
+  margin-bottom: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.menuSectionItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.menuDivider {
+  height: 1px;
+  margin: 2px 0;
+  opacity: 0.15;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: 3px;
+  font-size: 0.76rem;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.menuItem:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menuItem.active {
+  font-weight: 500;
+}
+
+.menuItem.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.menuItemLabel {
+  text-align: center;
+}
+
+.menuItemValue {
+  font-size: 0.70rem;
+  opacity: 0.6;
+}
+
+.menuBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+@keyframes menuSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── 动画 ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes soulBreathe {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes newBadgeSparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(var(--sparkle-scale));
+  }
+}
+
+/* ── 响应式 ── */
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .cardGrid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .showcaseCard {
+    min-height: 260px;
+  }
+
+  .detailModal {
+    width: min(94vw, 1080px);
+    height: 80vh;
+    padding: 18px;
+  }
+
+  .detailHeader {
+    margin-right: 0;
+    padding-right: 52px;
+  }
+
+  .modalCommand {
+    grid-template-columns: 1fr;
+    margin-right: 0;
+  }
+}
