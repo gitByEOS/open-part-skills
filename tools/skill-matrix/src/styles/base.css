@@ -119,7 +119,7 @@ button {
 
 .cardBody {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   font-size: 0.9rem;
 }
 
@@ -447,27 +447,175 @@ code {
 }
 
 @media (max-width: 620px) {
+  .hero {
+    padding-inline: 16px;
+  }
+
   .cardGrid {
-    grid-template-columns: 1fr;
+    --tile-cols: 2;
+    --tile-gap: 8px;
+    --tile-pad: 10px;
+    --tile-w: calc(
+      (100vw - var(--tile-pad) * 2 - var(--tile-gap) * (var(--tile-cols) - 1)) / var(--tile-cols)
+    );
+    /* 高/宽：过小显扁，过大显瘦（含命令行+按钮） */
+    --tile-ar-min: 1.28;
+    --tile-ar-max: 1.52;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--tile-gap);
+    width: 100%;
+    padding-inline: var(--tile-pad);
   }
 
   .showcaseCard {
-    min-height: 260px;
+    display: grid;
+    width: 100%;
+    min-height: calc(var(--tile-w) * var(--tile-ar-min));
+    max-height: calc(var(--tile-w) * var(--tile-ar-max));
+    padding: 12px;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    overflow: hidden;
+  }
+
+  .showcaseCard.withTag .cardHeader {
+    padding-right: 12px;
+  }
+
+  .cardHeader {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .cardHeader h2 {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.9rem;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .orb {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+    border-radius: 10px;
+  }
+
+  .cardBody {
+    align-self: start;
+    align-items: flex-start;
+    width: 100%;
+    min-height: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+
+  .cardBody p {
+    margin: 0;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .cardFooter {
+    gap: 8px;
+  }
+
+  .cardFooter code {
+    display: block;
+    padding: 6px 8px;
+    font-size: 0.58rem;
+    border-radius: 8px;
+  }
+
+  .cardFooter .magicBtn {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+  }
+
+  .cardTag {
+    top: 10px;
+    right: -20px;
+    width: 68px;
+    padding: 3px 0;
+    font-size: 0.5rem;
+    letter-spacing: 0.08em;
+  }
+
+  .modalCommand code {
+    font-size: 0.62rem;
+    padding: 10px 12px;
+  }
+
+  .modalBackdrop {
+    align-items: flex-end;
+    padding: 0;
   }
 
   .detailModal {
-    width: min(94vw, 1080px);
-    height: 80vh;
-    padding: 18px;
+    width: 100%;
+    max-height: min(92dvh, 100%);
+    height: min(92dvh, 100%);
+    padding: 16px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    border-radius: 20px 20px 0 0;
+    animation: sheetUp 220ms ease;
   }
 
   .detailHeader {
+    flex-wrap: wrap;
+    gap: 8px;
     margin-right: 0;
-    padding-right: 52px;
+    padding-right: 48px;
+    min-height: 0;
+  }
+
+  .detailModal h2 {
+    font-size: 1.05rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
   }
 
   .modalCommand {
     grid-template-columns: 1fr;
+    gap: 10px;
     margin-right: 0;
+  }
+
+  .modalCommand .magicBtn {
+    justify-self: start;
+    min-height: 44px;
+    padding-inline: 16px;
+  }
+
+  .closeButton {
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    width: 44px;
+    height: 44px;
+  }
+
+  .documentPreview code {
+    padding: 14px;
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+}
+
+@keyframes sheetUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -508,22 +508,109 @@
 /* ── Responsive ── */
 @media (max-width: 620px) {
   .theme-light .shell {
-    padding: 0;
+    padding: 0 0 max(48px, env(safe-area-inset-bottom));
+  }
+
+  .theme-light .shell::before {
+    height: 200px;
   }
 
   .theme-light .hero {
-    padding: 80px 20px 50px;
+    margin-bottom: 28px;
+    padding: max(48px, env(safe-area-inset-top) + 32px) 16px 28px;
+  }
+
+  .theme-light .eyebrow {
+    margin-bottom: 10px;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .theme-light h1 {
+    font-size: clamp(1.65rem, 7.5vw, 2.15rem);
+    line-height: 1.12;
+  }
+
+  .theme-light .heroText {
+    margin-top: 14px;
+    font-size: 0.92rem;
+    line-height: 1.55;
   }
 
   .theme-light .cardGrid {
-    padding: 0 16px 60px;
+    gap: 8px;
+    padding: 0 10px 40px;
   }
 
   .theme-light .showcaseCard {
-    min-height: 280px;
+    min-height: calc(var(--tile-w) * var(--tile-ar-min));
+    max-height: calc(var(--tile-w) * var(--tile-ar-max));
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .theme-light .orb {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+    border-radius: 10px;
+  }
+
+  .theme-light .cardHeader h2 {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .theme-light .cardBody {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .theme-light .cardFooter code {
+    font-size: 0.58rem;
+  }
+
+  .theme-light .showcaseCard .magicBtn {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+  }
+
+  .theme-light .showcaseCard:hover {
+    --lift: 0;
+    --scale: 1;
   }
 
   .theme-light .detailModal {
-    padding: 20px;
+    gap: 14px;
+    height: min(92dvh, 100%);
+    max-height: min(92dvh, 100%);
+    padding: 16px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    border-radius: 20px 20px 0 0;
+  }
+
+  .theme-light .closeButton {
+    position: absolute;
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    width: 44px;
+    height: 44px;
+  }
+
+  .theme-light .modalCommand .magicBtn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .theme-light h1 {
+    font-size: 1.55rem;
+  }
+
+  .theme-light .heroText {
+    font-size: 0.86rem;
   }
 }
