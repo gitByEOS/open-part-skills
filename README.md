@@ -42,14 +42,18 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 
 ## Tools
 
-GitHub Pages 选 **GitHub Actions**（`deploy-tools-pages.yml`），发布目录为 `tools/`。
-
 | 工具 | 说明 | 在线使用 |
 |------|------|----------|
 | [工具箱](./tools/) | 全部在线工具 | [工具箱入口](https://gitByEOS.github.io/open-part-skills/) |
 | [emoj](./tools/emoj/) | EMOJ 大全：搜索、分类浏览、点击复制 emoji | [emoj大全](https://gitByEOS.github.io/open-part-skills/emoj/) |
 | [video-compressor](./tools/video-compressor/) | 浏览器内视频压缩 | [视频压缩](https://gitByEOS.github.io/open-part-skills/video-compressor/) |
 
+
+## 交流 & 赞助
+
+[![请我喝杯瑞幸](https://img.shields.io/badge/请我-喝杯瑞幸-blue?style=flat&logo=buy-me-a-coffee)](docs/Coffee_QRCode.png)    [![企鹅基地](https://img.shields.io/badge/跟我-一起进步-blue?style=flat&logo=qq)](docs/QGourp_QRCode.png)    
+
+![一起玩AI](docs/Coffee_QRCode.png)    ![企鹅基地](docs/QGourp_QRCode.png)
 
 ## 许可
 
