@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pngya · 浏览器图片压缩</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="page-shell">
+    <header class="app-header">
+      <h1>pngya<span class="dot">.</span>web</h1>
+      <p class="subtitle">在本机浏览器完成 PNG/JPG 压缩，无任何数据上传</p>
+    </header>
+
+    <section class="control-panel">
+      <div class="field field-modes">
+        <span>压缩模式</span>
+        <div class="mode-group" id="modeGroup">
+          <button type="button" data-mode="quality">quality<span>偏画质</span></button>
+          <button type="button" data-mode="balanced" class="active">balanced<span>均衡</span></button>
+          <button type="button" data-mode="compact">compact<span>紧凑</span></button>
+          <button type="button" data-mode="extreme">extreme<span>极限</span></button>
+          <button type="button" data-mode="all">all<span>四档并行</span></button>
+        </div>
+      </div>
+    </section>
+
+    <div class="drop-zone" id="dropzone" role="button" tabindex="0" aria-label="拖拽图片到这里或点击选择">
+      <div class="plus">＋</div>
+      <strong>拖入 PNG / JPG，或点击选择</strong>
+      <span>支持多文件，全部本地处理</span>
+      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,image/png,image/jpeg" multiple />
+    </div>
+
+    <div class="result-table">
+      <div class="result-list" id="rowList"></div>
+    </div>
+
+    <div class="actions-bar" id="actionsBar" hidden>
+      <button type="button" id="downloadAll" class="btn btn-primary" disabled>打包下载 ZIP</button>
+      <button type="button" id="clearAll" class="btn btn-outline">清空</button>
+      <span class="count" id="resultCount"></span>
+    </div>
+  </main>
+
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
