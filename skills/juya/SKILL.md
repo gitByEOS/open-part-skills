@@ -1,7 +1,7 @@
 ---
 name: juya
 description: 获取橘鸦Juya的AI早报，用户提到橘鸦、AI早报、Juya时使用。
-version: 1.0.2
+version: 1.0.3
 dependencies:
   - webfetch-plus
 repository: https://github.com/gitByEOS/open-part-skills

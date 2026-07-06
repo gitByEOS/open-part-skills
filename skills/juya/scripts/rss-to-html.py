@@ -3,12 +3,13 @@
 解析橘鸦Juya RSS，输出分页 HTML —— 早茶早报风格
 """
 
-import urllib.request
 import re
 import os
 import sys
 from datetime import datetime
 import html as html_mod
+
+import juya_utils
 
 RSS_URL = "https://daily.juya.uk/rss.xml"
 
@@ -670,11 +671,33 @@ def extract_item_fields(item_xml):
     if link_match:
         issue_no = link_match.group(1)
 
-    content_match = re.search(r'<content:encoded><!\[CDATA\[(.*?)\]\]></content:encoded>', item_xml, re.DOTALL)
-    if content_match:
-        html_content = content_match.group(1)
+    html_content = extract_content_encoded(item_xml)
 
     return title, issue_no, html_content, date_str
+
+
+def extract_content_encoded(item_xml):
+    """兼容 CDATA 与 HTML 实体两种 content:encoded 格式"""
+    cdata_match = re.search(
+        r"<content:encoded><!\[CDATA\[(.*?)\]\]></content:encoded>",
+        item_xml,
+        re.DOTALL,
+    )
+    if cdata_match:
+        return cdata_match.group(1)
+
+    encoded_match = re.search(
+        r"<content:encoded>(.*?)</content:encoded>",
+        item_xml,
+        re.DOTALL,
+    )
+    if not encoded_match:
+        return ""
+
+    payload = encoded_match.group(1).strip()
+    if payload.startswith("<![CDATA[") and payload.endswith("]]>"):
+        return payload[9:-3]
+    return html_mod.unescape(payload)
 
 
 def main():
@@ -689,8 +712,7 @@ def main():
 
     # 抓取 RSS
     print("抓取 RSS...")
-    with urllib.request.urlopen(RSS_URL) as response:
-        rss_content = response.read().decode('utf-8')
+    rss_content = juya_utils.fetch_rss_content(RSS_URL)
 
     # 解析
     print("解析 RSS...")

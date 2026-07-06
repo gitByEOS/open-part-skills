@@ -14,6 +14,20 @@ from pathlib import Path
 
 ALBUM_CACHE_TTL = 6 * 3600
 WECHAT_LINK_RE = re.compile(r"https?://mp\.weixin\.qq\.com/\S+")
+# Cloudflare 会拦截 Python-urllib 默认 UA
+RSS_FETCH_USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+)
+
+
+def fetch_rss_content(url, timeout=30):
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": RSS_FETCH_USER_AGENT},
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return response.read().decode("utf-8")
 
 
 def load_rss_to_html():
@@ -322,8 +336,7 @@ def _article_from_rss_item(item_xml):
 def resolve_article_from_rss(target_date=None):
     rss = load_rss_to_html()
     try:
-        with urllib.request.urlopen(rss.RSS_URL, timeout=15) as response:
-            rss_content = response.read().decode("utf-8")
+        rss_content = fetch_rss_content(rss.RSS_URL, timeout=15)
     except Exception:
         return None
 
