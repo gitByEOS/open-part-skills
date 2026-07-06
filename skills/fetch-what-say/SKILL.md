@@ -58,14 +58,17 @@ esflow DAG 编排（`scripts/flow.py` 声明，`scripts/nodes/` 各节点）：
 
 ```text
 resolve → download → extract_audio → transcribe → agent_summary → export_html
+                                                        (TO_AGENT)
 ```
 
-- `resolve`：解析 input/cookies，算 media_id，建 work_dir，产出 plan
-- `download`：URL 走 yt-dlp，本地文件复制到 work_dir
-- `extract_audio`：ffmpeg 提取 16k 单声道 wav
-- `transcribe`：mlx-whisper 转写，产出 transcript.srt 与 transcript.txt
-- `agent_summary`：TO_AGENT 节点，跑到达它时退出进程（exit 2），Agent 写 summary.txt 后续跑
-- `export_html`：生成 viewer.html 并弹出
+| 节点 | 职责 |
+|---|---|
+| `resolve` | 解析 input/cookies，算 media_id，建 work_dir，产出 plan |
+| `download` | URL 走 yt-dlp，本地文件复制到 work_dir |
+| `extract_audio` | ffmpeg 提取 16k 单声道 wav |
+| `transcribe` | mlx-whisper 转写，产出 transcript.srt 与 transcript.txt |
+| `agent_summary` | TO_AGENT:agent 读 transcript.txt 用 Summary Prompt 写 summary.txt |
+| `export_html` | 生成 viewer.html 并弹出 |
 
 ## Agent 介入
 

@@ -10,3 +10,5 @@ runtime/runs/
 runs/
 browser/
 .wfp_*
+
+__pycache__

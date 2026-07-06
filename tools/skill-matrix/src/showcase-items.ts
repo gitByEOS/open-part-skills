@@ -138,6 +138,14 @@ const skills = sortSkills([
     "通过 fzf 搜索、多选并软链本地 skills/rules，多项目 skill 体系切换。",
     "链",
   ),
+  skill(
+    "skill-publish-verify",
+    "Skill Publish Verify",
+    "skill-publish-verify",
+    "发布前黑盒验证：隔离 venv + 路径，agent 以新用户身份自验任意 skill，产出可用性报告。",
+    "验",
+    "new",
+  ),
   skill("skill-testcase", "Testcase", "testcase", "按规则补全测试用例覆盖，提升完整性与有效性。", "测"),
   skill(
     "skill-vite-plus",
@@ -152,7 +160,6 @@ const skills = sortSkills([
     "voice-clone",
     "Confucius4-TTS Gradio API 参考音色克隆与文本转语音。",
     "声",
-    "new",
   ),
 ]);
 
