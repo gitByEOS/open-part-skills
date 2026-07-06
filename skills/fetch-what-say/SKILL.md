@@ -21,7 +21,7 @@ URL / 本地视频 -> yt-dlp / 复制 -> transcript.srt -> transcript.txt -> sum
 Python 包：
 
 ```bash
-pip install esflow>=0.1.2 mlx-whisper
+pip install esflow mlx-whisper
 ```
 
 系统二进制（yt-dlp / ffmpeg）：

@@ -1,22 +1,35 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""抢票日历 HTML 导出（提醒与 ICS 在网页内完成）。"""
+"""export_html 节点:组装抢票条目 + 生成自包含 HTML + 打开浏览器。
+
+扇入两个上游:holidays(节假日区间)、query_sale_time(起售时间)。
+resolve_stations 车站信息经 query_sale_time 透传(read 节点产物取 station 名)。
+HTML 模板内完成 ICS/CSV 下载与提醒配置,节点只负责生成与弹出。
+"""
+
+from __future__ import annotations
 
 import json
 import re
+import subprocess
+import sys
 import webbrowser
-from datetime import timedelta
+from datetime import date, timedelta
 from html import escape
 from pathlib import Path
 
+from esflow import Node
+
+from common import CliError, EXIT_VALIDATION, log
+
+
 DEFAULT_OUTPUT_DIR = Path.home() / "Downloads" / "ticket-calendar"
+TICKET_ADVANCE_DAYS = 15
 ICS_TIMEZONE = "Asia/Shanghai"
 EVENT_DURATION_MINUTES = 30
 REMIND_LEAD_MINUTES = 15
 
 
 def parse_sale_clock(sale_time):
-    """解析起售时刻，默认 14:00。"""
+    """解析起售时刻,默认 14:00。"""
     match = re.search(r"(\d{1,2}):(\d{2})", sale_time)
     if not match:
         return 14, 0
@@ -31,32 +44,32 @@ def build_ticket_entries(
     festival_periods,
     ticket_advance_days,
 ):
-    """组装去程/返程抢票记录。"""
+    """组装去程/返程抢票记录。festival_periods 的 start/end 为 iso 字符串。"""
     entries = []
 
     def append_leg(festival, period, leg, travel_day, station, sale_time):
         hour, minute = parse_sale_clock(sale_time)
-        ticket_day = travel_day - timedelta(days=ticket_advance_days)
+        ticket_day = (date.fromisoformat(travel_day) - timedelta(days=ticket_advance_days)).isoformat()
         entries.append({
             "id": f"{leg}-{festival}",
             "festival": festival,
             "leg": leg,
-            "travelDay": travel_day.isoformat(),
-            "holidayStart": period["start"].isoformat(),
-            "holidayEnd": period["end"].isoformat(),
-            "ticketDay": ticket_day.isoformat(),
+            "travelDay": travel_day,
+            "holidayStart": period["start"],
+            "holidayEnd": period["end"],
+            "ticketDay": ticket_day,
             "station": station,
             "saleHour": hour,
             "saleMinute": minute,
             "saleTime": f"{hour:02d}:{minute:02d}",
             "summary": f"{leg}抢{festival}票 · {station}",
             "description": (
-                f"方向：{leg}\n"
-                f"车站：{station}\n"
-                f"节日：{festival}\n"
-                f"假期：{period['start'].isoformat()} ~ {period['end'].isoformat()}\n"
-                f"乘车日期：{travel_day.isoformat()}\n"
-                f"预售期：{ticket_advance_days} 天\n"
+                f"方向:{leg}\n"
+                f"车站:{station}\n"
+                f"节日:{festival}\n"
+                f"假期:{period['start']} ~ {period['end']}\n"
+                f"乘车日期:{travel_day}\n"
+                f"预售期:{ticket_advance_days} 天\n"
                 f"请以 12306 官方为准。"
             ),
         })
@@ -83,13 +96,13 @@ def _route_slug(departure_station, return_station, year):
 def _route_note(departure_station, departure_sale_time, return_station, return_sale_time):
     note = f"去程 {departure_station} 起售 {departure_sale_time}"
     if return_station and return_sale_time:
-        note += f"；返程 {return_station} 起售 {return_sale_time}"
+        note += f";返程 {return_station} 起售 {return_sale_time}"
     note += "。「提前 N 天」= 抢票当天 + 前 N 天。"
     return note
 
 
 def generate_html_content(departure_station, return_station, year, departure_sale_time, return_sale_time, entries):
-    """生成自包含 HTML：页内配置提醒并下载 ICS。"""
+    """生成自包含 HTML:页内配置提醒并下载 ICS。"""
     payload = {
         "departureStation": departure_station,
         "returnStation": return_station,
@@ -261,7 +274,7 @@ def generate_html_content(departure_station, return_station, year, departure_sal
       <tbody id="calendarBody"></tbody>
     </table>
     <p class="note" id="ignoredBar" hidden></p>
-    <p class="note">基于预售期 15 天生成，请以 12306 官方为准。</p>
+    <p class="note">基于预售期 15 天生成,请以 12306 官方为准。</p>
   </div>
   <script id="calendarData" type="application/json">{data_json}</script>
   <script>
@@ -313,7 +326,7 @@ def generate_html_content(departure_station, return_station, year, departure_sal
         return;
       }}
       ignoredBarEl.hidden = false;
-      ignoredBarEl.innerHTML = '已忽略：' + ignored.map((entry) => (
+      ignoredBarEl.innerHTML = '已忽略:' + ignored.map((entry) => (
         '<button type="button" class="btn-restore" data-restore-id="' + entry.id + '">' +
         entry.festival + ' 恢复</button>'
       )).join('');
@@ -325,7 +338,7 @@ def generate_html_content(departure_station, return_station, year, departure_sal
       const label = getLegLabel(leg);
       const station = leg === '去程' ? data.departureStation : data.returnStation;
       const saleTime = leg === '去程' ? data.departureSaleTime : data.returnSaleTime;
-      routeNoteEl.textContent = '当前' + label + '：' + station + ' 起售 ' + saleTime + '。' + REMIND_HELP;
+      routeNoteEl.textContent = '当前' + label + ':' + station + ' 起售 ' + saleTime + '。' + REMIND_HELP;
     }}
 
     function pad(n) {{ return String(n).padStart(2, '0'); }}
@@ -391,8 +404,8 @@ def generate_html_content(departure_station, return_station, year, departure_sal
 
     function eventSummary(entry, remindDay, ticketDay) {{
       const left = daysBefore(remindDay, ticketDay);
-      if (left === 0) return entry.summary + '（今天开抢）';
-      return entry.summary + '（还有' + left + '天）';
+      if (left === 0) return entry.summary + '(今天开抢)';
+      return entry.summary + '(还有' + left + '天)';
     }}
 
     function eventEnd(day, hour, minute) {{
@@ -434,7 +447,7 @@ def generate_html_content(departure_station, return_station, year, departure_sal
           const start = icsDate(remindDay, entry.saleHour, entry.saleMinute);
           const end = eventEnd(remindDay, entry.saleHour, entry.saleMinute);
           const summary = eventSummary(entry, remindDay, entry.ticketDay);
-          const description = entry.description + '\\n抢票日期：' + entry.ticketDay + '\\n提醒日期：' + remindText;
+          const description = entry.description + '\\n抢票日期:' + entry.ticketDay + '\\n提醒日期:' + remindText;
           lines.push(
             'BEGIN:VEVENT',
             'UID:' + remindDay + '-' + entry.festival + '-' + entry.leg + '@holiday-of-12306',
@@ -446,7 +459,7 @@ def generate_html_content(departure_station, return_station, year, departure_sal
             'BEGIN:VALARM',
             'TRIGGER:-PT' + leadMinutes + 'M',
             'ACTION:DISPLAY',
-            'DESCRIPTION:' + icsEscape(summary + '，' + leadMinutes + '分钟后起售'),
+            'DESCRIPTION:' + icsEscape(summary + ',' + leadMinutes + '分钟后起售'),
             'END:VALARM',
             'END:VEVENT'
           );
@@ -461,7 +474,7 @@ def generate_html_content(departure_station, return_station, year, departure_sal
       for (const entry of getExportEntries()) {{
         const remindText = reminderDates(entry.ticketDay, remindDays)
           .map((day) => formatRemindLine(day, entry))
-          .join('；');
+          .join(';');
         rows.push([
           entry.festival,
           entry.travelDay,
@@ -480,7 +493,7 @@ def generate_html_content(departure_station, return_station, year, departure_sal
       const entries = getExportEntries();
       if (!entries.length) {{
         calendarBodyEl.innerHTML = (
-          '<tr><td colspan="7" style="text-align:center;color:var(--muted);">当前行程已全部忽略，可在下方恢复</td></tr>'
+          '<tr><td colspan="7" style="text-align:center;color:var(--muted);">当前行程已全部忽略,可在下方恢复</td></tr>'
         );
         return;
       }}
@@ -569,43 +582,58 @@ def generate_html_content(departure_station, return_station, year, departure_sal
 """
 
 
-def export_calendar_page(
-    departure_station,
-    return_station,
-    year,
-    departure_sale_time,
-    return_sale_time,
-    festival_periods,
-    ticket_advance_days,
-    out_dir=None,
-):
-    """写入 HTML 并返回路径。"""
-    out_dir = Path(out_dir or DEFAULT_OUTPUT_DIR)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    slug = _route_slug(departure_station, return_station, year)
-    html_path = out_dir / f"ticket-calendar-{slug}.html"
-    entries = build_ticket_entries(
-        departure_station,
-        departure_sale_time,
-        return_station,
-        return_sale_time,
-        festival_periods,
-        ticket_advance_days,
-    )
-    html_path.write_text(
-        generate_html_content(
-            departure_station,
-            return_station,
-            year,
-            departure_sale_time,
-            return_sale_time,
-            entries,
-        ),
-        encoding="utf-8",
-    )
-    return html_path
-
-
-def open_html(html_path):
+def _open_html(html_path):
     """在默认浏览器打开 HTML。"""
-    webbrowser.open(html_path.resolve().as_uri())
+    if sys.platform == "darwin":
+        subprocess.run(["open", str(html_path)], check=False)
+    else:
+        webbrowser.open(html_path.resolve().as_uri())
+
+
+class ExportHtml(Node):
+    id = "export_html"
+    title = "生成抢票日历页"
+
+    def accept(self, ctx) -> bool:
+        """两个上游都就绪才接手;holidays/ query_sale_time 任一被跳过则跳过本节点。"""
+        return ctx.get("holidays") is not None and ctx.get("query_sale_time") is not None
+
+    def run(self, ctx) -> dict:
+        holidays = ctx.get("holidays")
+        sale = ctx.get("query_sale_time")
+        resolved = ctx.get("resolve_stations")
+
+        departure = resolved["departure"]["name"]
+        return_station = resolved["return"]["name"] if resolved.get("return") else None
+        dep_sale_time = sale["departure_sale_time"]
+        ret_sale_time = sale.get("return_sale_time")
+        year = holidays["year"]
+        festival_periods = holidays["periods"]
+
+        entries = build_ticket_entries(
+            departure, dep_sale_time, return_station, ret_sale_time,
+            festival_periods, TICKET_ADVANCE_DAYS,
+        )
+
+        out_dir = Path((self.kwargs or {}).get("out") or DEFAULT_OUTPUT_DIR)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        slug = _route_slug(departure, return_station, year)
+        html_path = out_dir / f"ticket-calendar-{slug}.html"
+        html_path.write_text(
+            generate_html_content(departure, return_station, year, dep_sale_time, ret_sale_time, entries),
+            encoding="utf-8",
+        )
+
+        if (self.kwargs or {}).get("open", True):
+            _open_html(html_path)
+        log(f"[export_html] {html_path}")
+        return {
+            "html_path": str(html_path),
+            "departure": departure,
+            "return": return_station,
+            "year": year,
+            "festivals": list(festival_periods.keys()),
+        }
+
+    def deliver(self, artifact) -> bool:
+        return bool(artifact and Path(artifact["html_path"]).exists())
