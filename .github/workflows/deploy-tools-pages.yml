@@ -35,8 +35,13 @@ jobs:
       - name: Build Skills matrix (light)
         run: npm ci && npm run build
         working-directory: tools/skill-matrix
+      - name: Assemble publish dir
+        run: |
+          mkdir -p _publish/skill-matrix
+          cp -r tools/index.html tools/js tools/res tools/emoj tools/pngya tools/video-compressor _publish/
+          cp -r tools/skill-matrix/dist _publish/skill-matrix/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: tools
+          path: _publish
       - id: deployment
         uses: actions/deploy-pages@v4
