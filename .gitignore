@@ -11,4 +11,6 @@ runs/
 browser/
 .wfp_*
 
-__pycache__
+# python
+__pycache__/
+*.pyc

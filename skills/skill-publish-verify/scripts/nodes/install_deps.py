@@ -36,7 +36,8 @@ def parse_skill_dependencies(skill_md_text):
         if in_deps:
             stripped = line.strip()
             if stripped.startswith("- "):
-                deps.append(stripped[2:].strip())
+                # 剥 YAML 字符串引号,否则 pip 把引号当包名一部分报 Invalid requirement
+                deps.append(stripped[2:].strip().strip('"').strip("'"))
             elif stripped and not line.startswith((" ", "\t")):
                 in_deps = False
     return deps

@@ -1,183 +1,23 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""从 Vigil process.md 生成固定风格的离线 HTML 报告。"""
+"""export_html 节点:从 aggregate.json 渲染 security_report.html。
+
+直接消费结构化 JSON,不再从 process.md 反向解析 markdown 表格。
+HTML 模板沿用 vigil_report.py 的末世暗色调风格,自包含离线可看。
+"""
 
 from __future__ import annotations
 
-import argparse
 import json
-import re
+import subprocess
+import sys
 import webbrowser
 from pathlib import Path
 
+from esflow import Node
 
-RISK_ORDER = ["P0", "P1", "P2", "P3", "P4", "P5"]
-RISK_RANK = {risk: index for index, risk in enumerate(RISK_ORDER)}
-
-
-def split_row(line: str) -> list[str]:
-    line = line.strip()
-    if line.startswith("|"):
-        line = line[1:]
-    if line.endswith("|"):
-        line = line[:-1]
-    return [cell.strip() for cell in line.split("|")]
+from common import CliError, EXIT_VALIDATION
 
 
-def is_separator(line: str) -> bool:
-    cells = split_row(line)
-    return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell.strip()) for cell in cells)
-
-
-def read_table(lines: list[str], header: list[str]) -> list[dict[str, str]]:
-    header_line = "| " + " | ".join(header) + " |"
-    for index, line in enumerate(lines):
-        if split_row(line) != header:
-            continue
-        rows: list[dict[str, str]] = []
-        cursor = index + 1
-        if cursor < len(lines) and is_separator(lines[cursor]):
-            cursor += 1
-        while cursor < len(lines) and lines[cursor].lstrip().startswith("|"):
-            cells = split_row(lines[cursor])
-            if cells == header or is_separator(lines[cursor]):
-                cursor += 1
-                continue
-            if len(cells) == len(header):
-                rows.append(dict(zip(header, cells)))
-            cursor += 1
-        if rows:
-            return rows
-    raise SystemExit(f"未找到表格: {header_line}")
-
-
-def strip_code(value: str) -> str:
-    return re.sub(r"`([^`]+)`", r"\1", value).strip()
-
-
-def split_files(value: str) -> list[str]:
-    value = strip_code(value)
-    return [part.strip() for part in value.split("<br>") if part.strip()]
-
-
-def parse_scope(text: str) -> str:
-    match = re.search(r"审查范围：(.+?)，排除 merge commit。", text)
-    return match.group(1) if match else "未声明审查范围"
-
-
-def risk_level(row: dict[str, str]) -> str:
-    level = row.get("风险等级") or row.get("风险等级".strip()) or row.get("风险")
-    if level in RISK_RANK:
-        return level
-    return "P5"
-
-
-def sort_level(levels: list[str]) -> str:
-    return sorted(levels, key=lambda item: RISK_RANK.get(item, 99))[0] if levels else "P5"
-
-
-def make_pn(levels: list[str]) -> str:
-    chunks = []
-    for risk in RISK_ORDER:
-        count = levels.count(risk)
-        if count:
-            chunks.append(f"{risk}={count}")
-    return " ".join(chunks) or "P5=0"
-
-
-def high_risk_count(levels: list[str]) -> int:
-    return sum(1 for level in levels if level in {"P1", "P2"})
-
-
-def from_review_rows(review_rows: list[dict[str, str]]) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
-    commits = []
-    grouped: dict[str, list[dict[str, object]]] = {}
-    for row in review_rows:
-        item = {
-            "author": row["提交者"],
-            "hash": row["CommitHash"],
-            "time": row["时间"],
-            "level": row["风险等级"],
-            "summary": strip_code(row["存在什么风险"]),
-            "files": split_files(row["哪部分代码"]),
-            "test": strip_code(row["修改建议"]),
-        }
-        commits.append(item)
-        grouped.setdefault(str(item["author"]), []).append(item)
-
-    authors = []
-    for author, rows in grouped.items():
-        levels = [str(row["level"]) for row in rows]
-        authors.append({
-            "author": author,
-            "count": len(rows),
-            "pn": make_pn(levels),
-            "maxRisk": sort_level(levels),
-            "highRiskCount": high_risk_count(levels),
-            "summary": "；".join(str(row["summary"]) for row in rows[:2]),
-            "action": str(rows[0]["test"]),
-        })
-    authors.sort(key=lambda row: (RISK_RANK.get(str(row["maxRisk"]), 99), -int(row["highRiskCount"]), str(row["author"])))
-    return authors, commits
-
-
-def parse_process(path: Path) -> dict[str, object]:
-    text = path.read_text(encoding="utf-8")
-    lines = text.splitlines()
-
-    review_header = ["提交者", "CommitHash", "时间", "修改描述", "存在什么风险", "哪部分代码", "造成风险原因", "修改建议", "风险等级"]
-    author_header = ["作者", "提交数", "PN", "最高风险", "高风险 commit 数", "作者风险摘要", "优先通知动作"]
-    commit_header = ["作者", "CommitHash", "时间", "风险等级", "风险摘要", "关键文件范围", "必验项"]
-
-    review_rows = read_table(lines, review_header)
-    try:
-        author_rows = read_table(lines, author_header)
-        commit_rows = read_table(lines, commit_header)
-    except SystemExit:
-        authors, commits = from_review_rows(review_rows)
-    else:
-        authors = [
-            {
-                "author": row["作者"],
-                "count": int(row["提交数"]),
-                "pn": row["PN"],
-                "maxRisk": row["最高风险"],
-                "highRiskCount": int(row["高风险 commit 数"]),
-                "summary": strip_code(row["作者风险摘要"]),
-                "action": strip_code(row["优先通知动作"]),
-            }
-            for row in author_rows
-        ]
-        commits = [
-            {
-                "author": row["作者"],
-                "hash": row["CommitHash"],
-                "time": row["时间"],
-                "level": row["风险等级"],
-                "summary": strip_code(row["风险摘要"]),
-                "files": split_files(row["关键文件范围"]),
-                "test": strip_code(row["必验项"]),
-            }
-            for row in commit_rows
-        ]
-
-    counts = {risk: 0 for risk in RISK_ORDER}
-    for commit in commits:
-        counts[str(commit["level"])] = counts.get(str(commit["level"]), 0) + 1
-
-    return {
-        "scope": parse_scope(text),
-        "authors": authors,
-        "commits": commits,
-        "counts": counts,
-        "total": len(commits),
-        "maxRisk": sort_level([str(commit["level"]) for commit in commits]),
-    }
-
-
-def render_html(data: dict[str, object]) -> str:
-    payload = json.dumps(data, ensure_ascii=False)
-    return """<!doctype html>
+HTML_TEMPLATE = """<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
@@ -249,7 +89,7 @@ def render_html(data: dict[str, object]) -> str:
     const totalCount = Math.max(1, data.total);
 
     document.getElementById("subtitle").textContent = `范围：${data.scope}，排除 merge commit。共 ${data.total} 个提交。`;
-    document.getElementById("alert").textContent = `有 ${riskCount("P0")} 个P0隐患，请在出发前修复。当前最高风险为 ${data.maxRisk}。`;
+    document.getElementById("alert").textContent = data.alert || `当前最高风险 ${data.maxRisk}。`;
     document.getElementById("cards").innerHTML = [
       ["提交数", data.total, ""],
       ["P1 高危", riskCount("P1"), "p1"],
@@ -304,24 +144,53 @@ def render_html(data: dict[str, object]) -> str:
   </script>
 </body>
 </html>
-""".replace("__DATA__", payload)
+"""
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="从 Vigil process.md 生成 security_report.html")
-    parser.add_argument("process_md", type=Path, help="process.md 路径")
-    parser.add_argument("-o", "--output", type=Path, help="输出 HTML 路径，默认写到 process.md 同目录")
-    parser.add_argument("--no-open", action="store_true", help="只生成报告，不自动打开")
-    args = parser.parse_args()
+def generate_report(work_dir, *, open_browser=True):
+    """从 aggregate.json 渲染 security_report.html。open_browser=False 时不弹浏览器(给 CI/无头环境)。"""
+    work_dir = Path(work_dir).expanduser()
+    aggregate_path = work_dir / "aggregate.json"
+    if not aggregate_path.exists():
+        raise CliError("validation_error", f"缺少 aggregate.json:{aggregate_path}", EXIT_VALIDATION)
+    data = json.loads(aggregate_path.read_text(encoding="utf-8"))
+    # alert 文案根据实际风险等级动态生成,避免 P0=0 时仍说"请在出发前修复"
+    data["alert"] = _build_alert(data)
+    html = HTML_TEMPLATE.replace("__DATA__", json.dumps(data, ensure_ascii=False))
+    html_path = work_dir / "security_report.html"
+    html_path.write_text(html, encoding="utf-8")
+    if open_browser:
+        if sys.platform == "darwin":
+            subprocess.run(["open", str(html_path)], check=False)
+        else:
+            webbrowser.open(html_path.resolve().as_uri())
+    print(f"report: {html_path}")
+    return html_path
 
-    process_path = args.process_md.expanduser().resolve()
-    output_path = args.output.expanduser().resolve() if args.output else process_path.with_name("security_report.html")
-    data = parse_process(process_path)
-    output_path.write_text(render_html(data), encoding="utf-8")
-    print(output_path)
-    if not args.no_open:
-        webbrowser.open(output_path.as_uri())
+
+def _build_alert(data):
+    """根据 maxRisk 与 P0 计数生成 alert 文案,避免与数据矛盾。"""
+    p0 = data.get("counts", {}).get("P0", 0)
+    max_risk = data.get("maxRisk", "P5")
+    if p0 > 0:
+        return f"有 {p0} 个 P0 隐患，请在出发前修复。当前最高风险 {max_risk}。"
+    if max_risk in {"P1", "P2"}:
+        return f"无 P0 隐患，但最高风险 {max_risk}，建议尽快处理。"
+    if max_risk == "P3":
+        return f"无 P0/P1/P2 隐患，最高风险 {max_risk}，按计划修复即可。"
+    return f"无高危隐患，最高风险 {max_risk}，常规维护级别。"
 
 
-if __name__ == "__main__":
-    main()
+class ExportHtml(Node):
+    id = "export_html"
+    title = "生成 HTML 报告"
+
+    def run(self, ctx) -> dict:
+        resolve = ctx.get("resolve")
+        work_dir = Path(resolve["work_dir"])
+        open_browser = bool((self.kwargs or {}).get("open_browser", True))
+        html_path = generate_report(work_dir, open_browser=open_browser)
+        return {"report_path": str(html_path)}
+
+    def deliver(self, artifact) -> bool:
+        return Path(artifact["report_path"]).exists()
