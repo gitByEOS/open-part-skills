@@ -124,12 +124,19 @@ const skills = sortSkills([
     "模",
   ),
   skill(
+    "skill-okr-to-html",
+    "OKR to HTML",
+    "okr-to-html",
+    "将 OKR Markdown 生成为可切换 Objective 的单页 HTML 看板。",
+    "讲",
+    "new",
+  ),
+  skill(
     "skill-similar-judge",
     "Similar Judge",
     "similar-judge",
     "对比两份文本差异，输出相似度与词级差异 JSON，便于循环迭代提示词。",
     "似",
-    "new",
   ),
   skill(
     "skill-skill-linker",
