@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}}</title>
+    <style>
+        :root {
+            --bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --primary: #1a73e8;
+            --text: #1e293b;
+            --text-secondary: #475569;
+            --tag-bg: #e8f0fe;
+            --tag-text: #1a73e8;
+            --border: #e2e8f0;
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            --radius: 14px;
+            --textarea-bg: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2.8rem 2.4rem;
+        }
+
+        .header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.8rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+
+        .title-section h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.4px;
+            margin-bottom: 0.25rem;
+        }
+
+        .title-section .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .candidate-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #f1f5f9;
+            border-radius: 30px;
+            padding: 0.4rem 1.6rem;
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .candidate-badge .name {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #0f172a;
+        }
+
+        .candidate-badge .time {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        ol.question-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .question-item {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem 1.6rem;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .question-item:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: baseline;
+            gap: 0.8rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .question-number {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary);
+            background: var(--tag-bg);
+            padding: 0.15rem 0.75rem;
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+
+        .question-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            font-size: 0.8rem;
+            font-weight: 600;
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            letter-spacing: 0.2px;
+        }
+
+        .question-text {
+            font-size: 1.08rem;
+            font-weight: 500;
+            color: #0f172a;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .answer-summary-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .answer-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: var(--textarea-bg);
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text);
+            resize: vertical;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            line-height: 1.5;
+        }
+
+        .answer-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+            background-color: #ffffff;
+        }
+
+        .answer-textarea::placeholder {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .action-bar {
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s, transform 0.1s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1557b0;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--tag-bg);
+        }
+
+        .add-question-bar {
+            display: flex;
+            justify-content: center;
+        }
+
+        .add-question-bar--bottom {
+            margin-top: 1.2rem;
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 1px dashed var(--primary);
+            background: var(--tag-bg);
+            color: var(--primary);
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-add:hover {
+            background: #d4e4fc;
+            transform: translateY(-1px);
+        }
+
+        .question-text-input {
+            width: 100%;
+            padding: 0.55rem 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: var(--textarea-bg);
+            font-family: inherit;
+            font-size: 1.08rem;
+            font-weight: 500;
+            color: #0f172a;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            line-height: 1.5;
+            margin-bottom: 0.9rem;
+        }
+
+        .question-text-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+            background-color: #ffffff;
+        }
+
+        .question-text-input::placeholder {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* tag 胶囊 + 形式 */
+        .tag-chips {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .tag-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 0.2rem 0.5rem 0.2rem 0.8rem;
+            border-radius: 20px;
+            letter-spacing: 0.2px;
+        }
+
+        .tag-chip-x {
+            cursor: pointer;
+            font-size: 0.95rem;
+            line-height: 1;
+            color: var(--tag-text);
+            opacity: 0.6;
+            padding: 0 0.15rem;
+        }
+
+        .tag-chip-x:hover {
+            opacity: 1;
+        }
+
+        .tag-add-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.6rem;
+            height: 1.6rem;
+            border-radius: 50%;
+            border: 1px dashed var(--primary);
+            background: transparent;
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .tag-add-btn:hover {
+            background: var(--tag-bg);
+        }
+
+        .tag-add-input {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.6rem;
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+            width: 8rem;
+        }
+
+        .question-item.is-draft .remove-btn {
+            display: inline-flex;
+        }
+
+        .remove-btn {
+            display: none;
+            align-items: center;
+            gap: 0.3rem;
+            margin-left: auto;
+            padding: 0.25rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+            color: #b91c1c;
+            flex-shrink: 0;
+        }
+
+        .remove-btn:hover {
+            background: #fee2e2;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+            .container {
+                padding: 1.5rem 1rem;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* 打印：正常页边距 + 页脚居中页码 */
+        @page {
+            margin: 1.5cm 1.8cm 1.8cm;
+            @bottom-center {
+                content: counter(page);
+                font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                font-size: 10px;
+                color: #64748b;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                max-width: 100%;
+                border-radius: 0;
+                padding: 0;
+            }
+            .question-item {
+                border: 1px solid #cbd5e1;
+                break-inside: avoid;
+            }
+            /* 强制保留胶囊背景色，避免打印时变成纯文字 */
+            .question-number,
+            .tag,
+            .tag-chip,
+            .candidate-badge {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .btn, .action-bar, .add-question-bar, .remove-btn, .tag-add-btn {
+                display: none;
+            }
+            .answer-textarea, .question-text-input, .tag-add-input {
+                border: 1px solid #ccc;
+                background: white;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title-section">
+                <h1>{{HEADING}}</h1>
+                <div class="subtitle">{{SUBTITLE}}</div>
+            </div>
+            <div class="candidate-badge">
+                <span class="name">👤 {{CANDIDATE_NAME}}</span>
+                <span class="time">🕥 {{INTERVIEW_TIME}}</span>
+            </div>
+        </div>
+
+        <ol class="question-list" id="questionList">
+{{QUESTIONS}}
+        </ol>
+
+        <div class="add-question-bar add-question-bar--bottom">
+            <button class="btn-add" id="addQuestionBtn" type="button">
+                <span>➕</span> 临时添加问题
+            </button>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-secondary" onclick="window.print()">
+                <span>🖨️</span> 直接打印
+            </button>
+            <button class="btn btn-primary" id="exportBtn">
+                <span>📥</span> 导出为 Markdown
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const exportBtn = document.getElementById('exportBtn');
+            const addBtn = document.getElementById('addQuestionBtn');
+            const list = document.getElementById('questionList');
+
+            // 构建一个空的问题项 DOM
+            function buildDraftItem(qid) {
+                const item = document.createElement('li');
+                item.className = 'question-item is-draft';
+                item.innerHTML =
+                    '<div class="question-header">'
+                        + '<span class="question-number">' + qid + '</span>'
+                        + '<div class="tag-chips"></div>'
+                        + '<button class="tag-add-btn" type="button" title="追加标签">+</button>'
+                        + '<button class="remove-btn" type="button" title="删除此问题"><span>🗑️</span> 删除</button>'
+                    + '</div>'
+                    + '<input class="question-text-input" placeholder="输入问题正文..." data-question="' + qid + '">'
+                    + '<div class="answer-summary-label">📝 总结/评价</div>'
+                    + '<textarea class="answer-textarea" placeholder="在此输入候选人的回答要点、评价或总结..." data-question="' + qid + '"></textarea>';
+                bindTagAdd(item.querySelector('.tag-add-btn'), item.querySelector('.tag-chips'));
+                item.querySelector('.remove-btn').addEventListener('click', function() {
+                    item.remove();
+                    renumber();
+                });
+                return item;
+            }
+
+            // “+” 按钮：就地展开一个输入框，回车确认追加 chip，Esc 取消
+            function bindTagAdd(addBtn, chips) {
+                addBtn.addEventListener('click', function() {
+                    if (chips.querySelector('.tag-add-input')) return;
+                    const input = document.createElement('input');
+                    input.className = 'tag-add-input';
+                    input.placeholder = '标签名 回车确认';
+                    chips.appendChild(input);
+                    input.focus();
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const v = input.value.trim();
+                            if (v) addChip(chips, v);
+                            input.remove();
+                        } else if (e.key === 'Escape' || e.key === 'Esc') {
+                            input.remove();
+                        }
+                    });
+                    input.addEventListener('blur', function() {
+                        const v = input.value.trim();
+                        if (v) addChip(chips, v);
+                        input.remove();
+                    });
+                });
+            }
+
+            function addChip(chips, text) {
+                const chip = document.createElement('span');
+                chip.className = 'tag-chip';
+                chip.innerHTML = escHtml(text) + '<span class="tag-chip-x" title="移除">×</span>';
+                chip.querySelector('.tag-chip-x').addEventListener('click', function() {
+                    chip.remove();
+                });
+                chips.appendChild(chip);
+            }
+
+            function escHtml(s) {
+                return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
+            // 临时添加问题
+            addBtn.addEventListener('click', function() {
+                const nextNo = list.querySelectorAll('.question-item').length + 1;
+                const item = buildDraftItem('Q' + nextNo);
+                list.appendChild(item);
+                item.querySelector('.question-text-input').focus();
+            });
+
+            // 删除后重新编号 Q1..Qn
+            function renumber() {
+                list.querySelectorAll('.question-item').forEach(function(item, idx) {
+                    const qid = 'Q' + (idx + 1);
+                    item.querySelector('.question-number').textContent = qid;
+                    item.querySelectorAll('[data-question]').forEach(function(el) {
+                        el.setAttribute('data-question', qid);
+                    });
+                });
+            }
+
+            // 导出 Markdown
+            exportBtn.addEventListener('click', function() {
+                const items = list.querySelectorAll('.question-item');
+                let mdContent = `# 面试记录 - {{CANDIDATE_NAME}}\n\n**面试时间**：{{INTERVIEW_TIME}}  \n**候选人**：{{CANDIDATE_NAME}}  \n\n---\n\n`;
+
+                items.forEach(function(item) {
+                    const questionNumber = item.querySelector('.question-number').textContent.trim();
+                    const chips = item.querySelector('.tag-chips');
+                    const staticTags = item.querySelector('.question-tags');
+
+                    let tags = '';
+                    if (chips) {
+                        tags = Array.from(chips.querySelectorAll('.tag-chip'))
+                            .map(function(c) { return c.firstChild.textContent.trim(); })
+                            .filter(Boolean).join('、');
+                    } else if (staticTags) {
+                        tags = Array.from(staticTags.querySelectorAll('.tag'))
+                            .map(function(t) { return t.textContent.trim(); }).join('、');
+                    }
+
+                    const textInput = item.querySelector('.question-text-input');
+                    const questionText = textInput
+                        ? textInput.value.trim() || '（未填写问题）'
+                        : item.querySelector('.question-text').textContent.trim();
+
+                    const summary = item.querySelector('.answer-textarea').value.trim() || '（无记录）';
+
+                    mdContent += `### ${questionNumber}（${tags}）\n${questionText}\n\n**总结/评价：**  \n${summary}\n\n---\n\n`;
+                });
+
+                mdContent += `\n*导出时间：${new Date().toLocaleString()}*`;
+
+                const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `{{CANDIDATE_NAME}}面试记录_${new Date().toISOString().slice(0,10)}.md`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        })();
+    </script>
+</body>
+</html>

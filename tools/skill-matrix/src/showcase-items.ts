@@ -132,6 +132,14 @@ const skills = sortSkills([
     "new",
   ),
   skill(
+    "skill-meet-record-html",
+    "Meet Record HTML",
+    "meet-record-html",
+    "将面试/会谈问题 Markdown 生成为可现场填写总结、可临时追加问题的纪要 HTML。",
+    "纪",
+    "new",
+  ),
+  skill(
     "skill-similar-judge",
     "Similar Judge",
     "similar-judge",
