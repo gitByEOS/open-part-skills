@@ -117,56 +117,76 @@ def _load_case_from_job(job_dir):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _cleanup_job(work_dir):
-    """end/error 后极简清理:只保留 skill 产物 + skill_verify_report.md。
+def _cleanup_job(work_dir, runner=None):
+    """end/error 后极简清理:只保留 run_record.artifacts 指向的产物 + 报告。
 
-    读 run_record.artifacts 取实际产物路径,保留其父目录链;另保留报告文件。
-    work_dir 内其他条目(venv、skill 副本、brief、_case.json、esflow per-node
-    目录、agent 临时日志、run_record.json、verify_facts.json、install_deps.log)
-    全删。to_agent 中断时不调用——还要 --resume 跑后续节点。
+    精确保留:run_record.artifacts 中落在 work_dir 内的具体文件 + 报告。
+    删除 work_dir 内所有其他文件(含 .esflow-jobs/、src.md、srt.md、venv、
+    skill 副本、brief、run_record.json、verify_facts.json 等),再删空目录。
+    to_agent 中断时不调用——还要 --resume 跑后续节点。
+
+    keep_files 注入 runner.artifacts['_cleanup_keep'],供 _build_success_data
+    构造 envelope.data.artifacts 时读取,避免 rglob 无差别扫进 esflow 内部状态。
     """
     work_dir = Path(work_dir)
-    keep_files = {work_dir / REPORT_FILE}
-    keep_dirs = set()
+    work_root = work_dir.resolve()
+    keep_files = {(work_dir / REPORT_FILE).resolve()}
     record_path = work_dir / RUN_RECORD_FILE
     if record_path.is_file():
         try:
             record = json.loads(record_path.read_text(encoding="utf-8"))
-            work_root = work_dir.resolve()
             for raw in record.get("artifacts") or []:
                 p = Path(str(raw)).resolve()
-                if not p.is_relative_to(work_root):
-                    continue
-                rel = p.relative_to(work_root).parts
-                if len(rel) > 1:
-                    keep_dirs.add(work_dir / rel[0])
-                else:
+                if p.is_relative_to(work_root):
                     keep_files.add(p)
         except (OSError, json.JSONDecodeError):
             pass
-    for p in work_dir.iterdir():
-        if p in keep_files or p in keep_dirs:
-            continue
-        if p.is_dir():
-            shutil.rmtree(p, ignore_errors=True)
-        else:
+
+    # 删除非 keep 文件
+    for p in work_dir.rglob("*"):
+        if p.is_file() and p.resolve() not in keep_files:
             try:
                 p.unlink()
             except OSError:
                 pass
+    # 删空目录(深度优先,子目录先删)
+    for p in sorted(work_dir.rglob("*"), reverse=True):
+        if p.is_dir():
+            try:
+                if not any(p.iterdir()):
+                    p.rmdir()
+            except OSError:
+                pass
+
+    if runner is not None:
+        runner.artifacts["_cleanup_keep"] = sorted(str(p) for p in keep_files)
 
 
-def _artifact_paths(work_dir):
-    """清理后扫 work_dir,返回除报告外的所有文件绝对路径(即 skill 产物)。
+def _artifact_paths_from_keep(keep_list):
+    """从 keep 列表返回仍存在且非报告的产物路径。"""
+    return sorted(p for p in keep_list if Path(p).exists())
 
-    清理已删 run_record.json,改用 rglob 扫描保留的产物。to_agent 中断时未清理,
-    仍能扫到 out/ 等产物目录。
+
+def _artifact_paths_fallback(work_dir):
+    """--keep 模式未清理:从 run_record 读 artifacts,只报 run_record 列出的产物。
+
+    不再 rglob 全扫——避免 .esflow-jobs/、src.md、srt.md 等内部状态污染 envelope。
     """
     work_dir = Path(work_dir)
+    work_root = work_dir.resolve()
+    record_path = work_dir / RUN_RECORD_FILE
+    if not record_path.is_file():
+        return []
+    try:
+        record = json.loads(record_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    report = str((work_dir / REPORT_FILE).resolve())
     paths = []
-    for p in work_dir.rglob("*"):
-        if p.is_file() and p.name != REPORT_FILE:
-            paths.append(str(p.resolve()))
+    for raw in record.get("artifacts") or []:
+        p = Path(str(raw)).resolve()
+        if p.is_relative_to(work_root) and p.exists() and str(p) != report:
+            paths.append(str(p))
     return sorted(paths)
 
 
@@ -196,17 +216,29 @@ async def _run_resume(flow_dir, job_dir, node_args):
 
 
 def _build_success_data(runner, work_dir):
-    """清理后构造 envelope.data:只带仍存在的路径。
+    """清理后构造 envelope.data:只带仍存在的用户产物路径。
 
-    run_record.json / verify_facts.json 已被 _cleanup_job 删除,不再写入 envelope。
-    artifacts 列表读 run_record 后给出实际存在的产物路径(清理后保留的)。
+    artifacts 来源优先级:
+    1. runner.artifacts['_cleanup_keep'] —— 清理时注入,只含 run_record.artifacts
+       中清理后仍存在的文件(精确,不含 .esflow-jobs/、src.md、srt.md 等内部状态)
+    2. run_record.json fallback —— --keep 模式未清理时读 run_record.artifacts
+
+    不再 rglob 全扫 work_dir,避免 esflow per-node artifact.json 污染 envelope。
     """
+    work_dir = Path(work_dir)
     verify = runner.artifacts.get("verify_artifact", {})
     summary = verify.get("summary", {})
+    keep = runner.artifacts.get("_cleanup_keep")
+    if keep is not None:
+        report = str((work_dir / REPORT_FILE).resolve())
+        artifacts = [p for p in keep if p != report and Path(p).exists()]
+        artifacts = sorted(artifacts)
+    else:
+        artifacts = _artifact_paths_fallback(work_dir)
     return {
         "work_dir": str(work_dir),
         "report_path": str(Path(work_dir) / REPORT_FILE),
-        "artifacts": _artifact_paths(work_dir),
+        "artifacts": artifacts,
         "verify": {
             "exit_code": summary.get("exit_code"),
             "envelope_ok": summary.get("envelope_ok"),
@@ -269,7 +301,7 @@ def main():
 
         def on_after(break_kind, runner):
             if break_kind in ("end", "error") and not args.keep:
-                _cleanup_job(work_dir)
+                _cleanup_job(work_dir, runner)
 
         exit_code, _, _ = _run_with_envelope(
             lambda: _run_resume(flow_dir, job_dir, node_args),
@@ -299,7 +331,7 @@ def main():
         # to_agent/end/error 都持久化 case 供 --resume
         _persist_case(work_dir, case)
         if break_kind in ("end", "error") and not args.keep:
-            _cleanup_job(work_dir)
+            _cleanup_job(work_dir, runner)
 
     exit_code, _, _ = _run_with_envelope(
         lambda: _run_flow(flow_dir, DEFAULT_WORK_ROOT, work_dir, node_args),

@@ -22,7 +22,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [switch-chat](./skills/switch-chat/SKILL.md) | 切换会话交接任务时使用，生成可快速编辑网页，让新会话能无缝继承工作 | 1.0.0 | 2026-05-19 |
 | [git-review](./skills/git-review/SKILL.md) | 审查指定范围内 Git 提交，Agent 逐 commit 评估风险，双索引聚合输出可视化安全审查报告 | 1.1.0 | 2026-07-06 |
 | [memory-graph](./skills/memory-graph/SKILL.md) | 开发了一套 Agent 外挂记忆，关联历史记忆、沉淀会话记忆、提供 web-ui 查看或管理记忆 | 0.2.1 | 2026-05-29 |
-| [blog-narrator](./skills/blog-narrator/SKILL.md) | 把博客 Markdown 导出为带语音逐行披露演示 HTML，支持Edge TTS，可自行拓展其他TTS | 1.0.2 | 2026-05-29 |
+| [blog-narrator](./skills/blog-narrator/SKILL.md) | 把博客 Markdown 导出为逐行披露演示 HTML，支持轻量预览和 Edge TTS 分段配音合并 | 1.1.0 | 2026-07-07 |
 | [cc-claude](./skills/cc-claude/SKILL.md) | 让 Claude Code 支持自定义渠道和大模型选择; 已经迁移到 [gitByEOS/Clash](https://github.com/gitByEOS/Clash) | 1.0.0 | 2026-06-01 |
 | [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过 fzf 支持搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
 | [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.3 | 2026-07-06 |
