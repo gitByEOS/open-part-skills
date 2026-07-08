@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
 # 0 ok / 1 runtime / 2 to_agent / 3 validation
 EXIT_OK, EXIT_RUNTIME, EXIT_TO_AGENT, EXIT_VALIDATION = 0, 1, 2, 3
 
@@ -51,7 +51,7 @@ def schema():
             "work_dir": "string path",
             "report_path": "string path",
             "artifacts": "array,清理后仍存在的产物绝对路径",
-            "verify": "object, 摘要(exit_code/envelope_ok/artifact_count),全量事实在清理前已写 verify_facts.json(默认清理删除)",
+            "verify": "object, 摘要(exit_code 取 steps 末步,无 steps 则 null/envelope_ok/artifact_count),全量事实在清理前已写 verify_facts.json(默认清理删除)",
         },
         "error": {"code": "string", "message": "string", "retryable": "boolean"},
         "exit_codes": {"0": "ok", "1": "runtime", "2": "to_agent", "3": "validation"},

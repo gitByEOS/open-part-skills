@@ -29,7 +29,6 @@ from esflow import (
 
 from common import (
     CliError,
-    DEFAULT_OUTPUT_DIR,
     EXIT_OK,
     EXIT_RUNTIME,
     EXIT_VALIDATION,
@@ -68,7 +67,7 @@ def build_parser():
     parser = argparse.ArgumentParser(description="Git 提交安全审查:抓 commits → Agent 审 → 聚合 → HTML 报告")
     parser.add_argument("--repo", default=".", help="被审查的 git 仓库路径,默认当前目录")
     parser.add_argument("--scope", help="审查范围:since..until 日期 / branch1..branch2 / 单分支")
-    parser.add_argument("--out", default=str(DEFAULT_OUTPUT_DIR), help="输出根目录")
+    parser.add_argument("--out", default=None, help="esflow output_root,默认 /tmp/esflow/outputs")
     parser.add_argument("--resume", metavar="JOB_DIR", help="从 job_dir 续跑 TO_AGENT 节点")
     parser.add_argument("--job-dir", metavar="DIR", help="指定 esflow job 目录")
     parser.add_argument("--max-count", type=int, default=0, help="单分支模式下最多抓多少 commit,0 不限")
@@ -83,7 +82,6 @@ def _build_node_args(args) -> dict[str, dict]:
         "resolve": {
             "repo": args.repo,
             "scope": args.scope,
-            "out": args.out,
         },
         "collect_commits": {
             "max_count": args.max_count,
@@ -132,12 +130,10 @@ async def _run_to_break(runner, only=None, resume=False) -> tuple[BreakKind, Job
 
 
 async def _run_flow(flow_dir, output_root, job_dir, args, only=None):
-    runner = Runner.load(
-        flow_dir,
-        output_root=output_root,
-        job_dir=job_dir,
-        node_args=_build_node_args(args),
-    )
+    kwargs = {"job_dir": job_dir, "node_args": _build_node_args(args)}
+    if output_root is not None:
+        kwargs["output_root"] = output_root
+    runner = Runner.load(flow_dir, **kwargs)
     break_kind, break_event = await _run_to_break(runner, only=only)
     return runner, break_kind, break_event
 
@@ -156,16 +152,15 @@ async def _run_resume(flow_dir, job_dir, args):
 
 def _build_success_data(runner):
     artifacts = runner.artifacts
-    resolve = artifacts.get("resolve", {})
     collect = artifacts.get("collect_commits")
     aggregate = artifacts.get("aggregate")
     export_html = artifacts.get("export_html")
-    data = {"work_dir": resolve.get("work_dir")}
+    data = {}
     if collect:
         data["commits"] = collect.get("commits_path")
     if aggregate:
+        data["aggregate"] = aggregate.get("aggregate_path")
         data["process_md"] = aggregate.get("process_path")
-        data["reviews"] = str(Path(resolve["work_dir"]) / "review.json")
     if export_html:
         data["report"] = export_html.get("report_path")
     return data
@@ -174,12 +169,13 @@ def _build_success_data(runner):
 def _build_to_agent_data(runner):
     """TO_AGENT 退出时输出 envelope data:Agent 接管需要的路径集合。"""
     artifacts = runner.artifacts
-    resolve = artifacts.get("resolve", {})
     collect = artifacts.get("collect_commits")
+    agent_node = runner.runs.get("agent_review")
     data = {
-        "work_dir": resolve.get("work_dir"),
         "vigil_md": str(Path(__file__).parent.parent / "assets" / "vigil.md"),
     }
+    if agent_node is not None:
+        data["review_path"] = str(agent_node.output_dir / "review.json")
     if collect:
         data["commits"] = collect.get("commits_path")
         data["commits_count"] = collect.get("count")
@@ -206,7 +202,7 @@ def _run_with_envelope(coro_factory, started_at, *, build_data=None):
     if break_kind == "end":
         _emit_envelope(True, data=build_data(runner) if build_data else None, started_at=started_at)
     elif break_kind == "to_agent":
-        # TO_AGENT 也输出 envelope,Agent 按契约解析 stdout 能拿到 work_dir/commits/vigil_md
+        # TO_AGENT 也输出 envelope,Agent 按契约解析 stdout 能拿到 review_path/commits/vigil_md
         _emit_envelope(True, data=_build_to_agent_data(runner), started_at=started_at)
     return exit_code
 
@@ -241,7 +237,7 @@ def main():
         print(f"预检失败:\n{exc}", file=sys.stderr)
         return EXIT_VALIDATION
 
-    output_root = Path(args.out).expanduser() / ".esflow-jobs"
+    output_root = Path(args.out).expanduser() if args.out else None
     job_dir = Path(args.job_dir) if args.job_dir else None
 
     if args.dry_run:

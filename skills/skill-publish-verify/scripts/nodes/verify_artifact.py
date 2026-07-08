@@ -21,18 +21,20 @@ _TEXT_HEAD_LIMIT = 2000
 
 
 def _extract_envelope(record):
-    """run_record.envelope 优先,否则从 stdout 最后一行 JSON 解析。"""
+    """run_record.envelope 优先,否则从 steps 各步 stdout 末行 JSON 解析。"""
     if isinstance(record.get("envelope"), dict):
         return record["envelope"]
-    stdout = record.get("stdout", "") or ""
-    for line in reversed(stdout.splitlines()):
-        line = line.strip()
-        if not line.startswith("{"):
-            continue
-        try:
-            return json.loads(line)
-        except json.JSONDecodeError:
-            continue
+    steps = record.get("steps") or []
+    for step in reversed(steps):
+        stdout = step.get("stdout", "") or ""
+        for line in reversed(stdout.splitlines()):
+            line = line.strip()
+            if not line.startswith("{"):
+                continue
+            try:
+                return json.loads(line)
+            except json.JSONDecodeError:
+                continue
     return None
 
 
@@ -91,12 +93,11 @@ class VerifyArtifact(Node):
         work_dir = Path(isolate["work_dir"])
         record = json.loads((work_dir / RUN_RECORD_FILE).read_text(encoding="utf-8"))
         envelope = _extract_envelope(record)
+        steps = record.get("steps") or []
+        last_exit = steps[-1].get("exit_code") if steps else None
         facts = {
             "run_record": {
-                "command": record.get("command"),
-                "exit_code": record.get("exit_code"),
-                "stdout": record.get("stdout", ""),
-                "stderr": record.get("stderr", ""),
+                "steps": steps,
                 "envelope": envelope,
             },
             "envelope_ok": bool(envelope and envelope.get("ok") is True),
@@ -109,7 +110,7 @@ class VerifyArtifact(Node):
 
         summary = {
             "facts_path": str(facts_path),
-            "exit_code": facts["run_record"]["exit_code"],
+            "exit_code": last_exit,
             "envelope_ok": facts["envelope_ok"],
             "artifact_count": len(facts["artifacts"]),
         }

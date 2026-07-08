@@ -1,8 +1,9 @@
 """isolate_env 节点:建工作目录 + 全新 python venv。
 
-work_dir 由 run.py 经 node_args 注入(= esflow job_dir),保证 per-node
-artifact.json 与 run_record/report 同住一个目录。venv 不复用,每次全新装依赖
-才能暴露 SKILL.md 依赖说明是否完整。
+work_dir 由 run.py 经 node_args 注入(= esflow job_dir)。esflow 框架元数据
+落在 work_dir/.esflow/<rid>/artifact.json,业务产物(run_record/report)写在
+work_dir 根,两者分目录。venv 不复用,每次全新装依赖才能暴露 SKILL.md 依赖说明
+是否完整。
 """
 
 from __future__ import annotations

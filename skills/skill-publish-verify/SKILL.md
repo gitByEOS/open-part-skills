@@ -1,7 +1,7 @@
 ---
 name: skill-publish-verify
 description: 发布前黑盒验证。隔离 venv + 路径,agent 以新用户身份读 SKILL.md 自行使用待验 skill,收集 run_record 与产物事实,再由 agent 写可用性报告。任意有 SKILL.md 的 skill 发布前都能跑一遍。用户提到「发布前验证」「skill 黑盒验证」时使用本 skill。
-version: 1.0.0
+version: 1.1.0
 dependencies:
   - python3
   - esflow
@@ -57,7 +57,7 @@ isolate_env → copy_skill → install_deps → preflight_target → agent_run �
 python3 scripts/run.py case.json
 
 # 2. Agent 读 _agent_run_brief.json + skill_dir/SKILL.md,自行跑 skill,
-#    把 command/exit_code/stdout/stderr/artifacts/envelope 写入 run_record.json
+#    把 artifacts(必填)+ steps/envelope(可选)写入 run_record.json
 
 # 3. 续跑到 agent_report 退出(exit 2)
 python3 scripts/run.py --resume <job_dir>
@@ -78,13 +78,15 @@ python3 scripts/run.py --resume <job_dir>
 | `demand` / `work_dir` / `venv_dir` / `python` / `skill_dir` | 需求 + 隔离环境 |
 | `installed` / `skipped` / `install_deps_log_path` / `install_deps_source` | 依赖安装结果与日志 |
 | `preflight` | `{skill_md_exists, has_run_py, schema_exit_code, schema_stdout_head}` |
-| `run_record_file` / `run_record_required_fields` | 产物文件名与必填字段 |
+| `run_record_file` / `run_record_required_fields` / `run_record_optional_fields` / `run_record_step_fields` | 产物文件名 + 必填/可选字段 + steps 每步字段 |
 | `artifacts_must_under` | artifacts 路径必须落在该目录,越界 deliver 失败 |
 | `cwd_must_be` / `resume_cmd` | 执行工作目录 + 写完 run_record 后的续跑命令 |
 
-`run_record.json` 必填:`command`、`exit_code`(int)、`stdout`、`stderr`、
-`artifacts`(绝对路径列表,全部落在 `artifacts_must_under` 下);可选 `envelope`。
-agent 应主动用 `--out work_dir/out` 之类参数把产物输出到 work_dir 内。
+`run_record.json` 必填:`artifacts`(绝对路径列表,全部落在 `artifacts_must_under` 下,
+框架核实路径合法性 + 存在性)。可选:`steps`(数组,每步含 `command`/`exit_code`/
+`stdout`/`stderr`,agent 自报过程,框架不核实)、`envelope`(skill 最终 envelope)。
+单步 skill 可只填 `artifacts`;多步 skill(如自带 TO_AGENT 的 esflow skill)用 `steps`
+逐步记录。agent 应主动用 `--out work_dir/out` 之类参数把产物输出到 work_dir 内。
 
 ### agent_report brief 字段
 
@@ -97,10 +99,10 @@ agent 应主动用 `--out work_dir/out` 之类参数把产物输出到 work_dir 
 
 ### verify_facts.json
 
-全量事实外置,字段:`run_record`(command/exit_code/stdout/stderr/envelope)、
+全量事实外置,字段:`run_record`(steps/envelope,steps 为 agent 自报过程)、
 `envelope_ok`、`artifacts`(`[{path, exists, size, text_head}]`)、`work_dir_tree`。
-节点 artifact 与最终 envelope 只带摘要(`exit_code`/`envelope_ok`/`artifact_count`),
-避免多 job 时终端被单次 stdout/stderr 撑爆。
+节点 artifact 与最终 envelope 只带摘要(`exit_code`/`envelope_ok`/`artifact_count`,
+`exit_code` 取 steps 末步,无 steps 则 null),避免多 job 时终端被单次 stdout/stderr 撑爆。
 
 ## 参数
 
@@ -127,7 +129,7 @@ agent 应主动用 `--out work_dir/out` 之类参数把产物输出到 work_dir 
     "verify": {"exit_code": 0, "envelope_ok": true, "artifact_count": 1}
   },
   "error": null,
-  "meta": {"schema_version": "1.0.0", "tool": "skill-publish-verify", "elapsed_ms": 0}
+  "meta": {"schema_version": "1.1.0", "tool": "skill-publish-verify", "elapsed_ms": 0}
 }
 ```
 
@@ -170,6 +172,11 @@ done
 验任何有 `SKILL.md` 的 skill。有 `scripts/run.py` + `--schema`(esflow skill)
 则 preflight 把 schema 摘要喂给 brief、verify 解析 envelope;否则 `envelope=null`
 是合法事实,agent 按 SKILL.md 手工执行。不引入分支判断——null 本身就是事实。
+
+被验 skill 若自带 TO_AGENT 节点(如 esflow skill 的 agent_review),agent 须在
+`agent_run` 阶段内完整跑通其全部 resume 步骤(首跑到该 skill 的 TO_AGENT 退出 →
+写该 skill 要求的产物 → resume 续跑),把最终结果记入 run_record。即两层 TO_AGENT
+嵌套时,内层由 agent 自行消化,对 publish-verify 只暴露一次外层 resume。
 
 ## Agent 使用指引
 

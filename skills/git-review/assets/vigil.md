@@ -14,7 +14,7 @@
 
 1. 读取 `envelope.data.commits` 指向的 commits.json（框架已抓好的结构化提交清单,含每个 commit 的 hash/author/email/time/subject,不含 diff）
 2. 对每个 commit 用 `git show <hash>` 查看 diff，按下方规则评级
-3. 写 `work_dir/review.json`（结构化产物，schema 见下方）
+3. 写 `envelope.data.review_path` 指向的 `review.json`（结构化产物，schema 见下方）
 
 **框架已为你做完**：抓 git log、生成 commits.json。
 **框架会替你做完**：双索引聚合（作者榜 + commit 明细）、生成 `security_report.html`、生成人读 `process.md`。
@@ -31,7 +31,7 @@
 
 ## 📋 review.json Schema
 
-写到 `work_dir/review.json`，框架 deliver 严格校验：
+写到 `envelope.data.review_path`（即 `agent_review/review.json`），框架 deliver 严格校验：
 
 ```json
 {

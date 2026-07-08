@@ -9,14 +9,12 @@ import json
 import re
 import subprocess
 import sys
-from pathlib import Path
 
 
-SCHEMA_VERSION = "1.1.0"
+SCHEMA_VERSION = "1.2.0"
 # 0 ok / 1 runtime / 2 to_agent / 3 validation / 4 auth
 EXIT_OK, EXIT_RUNTIME, EXIT_TO_AGENT, EXIT_VALIDATION, EXIT_AUTH = 0, 1, 2, 3, 4
 
-DEFAULT_OUTPUT_DIR = Path("/tmp/git-review")
 RISK_ORDER = ["P0", "P1", "P2", "P3", "P4", "P5"]
 RISK_RANK = {risk: index for index, risk in enumerate(RISK_ORDER)}
 
@@ -103,9 +101,10 @@ def schema():
     return {
         "ok": "boolean",
         "data": {
-            "work_dir": "string path",
             "commits": "string path, commits.json 清单",
-            "reviews": "string path, review.json (Agent 逐 commit 风险评估)",
+            "review_path": "string path, review.json 写入路径 (TO_AGENT 退出时给)",
+            "vigil_md": "string path, assets/vigil.md (TO_AGENT 退出时给)",
+            "aggregate": "string path, aggregate.json",
             "report": "string path, security_report.html",
             "process_md": "string path, process.md (人读)",
         },

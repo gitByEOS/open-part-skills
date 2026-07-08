@@ -84,8 +84,7 @@ class CollectCommits(Node):
         if not commits:
             raise CliError("validation_error", f"范围内无 commit:{scope}", EXIT_VALIDATION)
 
-        work_dir = Path(plan["work_dir"])
-        commits_path = work_dir / "commits.json"
+        commits_path = self.output_dir / "commits.json"
         commits_path.write_text(json.dumps(commits, ensure_ascii=False, indent=2), encoding="utf-8")
 
         log(f"[collect] {len(commits)} commits -> {commits_path}")

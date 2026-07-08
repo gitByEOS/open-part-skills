@@ -129,8 +129,8 @@ class Aggregate(Node):
 
     def run(self, ctx) -> dict:
         resolve = ctx.get("resolve")
-        work_dir = Path(resolve["work_dir"])
-        review_path = work_dir / "review.json"
+        agent = ctx.get("agent_review") or {}
+        review_path = Path(agent["output_dir"]) / "review.json"
         if not review_path.exists():
             raise CliError("aggregate_error", f"缺少 review.json:{review_path}", EXIT_RUNTIME)
 
@@ -141,11 +141,11 @@ class Aggregate(Node):
 
         reviews = review_data["reviews"]
         data = _aggregate(reviews, resolve["scope"])
-        aggregate_path = work_dir / "aggregate.json"
+        aggregate_path = self.output_dir / "aggregate.json"
         aggregate_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
         process_md = _render_process_md(data, reviews)
-        process_path = work_dir / "process.md"
+        process_path = self.output_dir / "process.md"
         process_path.write_text(process_md, encoding="utf-8")
 
         log(f"[aggregate] {data['total']} commits, authors={len(data['authors'])} -> {aggregate_path}")

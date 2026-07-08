@@ -1,4 +1,4 @@
-"""resolve 节点:解析时间范围/分支范围与仓库,建 work_dir,产出 plan。
+"""resolve 节点:解析时间范围/分支范围与仓库,产出 plan。
 
 CLI 参数由 Runner.load(node_args=...) 注入到 self.kwargs。
 支持三种范围:
@@ -9,23 +9,16 @@ CLI 参数由 Runner.load(node_args=...) 注入到 self.kwargs。
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
 from esflow import Node
 
-from common import (
-    CliError,
-    DEFAULT_OUTPUT_DIR,
-    EXIT_VALIDATION,
-    log,
-    safe_id,
-)
+from common import CliError, EXIT_VALIDATION, log, safe_id
 
 
 class Resolve(Node):
     id = "resolve"
-    title = "解析范围与工作目录"
+    title = "解析范围与仓库"
 
     def run(self, ctx) -> dict:
         args = self.kwargs or {}
@@ -36,15 +29,10 @@ class Resolve(Node):
         if not scope:
             raise CliError("validation_error", "缺少审查范围,见 --scope", EXIT_VALIDATION)
 
-        out_root = Path(args.get("out") or DEFAULT_OUTPUT_DIR).expanduser()
-        media_id = safe_id(scope)
-        work_dir = out_root / media_id
-        work_dir.mkdir(parents=True, exist_ok=True)
-
         plan = {
             "repo": str(repo),
             "scope": scope,
-            "work_dir": str(work_dir),
+            "scope_id": safe_id(scope),
         }
-        log(f"[resolve] repo={repo} scope={scope} work_dir={work_dir}")
+        log(f"[resolve] repo={repo} scope={scope} scope_id={plan['scope_id']}")
         return plan

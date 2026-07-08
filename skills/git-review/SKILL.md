@@ -1,7 +1,7 @@
 ---
 name: git-review
 description: 审查指定范围内的 Git 提交，Agent 逐 commit 评估风险，纯 Python 双索引聚合，输出可视化安全审查报告。当用户需要审查 Git 提交风险或生成安全审查报告时使用
-version: 1.1.0
+version: 1.2.0
 dependencies:
   - "python>=3.10"
   - esflow
@@ -28,19 +28,19 @@ python3 scripts/run.py --repo /path/to/repo --scope main..dev
 python3 scripts/run.py --repo /path/to/repo --scope main
 ```
 
-输出到 `<out>/<scope_id>/`：
+产物路径见 stdout envelope 的 `data.report` 字段（绝对路径）；默认落 `<output_root>/git-review/<job_id>/`，按节点分目录：
 
-| 文件 | 说明 |
-|---|---|
-| `commits.json` | collect_commits 产物 |
-| `review.json` | Agent 写,逐 commit 风险评估 |
-| `aggregate.json` | 双索引聚合结果 |
-| `process.md` | 人读过程记录 |
-| `security_report.html` | 可视化报告 |
+| 文件 | 节点目录 | 说明 |
+|---|---|---|
+| `commits.json` | `collect_commits/` | git log 结构化清单 |
+| `review.json` | `agent_review/` | Agent 逐 commit 风险评估 |
+| `aggregate.json` | `aggregate/` | 双索引聚合结果 |
+| `process.md` | `aggregate/` | 人读过程记录 |
+| `security_report.html` | `export_html/` | 可视化报告（自动弹浏览器） |
 
-`review.json` 由 Agent 读 `assets/vigil.md` + `commits.json` 生成。
+`review.json` 由 Agent 读 `assets/vigil.md` + `commits.json` 生成，写到 `agent_review/` 目录。
 
-> 默认输出 `/tmp/git-review/`，高频操作不占用户目录。TO_AGENT resume 依赖 work_dir 存活，`/tmp` 被清理后 resume 会丢，需尽快 resume 或显式 `--out` 到持久目录。
+> 默认 `output_root = /tmp/esflow/outputs`，享受系统自动清理。需长期保留用 `--out <dir>` 指定持久目录。`--resume` 依赖 job_dir 存活，目录被清理后 resume 会丢。
 
 ### scope 日期边界
 
@@ -52,39 +52,40 @@ esflow DAG 编排（`scripts/flow.py` 声明，`scripts/nodes/` 各节点）：
 
 | 节点 | 职责 |
 |---|---|
-| `resolve` | 解析 repo/scope，建 work_dir，产出 plan |
-| `collect_commits` | 跑 git log，结构化 commits.json |
+| `resolve` | 解析 repo/scope，产出 plan（含 scope_id） |
+| `collect_commits` | 跑 git log，结构化 commits.json 到节点 output_dir |
 | `agent_review` | TO_AGENT 节点，跑到它退出进程（exit 2），Agent 写 review.json 后续跑 |
 | `aggregate` | 纯 Python 双索引聚合（作者风险榜 + commit 风险明细），产出 aggregate.json + process.md |
-| `export_html` | 从 aggregate.json 渲染 security_report.html |
+| `export_html` | 从 aggregate.json 渲染 security_report.html，自动弹浏览器 |
 
-### work_dir 与 job_dir
+### job_dir
 
-- **work_dir** = `<out>/<scope_id>/`，业务产物目录
-- **job_dir** = `<out>/.esflow-jobs/git-review/<timestamp>/`，esflow 框架目录（节点 artifact + `_break_to_agent.json` + `_flow_dir.txt`）
-- TO_AGENT 退出时 stdout envelope 携带 `work_dir / commits / vigil_md`，Agent 解析 stdout 拿接管路径
-- `--resume <job_dir>` 传 job_dir（非 work_dir）
+- **job_dir** = `<output_root>/git-review/<job_id>/`，`<job_id>` = `<YYYYMMDD-HHMMSS>-<4hash>`
+- 各节点 output_dir = `job_dir/<rid>/`，产物落各自目录，互不覆盖
+- 框架元数据在 `job_dir/.esflow/`：`break_to_agent.json`（待 resume 节点列表）、`<rid>/artifact.json`（每节点一个）
+- TO_AGENT 退出时 stdout envelope 携带 `review_path / commits / vigil_md / commits_count`，Agent 解析 stdout 拿接管路径
+- `--resume <job_dir>` 传 job_dir 续跑
 
 ## Agent 介入
 
 ```bash
 # 1. 首跑到 agent_review 退出(exit 2)
 python3 scripts/run.py --repo /path/to/repo --scope 2026-05-01..2026-05-07
-# stdout envelope: {ok:true, data:{work_dir, commits(commits.json 路径), vigil_md, commits_count}}
+# stdout envelope.data: {review_path, commits, vigil_md, commits_count}
 # stderr: [to_agent] 完成后续跑:python3 scripts/run.py --resume <job_dir>
 
 # 2. Agent 读 data.vigil_md + data.commits,按 vigil 规则逐 commit 评估
-#    写 data.work_dir/review.json (schema 见下方)
+#    写 data.review_path (agent_review/review.json)
 
 # 3. 续跑聚合 + HTML
 python3 scripts/run.py --resume <job_dir>
 ```
 
-TO_AGENT 退出时 envelope.data 只含 `work_dir/commits/vigil_md/commits_count`（产物未生成）；续跑聚合后最终 envelope.data 才含 `reviews/report/process_md`（见 `--schema`）。
+TO_AGENT 退出时 envelope.data 含 `review_path/commits/vigil_md/commits_count`（产物未生成）；续跑聚合后最终 envelope.data 含 `commits/aggregate/process_md/report`（见 `--schema`）。
 
 ## review.json Schema
 
-写到 `work_dir/review.json`，框架 deliver 严格校验值类型：
+写到 `agent_review/review.json`（即 envelope.data.review_path），框架 deliver 严格校验值类型：
 
 ```json
 {
@@ -115,7 +116,7 @@ TO_AGENT 退出时 envelope.data 只含 `work_dir/commits/vigil_md/commits_count
 |---|---:|---|
 | `--repo <path>` | `.` | 被审查的 git 仓库 |
 | `--scope <range>` | - | 日期 `since..until` / 分支 `b1..b2` / 单分支 |
-| `--out <dir>` | `/tmp/git-review` | 输出根目录 |
+| `--out <dir>` | `/tmp/esflow/outputs` | esflow output_root，job_dir 落其下 |
 | `--resume <job_dir>` | - | 续跑 TO_AGENT 节点 |
 | `--max-count <n>` | `0` | 单分支模式最多抓多少 commit,0 不限 |
 | `--no-open` | false | 不弹浏览器,给 CI/无头环境 |
@@ -128,5 +129,5 @@ TO_AGENT 退出时 envelope.data 只含 `work_dir/commits/vigil_md/commits_count
 
 - `security_report.html` 由 `nodes/export_html.py` 生成，避免样式漂移
 - 审查代码只读，不修改被审查业务代码
-- 每次 review.json 写到独立 work_dir，不覆盖历史报告
+- 每次跑用独立 job_id，不覆盖历史报告
 - `assets/vigil.md` 是 Agent 角色设定与 schema 完整说明，agent_review 节点执行前必须读

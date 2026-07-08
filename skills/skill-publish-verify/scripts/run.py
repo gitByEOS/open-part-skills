@@ -121,7 +121,7 @@ def _cleanup_job(work_dir, runner=None):
     """end/error 后极简清理:只保留 run_record.artifacts 指向的产物 + 报告。
 
     精确保留:run_record.artifacts 中落在 work_dir 内的具体文件 + 报告。
-    删除 work_dir 内所有其他文件(含 .esflow-jobs/、src.md、srt.md、venv、
+    删除 work_dir 内所有其他文件(含 .esflow/、src.md、srt.md、venv、
     skill 副本、brief、run_record.json、verify_facts.json 等),再删空目录。
     to_agent 中断时不调用——还要 --resume 跑后续节点。
 
@@ -170,7 +170,7 @@ def _artifact_paths_from_keep(keep_list):
 def _artifact_paths_fallback(work_dir):
     """--keep 模式未清理:从 run_record 读 artifacts,只报 run_record 列出的产物。
 
-    不再 rglob 全扫——避免 .esflow-jobs/、src.md、srt.md 等内部状态污染 envelope。
+    不再 rglob 全扫——避免 .esflow/、src.md、srt.md 等内部状态污染 envelope。
     """
     work_dir = Path(work_dir)
     work_root = work_dir.resolve()
@@ -220,7 +220,7 @@ def _build_success_data(runner, work_dir):
 
     artifacts 来源优先级:
     1. runner.artifacts['_cleanup_keep'] —— 清理时注入,只含 run_record.artifacts
-       中清理后仍存在的文件(精确,不含 .esflow-jobs/、src.md、srt.md 等内部状态)
+       中清理后仍存在的文件(精确,不含 .esflow/、src.md、srt.md 等内部状态)
     2. run_record.json fallback —— --keep 模式未清理时读 run_record.artifacts
 
     不再 rglob 全扫 work_dir,避免 esflow per-node artifact.json 污染 envelope。

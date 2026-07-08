@@ -14,7 +14,7 @@ from pathlib import Path
 
 from esflow import Node
 
-from common import CliError, EXIT_VALIDATION
+from common import CliError, EXIT_VALIDATION, log
 
 
 HTML_TEMPLATE = """<!doctype html>
@@ -147,24 +147,23 @@ HTML_TEMPLATE = """<!doctype html>
 """
 
 
-def generate_report(work_dir, *, open_browser=True):
-    """从 aggregate.json 渲染 security_report.html。open_browser=False 时不弹浏览器(给 CI/无头环境)。"""
-    work_dir = Path(work_dir).expanduser()
-    aggregate_path = work_dir / "aggregate.json"
+def generate_report(aggregate_path, output_dir, *, open_browser=True):
+    """从 aggregate.json 渲染 security_report.html 到 output_dir。open_browser=False 时不弹浏览器(给 CI/无头环境)。"""
+    aggregate_path = Path(aggregate_path).expanduser()
     if not aggregate_path.exists():
         raise CliError("validation_error", f"缺少 aggregate.json:{aggregate_path}", EXIT_VALIDATION)
     data = json.loads(aggregate_path.read_text(encoding="utf-8"))
     # alert 文案根据实际风险等级动态生成,避免 P0=0 时仍说"请在出发前修复"
     data["alert"] = _build_alert(data)
     html = HTML_TEMPLATE.replace("__DATA__", json.dumps(data, ensure_ascii=False))
-    html_path = work_dir / "security_report.html"
+    html_path = Path(output_dir) / "security_report.html"
     html_path.write_text(html, encoding="utf-8")
     if open_browser:
         if sys.platform == "darwin":
             subprocess.run(["open", str(html_path)], check=False)
         else:
             webbrowser.open(html_path.resolve().as_uri())
-    print(f"report: {html_path}")
+    log(f"[export_html] report -> {html_path}")
     return html_path
 
 
@@ -186,10 +185,9 @@ class ExportHtml(Node):
     title = "生成 HTML 报告"
 
     def run(self, ctx) -> dict:
-        resolve = ctx.get("resolve")
-        work_dir = Path(resolve["work_dir"])
+        aggregate = ctx.get("aggregate") or {}
         open_browser = bool((self.kwargs or {}).get("open_browser", True))
-        html_path = generate_report(work_dir, open_browser=open_browser)
+        html_path = generate_report(aggregate["aggregate_path"], self.output_dir, open_browser=open_browser)
         return {"report_path": str(html_path)}
 
     def deliver(self, artifact) -> bool:
