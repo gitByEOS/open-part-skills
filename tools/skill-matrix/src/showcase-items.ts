@@ -176,6 +176,13 @@ const skills = sortSkills([
     "Confucius4-TTS Gradio API 参考音色克隆与文本转语音。",
     "声",
   ),
+  skill(
+    "skill-weather-search",
+    "Weather Search",
+    "weather-search",
+    "按地点与活动半径查周边天气与空气质量，输出 Markdown 报告与出门防护建议。",
+    "天",
+  ),
 ]);
 
 const mcps: ShowcaseItem[] = [
