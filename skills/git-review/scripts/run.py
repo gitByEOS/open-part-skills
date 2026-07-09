@@ -142,7 +142,6 @@ async def _run_resume(flow_dir, job_dir, args):
     runner = Runner.load(
         flow_dir,
         job_dir=job_dir,
-        node_args=_build_node_args(args),
     )
     if not runner.has_break_to_agent():
         raise CliError("resume_error", f"无待完成的 TO_AGENT 节点:{job_dir}", EXIT_VALIDATION)

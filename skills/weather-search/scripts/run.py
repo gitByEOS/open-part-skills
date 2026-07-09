@@ -17,7 +17,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
-import shlex
 import sys
 import time
 import urllib.request
@@ -46,12 +45,6 @@ from common import (
 from weather_domain import ADVICE_FILENAME, DEFAULT_DAYS, DEFAULT_RADIUS_KM
 
 _RESUME_CMD = "python3 scripts/run.py --resume {job_dir}"
-
-
-def _build_resume_cmd(out_dir=None) -> str:
-    if not out_dir:
-        return _RESUME_CMD
-    return f"{_RESUME_CMD} --out {shlex.quote(str(out_dir))}"
 
 
 def check_python_version() -> CheckResult | None:
@@ -130,12 +123,12 @@ def _emit_unexpected(exc, started_at):
     return EXIT_RUNTIME
 
 
-async def _run_to_break(runner, *, resume=False, resume_cmd=_RESUME_CMD) -> tuple[BreakKind, JobEvent | None]:
+async def _run_to_break(runner, *, resume=False) -> tuple[BreakKind, JobEvent | None]:
     events, break_kind, break_event = await runner.run_to_break(resume=resume)
     for ev in events:
         esflow_event(ev)
     if break_kind == "to_agent" and break_event is not None:
-        print(Runner.to_agent_hint(break_event, resume_cmd=resume_cmd), file=sys.stderr)
+        print(Runner.to_agent_hint(break_event, resume_cmd=_RESUME_CMD), file=sys.stderr)
         print(ADVICE_STYLE_HINT, file=sys.stderr)
     return break_kind, break_event
 
@@ -145,15 +138,16 @@ async def _run_flow(flow_dir, query, days, radius_km, out_dir):
         flow_dir,
         node_args=_build_node_args(query, days, radius_km, out_dir),
     )
-    break_kind, break_event = await _run_to_break(runner, resume_cmd=_build_resume_cmd(out_dir))
+    break_kind, break_event = await _run_to_break(runner)
     return runner, break_kind, break_event
 
 
 async def _run_resume(flow_dir, job_dir, out_dir):
-    runner = Runner.load(flow_dir, job_dir=Path(job_dir), node_args=_build_node_args(None, None, None, out_dir))
+    node_args = _build_node_args(None, None, None, out_dir) if out_dir else None
+    runner = Runner.load(flow_dir, job_dir=Path(job_dir), node_args=node_args)
     if not runner.has_break_to_agent():
         raise CliError("resume_error", f"无待完成的 TO_AGENT 节点:{job_dir}", EXIT_VALIDATION)
-    break_kind, break_event = await _run_to_break(runner, resume=True, resume_cmd=_build_resume_cmd(out_dir))
+    break_kind, break_event = await _run_to_break(runner, resume=True)
     return runner, break_kind, break_event
 
 

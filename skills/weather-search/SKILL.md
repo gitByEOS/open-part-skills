@@ -37,11 +37,11 @@ python3 scripts/run.py --query 北京大兴机场 --days 3 --radius-km 10 [--out
 # 2. Agent 读 analyze_grid_artifact,写 data.advice_path
 
 # 3. 续跑落盘
-python3 scripts/run.py --resume <job_dir> [--out ./out]
+python3 scripts/run.py --resume <job_dir>
 # stdout: envelope(ok, data.out_path / data.out_dir / data.job_dir)
 ```
 
-最终报告路径为 envelope `data.out_path`。未传 `--out` 时写到 `export/weather_report.md`；传 `--out <DIR>` 时写到 `<DIR>/weather_report.md`。使用 `--out` 时，首跑与 `--resume` 都传同一个目录。
+最终报告路径为 envelope `data.out_path`。未传 `--out` 时写到 `export/weather_report.md`；传 `--out <DIR>` 时写到 `<DIR>/weather_report.md`，`--resume` 会自动继承首跑入参。
 
 ## 参数
 
