@@ -35,6 +35,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [okr-to-html](./skills/okr-to-html/SKILL.md) | 将 OKR Markdown 生成为可切换 Objective 的单页 HTML 看板 | 1.0.0 | 2026-07-06 |
 | [meet-record-html](./skills/meet-record-html/SKILL.md) | 将面试/会谈问题 Markdown 生成为可现场填写总结、可临时追加问题的纪要 HTML | 1.0.0 | 2026-07-07 |
 | [weather-search](./skills/weather-search/SKILL.md) | 按地点与活动半径查周边天气与空气质量，输出报告与出门防护建议 | 1.0.0 | 2026-07-09 |
+| [esflow](./skills/esflow/SKILL.md) | 教会Agent如何使用esflow，简化学习成本，直接从需求到落地 | 0.1.4 | 2026-07-09 |
 
 ## MCPs
 

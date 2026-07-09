@@ -95,6 +95,14 @@ const skills = sortSkills([
     "听",
   ),
   skill(
+    "skill-esflow",
+    "esflow",
+    "esflow",
+    "编排 Python DAG workflow，支持暂停协作、定点续跑、扇出与兜底链。",
+    "流",
+    "new",
+  ),
+  skill(
     "skill-git-review",
     "Git Review",
     "git-review",
