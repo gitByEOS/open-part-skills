@@ -1,4 +1,4 @@
-# Agent Skills
+# Open-Part-Skills
 
 EOS. 开放的部分 Skills，可用于 Claude Code、Cursor、CodeX 等工具。
 
@@ -13,6 +13,10 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 ## Skills
 
 [![skills.sh](https://skills.sh/b/gitByEOS/open-part-skills)](https://skills.sh/gitByEOS/open-part-skills)
+![SkillsCount](https://img.shields.io/github/directory-file-count/gitbyeos/open-part-skills/skills?type=dir&label=Skills)
+![GitHub Repo stars](https://img.shields.io/github/stars/gitbyeos/open-part-skills?style=flat&logo=github&label=Stars)
+![GitHub last commit](https://img.shields.io/github/last-commit/gitbyeos/open-part-skills?label=Last%20Commit)
+[![view-dist](https://img.shields.io/badge/跳转-网页版-blue?style=flat&logo=quicklook)](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/) 
 
 | 技能 | 说明 | 版本 | 上次更新 |
 |------|------|------|----------|

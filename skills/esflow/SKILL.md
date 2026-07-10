@@ -6,7 +6,7 @@ version: 0.1.4
 dependencies:
   - "python>=3.10"
   - esflow
-repository: https://github.com/gitByEOS/open-part-skills
+repository: https://github.com/gitByEOS/esflow
 ---
 
 # esflow
