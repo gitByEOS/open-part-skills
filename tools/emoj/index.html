@@ -6,17 +6,16 @@
 <title>EMOJ 大全</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-.light{--bg:#f5f7fa;--bg-secondary:#ffffff;--bg-tertiary:#f0f2f5;--text:#1a1a2e;--text-secondary:#6c757d;--accent:#084298;--border:#dee2e6;--item-bg:#ffffff;--item-hover:#e9ecef;--shadow:rgba(0,0,0,0.08);--tooltip-bg:#343a40;--h1-color:#084298}
-.dark{--bg:#1a1a1a;--bg-secondary:#252525;--bg-tertiary:#2d2d2d;--text:#e0e0e0;--text-secondary:#888;--accent:#0a84ff;--border:#3a3a3a;--item-bg:#2a2a2a;--item-hover:#3a3a3a;--shadow:rgba(0,0,0,0.5);--tooltip-bg:#4a4a4a;--h1-color:#fff}
+.light{--bg:#f8f8f8;--bg-secondary:#f8f8f8;--bg-tertiary:#ffffff;--text:#333333;--text-secondary:#666666;--accent:#18a0fb;--border:rgba(0,0,0,0.1);--item-bg:#ffffff;--item-hover:#ffffff;--shadow:rgba(0,0,0,0.06);--shadow-hover:rgba(0,0,0,0.24);--tooltip-bg:#343a40;--h1-color:#333333;--accent-ring:rgba(24,160,251,0.15);--notification-bg:#212121}
+.dark{--bg:#1a1a1a;--bg-secondary:#252525;--bg-tertiary:#2d2d2d;--text:#e0e0e0;--text-secondary:#888;--accent:#0a84ff;--border:#3a3a3a;--item-bg:#2a2a2a;--item-hover:#3a3a3a;--shadow:rgba(0,0,0,0.5);--tooltip-bg:#4a4a4a;--h1-color:#fff;--notification-bg:#343a40}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 header{position:sticky;top:0;z-index:100;background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:20px 24px;box-shadow:0 2px 8px var(--shadow);text-align:center}
 header h1{font-size:1.5rem;font-weight:600;margin-bottom:16px;color:var(--h1-color)}
 #theme-toggle{position:absolute;top:16px;right:20px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;cursor:pointer;font-size:1.1rem;transition:all .15s}
 #theme-toggle:hover{background:var(--item-hover)}
-#theme-toggle img{display:block;width:20px;height:20px}
-.dark #theme-toggle img{filter:invert(1)}
+#theme-toggle svg{display:block;width:20px;height:20px}
 #search-bar{width:100%;max-width:900px;padding:14px 19px;border:1px solid var(--border);border-radius:8px;background:var(--bg-tertiary);color:var(--text);font-size:19px;outline:none;transition:all .15s;margin:0 auto;display:block}
-#search-bar:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(8,66,152,0.15)}
+#search-bar:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-ring,rgba(8,66,152,0.15))}
 .dark #search-bar:focus{box-shadow:0 0 0 3px rgba(10,132,255,0.25)}
 #stats{font-size:.85rem;color:var(--text-secondary);margin-top:10px;text-align:center}
 #categories{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;justify-content:center}
@@ -28,35 +27,40 @@ header h1{font-size:1.5rem;font-weight:600;margin-bottom:16px;color:var(--h1-col
 .emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:4px}
 .emoji-item{display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:1;background:var(--item-bg);border-radius:4px;cursor:pointer;transition:all .15s;position:relative;border:1px solid var(--border);color:var(--text);padding:4px;box-shadow:0 2px 4px var(--shadow);outline:none;-webkit-tap-highlight-color:transparent;-webkit-appearance:none;-moz-appearance:none;appearance:none;user-select:none;-webkit-user-select:none}
 .emoji-item:focus,.emoji-item:focus-visible,.emoji-item:active{outline:none;box-shadow:0 2px 4px var(--shadow)}
-.emoji-item:hover{background:var(--item-hover);transform:scale(1.12);z-index:2;box-shadow:0 4px 16px var(--shadow)}
+.emoji-item:hover{background:var(--item-hover);transform:scale(1.12);z-index:2;box-shadow:0 4px 16px var(--shadow-hover,var(--shadow))}
 .emoji-char{font-size:32px;line-height:1;user-select:none;-webkit-user-select:none}
 .emoji-item .tooltip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--tooltip-bg);color:#fff;font-size:.7rem;padding:6px 10px;border-radius:6px;white-space:nowrap;z-index:10;pointer-events:none;box-shadow:0 2px 8px var(--shadow)}
 .emoji-item .tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--tooltip-bg)}
 .emoji-item:hover .tooltip{display:block}
-.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#fff;padding:12px 28px;border-radius:10px;font-size:.95rem;z-index:200;opacity:0;transition:all .3s ease;pointer-events:none;box-shadow:0 4px 12px var(--shadow)}
-.copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#notification{position:fixed;bottom:40px;left:50%;width:auto;transform:translateX(-50%);color:#fff;background-color:var(--notification-bg);padding:8px 24px;border-radius:8px;opacity:0;transition:opacity .3s ease-in-out;box-shadow:0 0 12px var(--shadow);z-index:200;pointer-events:none}
+#notification-id{font-weight:bold}
+#notification.show{opacity:.9}
 .no-results{text-align:center;padding:48px;color:var(--text-secondary);font-size:1rem}
 </style>
 </head>
 <body>
 <header>
-<button id="theme-toggle" title="切换明暗主题"><img id="theme-toggle-icon" src="icons/mode_dark.png" alt="切换明暗主题"></button>
+<button id="theme-toggle" title="明暗主题" aria-label="明暗主题"><span id="theme-toggle-icon"></span></button>
 <h1>EMOJ 大全</h1>
 <input type="text" id="search-bar" placeholder="搜索 emoji 名称、标签或直接粘贴 emoji...">
 <div id="stats"></div>
 <div id="categories"></div>
 </header>
 <main id="main"></main>
-<div class="copy-toast" id="toast">已复制!</div>
+<div id="notification">已复制：<span id="notification-id"></span></div>
 <script>
 (function(){
   var html=document.documentElement;
   var btn=document.getElementById("theme-toggle");
   var icon=document.getElementById("theme-toggle-icon");
   var saved=localStorage.getItem("emoji-theme")||"dark";
+  var ICONS={
+    sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>',
+    moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'
+  };
   html.classList.add(saved);
   function updateThemeIcon(isDark){
-    icon.src=isDark?"icons/mode_light.png":"icons/mode_dark.png";
+    icon.innerHTML=isDark?ICONS.sun:ICONS.moon;
   }
   updateThemeIcon(saved==="dark");
   btn.addEventListener("click",function(){
@@ -2470,7 +2474,15 @@ function render(){
 }
 
 function copyEmoji(char,name){
-  const done=()=>{const t=document.getElementById("toast");t.textContent="已复制 "+char+" "+name;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500)};
+  const notification=document.getElementById("notification");
+  const notificationText=document.getElementById("notification-id");
+  let timer;
+  const done=()=>{
+    notificationText.textContent=char+" "+name;
+    window.clearTimeout(timer);
+    notification.classList.add("show");
+    timer=window.setTimeout(()=>notification.classList.remove("show"),3000);
+  };
   if(navigator.clipboard&&window.isSecureContext){
     navigator.clipboard.writeText(char).then(done).catch(()=>fallbackCopy(char,done));
   }else{

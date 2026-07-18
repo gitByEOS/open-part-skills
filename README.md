@@ -56,6 +56,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [工具箱](./tools/) | 全部在线工具 | [工具箱入口](https://gitByEOS.github.io/open-part-skills/) |
 | [skill-matrix](./tools/skill-matrix/) | 为 Skill 增加可视化效果 | [Skills 矩阵](https://gitByEOS.github.io/open-part-skills/skill-matrix/dist/) |
 | [emoj](./tools/emoj/) | EMOJ 大全：搜索、分类浏览、点击复制 emoji | [emoj大全](https://gitByEOS.github.io/open-part-skills/emoj/) |
+| [codicon](./tools/codicon/) | 微软开源常用svg图标 | [codicon](https://gitByEOS.github.io/open-part-skills/codicon/) |
 | [pngya](./tools/pngya/) | 浏览器内图片压缩 | [图片压缩](https://gitByEOS.github.io/open-part-skills/pngya/) |
 | [video-compressor](./tools/video-compressor/) | 浏览器内视频压缩 | [视频压缩](https://gitByEOS.github.io/open-part-skills/video-compressor/) |
 | [FastRead](https://github.com/gitByEOS/FastRead) | 精选离线文字转语音，微软edge可选 | [需要下载](https://github.com/gitByEOS/FastRead/releases) |

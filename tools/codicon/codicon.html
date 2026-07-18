@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodIcon | VS Code 图标字体</title>
+  <link rel="stylesheet" href="codicon.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    .light {
+      --bg: #f8f8f8;
+      --bg-secondary: #f8f8f8;
+      --bg-tertiary: #ffffff;
+      --text: #333333;
+      --text-secondary: #666666;
+      --accent: #18a0fb;
+      --border: rgba(0, 0, 0, 0.1);
+      --item-bg: #ffffff;
+      --item-hover: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.06);
+      --shadow-hover: rgba(0, 0, 0, 0.24);
+      --h1-color: #333333;
+      --notification-bg: #212121;
+      --accent-ring: rgba(24, 160, 251, 0.15);
+      --code-bg: #111827;
+      --code-text: #e5e7eb;
+      --preview-bg: #f9fafb;
+      --demo-btn-bg: #ffffff;
+      --demo-btn-hover: #f3f4f6;
+      --demo-btn-border: #d1d5db;
+      --demo-btn-text: #111827;
+      --heart-red: #ef4444;
+      --heart-yellow: #ca8a04;
+      --heart-blue: #2563eb;
+      --heart-purple: #9333ea;
+    }
+
+    .dark {
+      --bg: #1a1a1a;
+      --bg-secondary: #252525;
+      --bg-tertiary: #2d2d2d;
+      --text: #e0e0e0;
+      --text-secondary: #888;
+      --accent: #0a84ff;
+      --border: #3a3a3a;
+      --item-bg: #2a2a2a;
+      --item-hover: #3a3a3a;
+      --shadow: rgba(0, 0, 0, 0.5);
+      --h1-color: #fff;
+      --notification-bg: #343a40;
+      --accent-ring: rgba(10, 132, 255, 0.25);
+      --code-bg: #0f1117;
+      --code-text: #d1d5db;
+      --preview-bg: #232323;
+      --demo-btn-bg: #2a2a2a;
+      --demo-btn-hover: #353535;
+      --demo-btn-border: #444;
+      --demo-btn-text: #e0e0e0;
+      --heart-red: #f87171;
+      --heart-yellow: #facc15;
+      --heart-blue: #60a5fa;
+      --heart-purple: #c084fc;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background-color .15s ease, color .15s ease;
+    }
+
+    body.guide-open {
+      overflow: hidden;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px 16px;
+      box-shadow: 0 2px 8px var(--shadow);
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--h1-color);
+    }
+
+    .header-actions {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .header-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0 12px;
+      cursor: pointer;
+      font-size: .85rem;
+      text-decoration: none;
+      transition: all .15s;
+      appearance: none;
+      -webkit-appearance: none;
+      font-family: inherit;
+      line-height: 1;
+    }
+
+    .header-btn:hover {
+      background: var(--item-hover);
+    }
+
+    #theme-toggle svg {
+      display: block;
+      width: 20px;
+      height: 20px;
+    }
+
+    #search {
+      width: 100%;
+      max-width: 900px;
+      padding: 14px 19px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-tertiary);
+      color: var(--text);
+      font-size: 19px;
+      outline: none;
+      transition: all .15s;
+      margin: 0 auto;
+      display: block;
+    }
+
+    #search:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-ring);
+    }
+
+    #icons {
+      padding: 16px 24px 40px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .icon {
+      width: 100px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .icon:hover .inner {
+      box-shadow: 0 0 12px var(--shadow-hover, var(--shadow));
+    }
+
+    .icon .inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 80px;
+      background: var(--item-bg);
+      box-shadow: 0 0 12px var(--shadow);
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      transition: all .2s ease;
+    }
+
+    .icon .inner i {
+      font-size: 48px;
+      color: var(--text);
+    }
+
+    .label {
+      display: block;
+      margin-top: 8px;
+      padding: 0 4px;
+      font-size: 10px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #notification {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      background: var(--notification-bg);
+      padding: 8px 24px;
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity .3s ease;
+      box-shadow: 0 0 12px var(--shadow);
+      pointer-events: none;
+      max-width: calc(100vw - 32px);
+      word-break: break-all;
+      z-index: 300;
+    }
+
+    #notification.show { opacity: .9; }
+
+    #notification-id { font-weight: 600; }
+
+    .no-results {
+      width: 100%;
+      padding: 48px 16px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .guide-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease;
+      z-index: 200;
+    }
+
+    .guide-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .guide-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(546px, 100vw);
+      height: 100vh;
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border);
+      box-shadow: -8px 0 32px var(--shadow);
+      transform: translateX(100%);
+      transition: transform .28s cubic-bezier(0.22, 0.9, 0.28, 1);
+      z-index: 210;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .guide-panel.show {
+      transform: translateX(0);
+    }
+
+    .guide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-secondary);
+      flex-shrink: 0;
+    }
+
+    .guide-header h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--h1-color);
+    }
+
+    .guide-close {
+      min-width: 36px;
+      min-height: 36px;
+      padding: 0;
+    }
+
+    .guide-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .guide-lead {
+      margin-bottom: 20px;
+      color: var(--text-secondary);
+      font-size: .9rem;
+      line-height: 1.6;
+    }
+
+    .guide-section {
+      margin-bottom: 20px;
+      padding: 16px;
+      background: var(--item-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .guide-section h3 {
+      margin-bottom: 10px;
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--h1-color);
+    }
+
+    .guide-section p {
+      margin-bottom: 10px;
+      font-size: .875rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .guide-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .guide-section code {
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: var(--preview-bg);
+      color: var(--text);
+      font-size: .82rem;
+    }
+
+    .guide-pre {
+      margin: 0;
+      padding: 12px 14px;
+      overflow-x: auto;
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .guide-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .guide-preview-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--preview-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: .85rem;
+      color: var(--text);
+    }
+
+    .guide-icon-16 { font-size: 16px; }
+    .guide-icon-24 { font-size: 24px; }
+    .guide-icon-32 { font-size: 32px; }
+
+    .demo-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border: 1px solid var(--demo-btn-border);
+      border-radius: 8px;
+      background: var(--demo-btn-bg);
+      color: var(--demo-btn-text);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+
+    .demo-btn:hover {
+      background: var(--demo-btn-hover);
+    }
+
+    .guide-downloads {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .guide-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-tertiary);
+      color: var(--text);
+      text-decoration: none;
+      font-size: .85rem;
+      transition: background .15s ease;
+    }
+
+    .guide-download:hover {
+      background: var(--item-hover);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-actions">
+      <button id="guide-open" class="header-btn" type="button">如何使用</button>
+      <button id="theme-toggle" class="header-btn" type="button" title="明暗主题" aria-label="明暗主题">
+        <span id="theme-toggle-icon"></span>
+      </button>
+    </div>
+    <h1>CodIcon</h1>
+    <input type="search" id="search" placeholder="搜索图标名称或描述">
+  </header>
+
+  <main id="icons"></main>
+  <div id="notification">已复制：<span id="notification-id"></span></div>
+
+  <div id="guide-backdrop" class="guide-backdrop" aria-hidden="true"></div>
+  <aside id="guide-panel" class="guide-panel" aria-hidden="true" aria-labelledby="guide-title">
+    <div class="guide-header">
+      <h2 id="guide-title">如何使用</h2>
+      <button id="guide-close" class="header-btn guide-close" type="button" title="关闭" aria-label="关闭">×</button>
+    </div>
+    <div class="guide-body">
+      <p class="guide-lead">引入 <code>codicon.css</code> 后，用类名即可显示 VS Code 图标字体</p>
+
+      <section class="guide-section">
+        <h3>下载资源</h3>
+        <p>将字体与样式放在同一目录，或自行调整 CSS 中的字体路径</p>
+        <div class="guide-downloads">
+          <a class="guide-download" href="codicon.ttf" download="codicon.ttf">下载 TTF</a>
+          <a class="guide-download" href="codicon.css" download="codicon.css">下载 CSS</a>
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <h3>1. 引入样式</h3>
+        <pre class="guide-pre">&lt;link rel="stylesheet" href="codicon.css"&gt;</pre>
+      </section>
+
+      <section class="guide-section">
+        <h3>2. 基础用法</h3>
+        <pre class="guide-pre">&lt;i class="codicon codicon-add"&gt;&lt;/i&gt;
+&lt;i class="codicon codicon-search"&gt;&lt;/i&gt;
+&lt;i class="codicon codicon-settings-gear"&gt;&lt;/i&gt;</pre>
+        <div class="guide-preview">
+          <span class="guide-preview-item"><i class="codicon codicon-add"></i> add</span>
+          <span class="guide-preview-item"><i class="codicon codicon-search"></i> search</span>
+          <span class="guide-preview-item"><i class="codicon codicon-settings-gear"></i> settings-gear</span>
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <h3>3. 调整大小与颜色</h3>
+        <pre class="guide-pre">&lt;i class="codicon codicon-heart" style="color:#ef4444"&gt;&lt;/i&gt;</pre>
+        <div class="guide-preview">
+          <i class="codicon codicon-heart guide-icon-24" style="color:var(--heart-red)"></i>
+          <i class="codicon codicon-heart guide-icon-24" style="color:var(--heart-yellow)"></i>
+          <i class="codicon codicon-heart guide-icon-24" style="color:var(--heart-blue)"></i>
+          <i class="codicon codicon-heart guide-icon-24" style="color:var(--heart-purple)"></i>
+        </div>
+        <p>图标本质是字体，直接改 <code>font-size</code> 和 <code>color</code> 即可</p>
+      </section>
+
+      <section class="guide-section">
+        <h3>4. 放在按钮里</h3>
+        <pre class="guide-pre">&lt;button class="demo-btn"&gt;
+  &lt;i class="codicon codicon-save"&gt;&lt;/i&gt;
+  保存
+&lt;/button&gt;</pre>
+        <div class="guide-preview">
+          <button class="demo-btn" type="button">
+            <i class="codicon codicon-save"></i>
+            保存
+          </button>
+          <button class="demo-btn" type="button">
+            <i class="codicon codicon-trash"></i>
+            删除
+          </button>
+        </div>
+      </section>
+
+      <section class="guide-section">
+        <h3>5. 查找图标名</h3>
+        <p>在本页搜索并点击图标，即可复制对应 HTML 代码</p>
+      </section>
+    </div>
+  </aside>
+
+  <script src="icons.js"></script>
+  <script>
+    (function initTheme() {
+      var html = document.documentElement;
+      var btn = document.getElementById('theme-toggle');
+      var icon = document.getElementById('theme-toggle-icon');
+      var saved = localStorage.getItem('codicon-theme') || 'dark';
+      var ICONS = {
+        sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>',
+        moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'
+      };
+
+      html.classList.add(saved);
+      html.classList.toggle('light', saved === 'light');
+      html.classList.toggle('dark', saved === 'dark');
+
+      function updateThemeIcon(isDark) {
+        icon.innerHTML = isDark ? ICONS.sun : ICONS.moon;
+      }
+
+      updateThemeIcon(saved === 'dark');
+      btn.addEventListener('click', function() {
+        var isDark = html.classList.toggle('dark');
+        html.classList.toggle('light', !isDark);
+        updateThemeIcon(isDark);
+        localStorage.setItem('codicon-theme', isDark ? 'dark' : 'light');
+      });
+    })();
+
+    (function initGuide() {
+      var body = document.body;
+      var openBtn = document.getElementById('guide-open');
+      var closeBtn = document.getElementById('guide-close');
+      var backdrop = document.getElementById('guide-backdrop');
+      var panel = document.getElementById('guide-panel');
+
+      function setGuideOpen(isOpen) {
+        body.classList.toggle('guide-open', isOpen);
+        backdrop.classList.toggle('show', isOpen);
+        panel.classList.toggle('show', isOpen);
+        backdrop.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        panel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+      }
+
+      openBtn.addEventListener('click', function() {
+        setGuideOpen(true);
+      });
+
+      closeBtn.addEventListener('click', function() {
+        setGuideOpen(false);
+      });
+
+      backdrop.addEventListener('click', function() {
+        setGuideOpen(false);
+      });
+
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          setGuideOpen(false);
+        }
+      });
+    })();
+
+    var iconsRoot = document.getElementById('icons');
+    var search = document.getElementById('search');
+    var notification = document.getElementById('notification');
+    var notificationText = document.getElementById('notification-id');
+    var timer;
+
+    function iconCode(name) {
+      return '<i class="codicon codicon-' + name + '"></i>';
+    }
+
+    function iconSearchText(name) {
+      var description = ICON_DESCRIPTIONS[name] || '';
+      return (name + ' ' + description).replace(/-/g, ' ').toUpperCase();
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+      var copier = document.createElement('textarea');
+      copier.value = text;
+      copier.setAttribute('readonly', '');
+      copier.style.position = 'absolute';
+      copier.style.left = '-9999px';
+      document.body.appendChild(copier);
+      copier.select();
+      document.execCommand('copy');
+      document.body.removeChild(copier);
+      return Promise.resolve();
+    }
+
+    function showNotification(text) {
+      window.clearTimeout(timer);
+      notificationText.textContent = text;
+      notification.classList.add('show');
+      timer = window.setTimeout(function() {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    function renderIcons(filter) {
+      var keyword = (filter || '').trim().toUpperCase();
+      var visible = 0;
+      var fragment = document.createDocumentFragment();
+
+      ICON_NAMES.forEach(function(name) {
+        if (keyword && iconSearchText(name).indexOf(keyword) === -1) {
+          return;
+        }
+
+        visible += 1;
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'icon';
+        button.title = name;
+        button.innerHTML =
+          '<span class="inner"><i class="codicon codicon-' + name + '" aria-hidden="true"></i></span>' +
+          '<span class="label">' + name + '</span>';
+        button.addEventListener('click', function() {
+          var code = iconCode(name);
+          copyText(code).then(function() {
+            showNotification(code);
+          });
+        });
+        fragment.appendChild(button);
+      });
+
+      iconsRoot.replaceChildren(fragment);
+      if (!visible) {
+        iconsRoot.innerHTML = '<div class="no-results">没有匹配的图标</div>';
+      }
+    }
+
+    search.addEventListener('input', function() {
+      renderIcons(search.value);
+    });
+
+    renderIcons();
+    search.focus();
+  </script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 # 仅将 tools/ 目录发布到 GitHub Pages，站点根路径即 tools 内容（如 /emoj/）
+# 约定：静态工具直接复制子目录；含 package.json 且带 build 脚本的先构建，仅发布 dist/
 name: Deploy tools to Pages
 
 on:
@@ -27,21 +28,49 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: tools/skill-matrix/package-lock.json
-      - name: Build Skills matrix (light)
-        run: npm ci && npm run build
-        working-directory: tools/skill-matrix
-      - name: Assemble publish dir
+          cache-dependency-path: tools/**/package-lock.json
+
+      - name: 构建需编译的 tools
         run: |
-          mkdir -p _publish/skill-matrix
-          cp -r tools/index.html tools/js tools/res tools/emoj tools/pngya tools/video-compressor _publish/
-          cp -r tools/skill-matrix/dist _publish/skill-matrix/
+          set -euo pipefail
+          shopt -s nullglob
+          for dir in tools/*/; do
+            pkg="${dir}package.json"
+            [ -f "$pkg" ] || continue
+            grep -q '"build"' "$pkg" || continue
+            echo "构建 $(basename "$dir")..."
+            (cd "$dir" && npm ci && npm run build)
+          done
+
+      - name: 组装发布目录
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          mkdir -p _publish
+
+          for item in tools/*; do
+            name=$(basename "$item")
+            if [ -f "$item" ]; then
+              cp "$item" _publish/
+            elif [ -d "$item" ]; then
+              if [ -f "$item/package.json" ] && grep -q '"build"' "$item/package.json"; then
+                [ -d "$item/dist" ] || { echo "构建产物缺失: $name/dist"; exit 1; }
+                mkdir -p "_publish/$name"
+                rsync -a "$item/dist/" "_publish/$name/dist/"
+              else
+                cp -r "$item" _publish/
+              fi
+            fi
+          done
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _publish
+
       - id: deployment
         uses: actions/deploy-pages@v4
