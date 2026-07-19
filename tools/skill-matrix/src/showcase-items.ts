@@ -88,6 +88,14 @@ const skills = sortSkills([
     "渠",
   ),
   skill(
+    "skill-html-cut",
+    "HTML Cut",
+    "html-cut",
+    "将网页或本地 HTML 渲染为高清 PNG 截图，支持全页、视口、分辨率与加载等待控制。",
+    "截",
+    "new",
+  ),
+  skill(
     "skill-fetch-what-say",
     "Fetch What Say",
     "fetch-what-say",

@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>任务交接：QQ `exec-log` 真实联调</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg:#080b13;
+  --panel:#111827;
+  --panel-strong:#172033;
+  --panel-soft:#0d1320;
+  --line:#253044;
+  --line-soft:rgba(148,163,184,0.14);
+  --text:#e5edf8;
+  --muted:#7f8da3;
+  --muted-strong:#a8b3c7;
+  --blue:#60a5fa;
+  --blue-strong:#38bdf8;
+  --green:#22c55e;
+  --yellow:#f59e0b;
+  --red:#ef4444;
+  --red-bg:rgba(127,29,29,0.42);
+  --shadow:0 24px 80px rgba(0,0,0,0.38);
+}
+body {
+  font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#0d1117;
+  color:#cdd6f4;
+  padding:40px 20px 80px;
+  line-height:1.7;
+}
+.container { max-width:900px; margin:0 auto; }
+header {
+  position:relative;
+  padding:10px 18px 12px;
+  margin-bottom:34px;
+  overflow:hidden;
+  text-align:center;
+  border:1px solid var(--line-soft);
+  border-radius:10px;
+  background:linear-gradient(145deg,rgba(17,24,39,0.94),rgba(15,23,42,0.76));
+  box-shadow:var(--shadow);
+}
+header::before {
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  content:"";
+  background:linear-gradient(90deg,transparent,rgba(96,165,250,0.16),transparent);
+  transform:translateX(-45%);
+}
+#mainTitle {
+  position:relative;
+  width:100%;
+  padding:4px 12px;
+  border:1px solid transparent;
+  border-radius:8px;
+  background:none;
+  color:#f8fafc;
+  font-family:inherit;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-0.03em;
+  text-align:center;
+  text-shadow:0 0 30px rgba(56,189,248,0.28);
+  transition:background 0.18s,border-color 0.18s;
+}
+#mainTitle:hover, #mainTitle:focus { border-color:rgba(96,165,250,0.42); outline:none; background:rgba(15,23,42,0.58); }
+.meta { position:relative; color:var(--muted-strong); font-size:13px; }
+
+/* toolbar */
+.toolbar {
+  display:flex; gap:8px; justify-content:center; margin-bottom:28px; flex-wrap:wrap;
+}
+.toolbar button {
+  background:#21262d; color:#cdd6f4; border:1px solid #30363d; border-radius:8px;
+  padding:8px 16px; font-size:13px; cursor:pointer; font-family:inherit; transition:all 0.15s;
+}
+.toolbar button:hover { background:#30363d; }
+.toolbar button.save { background:#238636; border-color:#2ea043; color:#fff; }
+.toolbar button.save:hover { background:#2ea043; }
+
+/* section */
+.section {
+  background:#161b22; border:1px solid #21262d; border-radius:10px;
+  margin-bottom:16px; overflow:hidden;
+}
+.s-head {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 16px;
+  border-bottom:1px solid var(--line-soft);
+  background:linear-gradient(90deg,rgba(30,41,59,0.84),rgba(15,23,42,0.72));
+}
+.s-ico {
+  font-size:18px; cursor:default;
+}
+.s-title {
+  flex:1; background:none; border:1px solid transparent; border-radius:6px;
+  color:#cdd6f4; font-size:15px; font-weight:600; font-family:inherit;
+  padding:2px 8px;
+}
+.s-title:hover { border-color:#30363d; }
+.s-title:focus { border-color:#58a6ff; outline:none; background:#0d1117; }
+
+.s-add {
+  background:none; border:1px dashed #30363d; border-radius:6px;
+  color:#484f58; cursor:pointer; font-size:18px; width:28px; height:28px;
+  display:flex; align-items:center; justify-content:center;
+}
+.s-add:hover { color:#58a6ff; border-color:#58a6ff; }
+.s-del {
+  background:none; border:none; color:#484f58; cursor:pointer;
+  font-size:18px; width:28px; height:28px;
+  display:flex; align-items:center; justify-content:center; border-radius:6px;
+}
+.s-del:hover { color:#f85149; background:#3d1416; }
+
+.content { padding:12px 16px; }
+.content:empty::before { content:"点击右侧 ＋ 添加内容"; color:#30363d; display:block; padding:8px 0; }
+
+/* row */
+.row {
+  display:flex; align-items:center; gap:6px; margin-bottom:6px;
+  padding:6px 10px; border-radius:6px; background:#0d1117;
+  border-left:3px solid #30363d;
+}
+.row:hover .row-del { opacity:1; }
+.row.done { border-left-color:#238636; }
+.row.done .row-text { text-decoration:line-through; color:#6c7086; }
+.row.todo { border-left-color:#d29922; }
+.row.para { border-left-color:#58a6ff; }
+.section.goal .row { border-left-color:#58a6ff; }
+.section.progress .row.done { border-left-color:#238636; }
+.section.progress .row.todo { border-left-color:#d29922; }
+.section.todos .row { border-left-color:#d29922; }
+.section.decision .row { border-left-color:#a371f7; }
+.section.files .row { border-left-color:#39c5cf; }
+.section.note .row { border-left-color:#f85149; }
+
+.row-text {
+  flex:1; background:none; border:1px solid transparent; border-radius:4px;
+  color:#cdd6f4; font-size:14px; font-family:inherit; padding:2px 6px;
+  line-height:1.6; resize:none; overflow:hidden; min-height:24px;
+}
+.row-text:hover { border-color:#30363d; }
+.row-text:focus { border-color:#58a6ff; outline:none; background:#1c2128; }
+
+.row-toggle {
+  width:26px; height:26px; border-radius:50%; border:none; background:none;
+  cursor:pointer; color:#484f58; font-size:14px; display:flex;
+  align-items:center; justify-content:center; flex-shrink:0;
+}
+.row.done .row-toggle { color:#238636; }
+.row.todo .row-toggle { color:#d29922; }
+
+.row-del {
+  color:#f85149; background:none; border:none;
+  cursor:pointer; font-size:13px; padding:4px 8px; flex-shrink:0;
+  font-family:inherit; border-radius:4px; opacity:0; transition:opacity 0.15s;
+}
+.row:hover .row-del { opacity:1; }
+.row-del:hover { background:#3d1416; }
+
+/* add section */
+.add-section {
+  border:2px dashed #21262d; border-radius:10px; padding:20px;
+  text-align:center; cursor:pointer; color:#484f58; font-size:14px;
+  margin-bottom:20px; transition:all 0.2s;
+}
+.add-section:hover { border-color:#30363d; color:#6c7086; }
+
+footer { text-align:center; padding:32px 0 0; color:#30363d; font-size:12px; }
+
+/* toast */
+.toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px);
+  background:#238636; color:#fff; padding:10px 24px; border-radius:8px;
+  font-size:14px; opacity:0; transition:all 0.3s; z-index:999;
+  pointer-events:none;
+}
+.toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <input id="mainTitle" value="任务交接：QQ `exec-log` 真实联调" />
+    <p class="meta">任务交接文档 · 直接编辑内容，随时保存</p>
+  </header>
+  <div class="toolbar">
+    <button class="save" onclick="writeBack()">回写</button>
+    <button onclick="saveMd()">复制</button>
+    <button onclick="autoSave()">导出文件</button>
+  </div>
+  <div id="sectionsRoot"></div>
+  <div class="add-section" onclick="addSection()">＋ 添加新区块</div>
+  <footer>switch-chat skill</footer>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+var SECTIONS = [{"title": "工作目标", "icon": "📋", "paragraphs": ["在真实 QQ 环境验证新实现的 `QQ_STREAM_MODE=exec-log`：C2C 任务运行时显示命令/文件活动，结束后同一条流消息替换为纯最终回答，并正确落盘、恢复会话和发送 `msg_tail`。"], "items": []}, {"title": "当前进度", "icon": "🚧", "paragraphs": [], "items": [{"type": "done", "text": "已实现 `exec-log` 流式路径，默认仍为 `app-server`"}, {"type": "done", "text": "新增 `src/codex-job-runner.mjs`，为每轮创建 `<workspace>/.qq-runs/<message-id>/`"}, {"type": "done", "text": "新增 `src/codex-log-tail.mjs`，按 byte offset 增量读取 JSONL，处理半行、坏行和超大行"}, {"type": "done", "text": "新增 `src/codex-stream-parser.mjs` 与 `src/stream-renderer.mjs`"}, {"type": "done", "text": "`src/codex-gateway.mjs` 支持 `QQ_STREAM_MODE=app-server|exec-log`"}, {"type": "done", "text": "`src/qq-gateway.mjs` 改为 QQ 全文 replace 语义，终态可替换掉运行进度区"}, {"type": "done", "text": "修复已开流 update/DONE 失败时的静态失败补偿"}, {"type": "done", "text": "修复 `exec-log` 静态路径忽略 partial，不会调用空 `onPartial`"}, {"type": "done", "text": "更新 `.env.example`、`.gitignore`、`README.md`"}, {"type": "done", "text": "新增 parser、renderer、tailer、runner、QQ 流失败、静态回调测试"}, {"type": "done", "text": "`npm test` 通过：24/24"}, {"type": "done", "text": "tester 独立最终验收通过"}, {"type": "todo", "text": "尚未真实 QQ 联调"}, {"type": "todo", "text": "所有改动尚未提交"}]}, {"title": "注意事项", "icon": "⚠️", "paragraphs": [], "items": [{"type": "text", "text": "`exec-log` 的 agent 文本来自完成事件，不是 token 级 delta；进度体验以工具活动为主"}, {"type": "text", "text": "C2C `stream_messages` 必须基于 5 分钟内的入站消息"}, {"type": "text", "text": "首帧后 stream update 或 DONE 失败时，代码会发独立静态失败补偿；这可能产生一条旧流消息加一条失败提示，是刻意的可靠性优先策略"}, {"type": "text", "text": "测试和 tester 均已通过，但真实 QQ API 的 replace 渲染、msg_seq、媒体顺序仍必须以本次联调为准"}, {"type": "text", "text": "项目工作树有未提交实现，也有用户原有未跟踪 `docs/`；提交前请按文件逐项确认"}]}, {"title": "关键改动", "icon": "✏️", "paragraphs": ["### 新增模块", "### 已修改模块", "### 运行目录", "```text", "<当前会话 workspace>/.qq-runs/<QQ-message-id>/", "events.jsonl", "codex.log", "last.txt", "meta.json", "```", "`meta.json` 含 runId、pid、workspace、sessionId、开始/结束时间、exitCode、phase。"], "items": [{"type": "text", "text": "`src/codex-job-runner.mjs`：启动 `codex exec --json`、创建运行目录、写 meta、读取 `last.txt`"}, {"type": "text", "text": "`src/codex-log-tail.mjs`：JSONL 增量 tail、节流、结束 flush"}, {"type": "text", "text": "`src/codex-stream-parser.mjs`：归约 `thread.started`、`command_execution`、`file_change`、`agent_message`、`turn.completed`"}, {"type": "text", "text": "`src/stream-renderer.mjs`：将快照渲染成 QQ 的“进度 + 草稿”全文"}, {"type": "text", "text": "`src/codex-gateway.mjs`：`--stream-json` 下按 `QQ_STREAM_MODE` 选择 app-server 或 exec-log"}, {"type": "text", "text": "`src/qq-gateway.mjs`：传递 run ID/流配置、接收 `run` 元数据、QQ replace、错误补偿、静态 exec-log bridge"}]}, {"title": "联调前配置", "icon": "✏️", "paragraphs": ["在实际 `.env` 中确认：", "```bash", "QQ_STREAMING=true", "QQ_STREAM_MODE=exec-log", "QQ_RUN_DIR=.qq-runs", "QQ_STREAM_ACTIVITY_LIMIT=5", "QQ_STREAM_RENDER_THROTTLE_MS=500", "```"], "items": [{"type": "text", "text": "`QQ_STREAM_MODE` 默认是 `app-server`，真实联调前必须显式改为 `exec-log`"}, {"type": "text", "text": "改动 `.env` 后重启网关：`./tools/start-qq-gateway.sh`"}, {"type": "text", "text": "不要提交 `.env`、`.qq-runs`、`.qq-codex-sessions.json`"}, {"type": "text", "text": "`QQ_RUN_RETENTION_DAYS` 目前仅是文档预留，尚未实现自动清理"}]}, {"title": "真实联调步骤", "icon": "✏️", "paragraphs": ["### 1. C2C 新建任务", "1. 重启网关后，私聊机器人发送：", "```text", "请执行 pwd，然后创建 stream-smoke.txt，内容为 hello，最后说明完成了什么。", "```", "2. 预期 QQ 运行中显示：", "3. 预期结束时：", "### 2. 主机落盘检查", "找到当前私聊 workspace 的新运行目录：", "```bash", "find \"${QQ_WORKSPACE_ROOT:-$HOME/.qq-codex-workspaces}\" \\", "-path '*/.qq-runs/*' -type f -print", "```", "检查最新目录：", "```bash", "RUN_DIR='<最新 .qq-runs/<message-id> 目录>'", "find \"$RUN_DIR\" -maxdepth 1 -type f -print", "python3 -m json.tool \"$RUN_DIR/meta.json\"", "```", "预期：四个文件都存在，`meta.json` 的 `phase` 为 `completed`，`exitCode` 为 `0`，`sessionId` 非空。", "### 3. C2C resume", "在同一私聊发送：", "```text", "读取刚才创建的 stream-smoke.txt，并告诉我内容。", "```", "预期：", "### 4. 文件变更活动", "发送：", "```text", "请使用 apply_patch 把 stream-smoke.txt 的 hello 改为 hello QQ，然后说明修改结果。", "```", "预期进度区出现类似：", "```text", "```", "### 5. 媒体与小尾巴顺序", "可让 Codex 在 workspace 创建一个允许发送的 `.txt` 文件，并在最终回答中输出：", "```text", "<qqmedia>绝对路径</qqmedia>", "```", "预期：纯最终正文 → 媒体 → 单独 `msg_tail`，不应把 `<qqmedia>` 标签或进度区留在最终流正文。", "### 6. 静态回退", "任选一项验证：", "预期：不走 QQ `stream_messages`，最终静态回复正常；`exec-log` 仍生成运行目录，且主机日志不应出现 `onPartial is not a function`。", "### 7. 默认回归", "将 `.env` 改回：", "```bash", "QQ_STREAM_MODE=app-server", "```", "重启后在 C2C 发送一个短任务。", "预期：现有 app-server 流式行为正常，且不创建新的 `.qq-runs` 目录。"], "items": [{"type": "text", "text": "`**进度**`"}, {"type": "text", "text": "命令活动，例如 `$ pwd`、创建/修改文件"}, {"type": "text", "text": "可选 agent 草稿"}, {"type": "text", "text": "同一条 C2C 流消息替换为纯最终回答"}, {"type": "text", "text": "不保留进度区"}, {"type": "text", "text": "单独收到 model/ctx/session/run 的 `msg_tail`"}, {"type": "text", "text": "仍出现 exec-log 进度区"}, {"type": "text", "text": "新建另一条 `.qq-runs/<message-id>/`"}, {"type": "text", "text": "新旧 `meta.json` 的 `sessionId` 相同"}, {"type": "text", "text": "回复成功恢复上下文"}, {"type": "text", "text": "修改 `stream-smoke.txt` ✓"}, {"type": "text", "text": "在群聊发送普通任务"}, {"type": "text", "text": "临时设 `QQ_STREAMING=false` 后重启，向 C2C 发送普通任务"}]}, {"title": "已验证的技术事实", "icon": "✏️", "paragraphs": [], "items": [{"type": "text", "text": "QQ SDK `@tencent-connect/qqbot-nodejs@1.0.4` 使用 `input_mode=replace`，每帧可以原位替换全文"}, {"type": "text", "text": "新建 `codex exec --json` 支持 `--cd`、`--sandbox`、`--color never`"}, {"type": "text", "text": "`codex exec resume --json` 不支持 `--cd`、`--sandbox`、`--color`；实现通过子进程 `cwd=workspace` 恢复"}, {"type": "text", "text": "图像参数位于 prompt 后，避免 CLI 的可变参数吞掉 prompt"}, {"type": "text", "text": "app-server 创建的 session 已在本机验证可被 `codex exec resume` 恢复"}, {"type": "text", "text": "工具命令失败不必然使 Codex 子进程非零；应在活动区显示失败，但不自动判整个 turn 失败"}]}];
+var FILE_PATH = null;
+var SAVE_ENDPOINT = "http://127.0.0.1:56215/save";
+var CONTINUE_COMMAND = '/switch-chat 继续';
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function sectionClass(title) {
+  var map = {
+    '工作目标':'goal',
+    '当前进度':'progress',
+    '待办事项':'todos',
+    '关键决策':'decision',
+    '关键文件':'files',
+    '注意事项':'note'
+  };
+  return map[title] || 'other';
+}
+
+function render() {
+  var root = document.getElementById('sectionsRoot');
+  root.innerHTML = '';
+  SECTIONS.forEach(function(sec, si) {
+    var el = document.createElement('div');
+    el.className = 'section ' + sectionClass(sec.title);
+    el.dataset.si = si;
+
+    var rows = '';
+    (sec.paragraphs || []).forEach(function(p, pi) {
+      rows += '<div class="row para" data-si="'+si+'" data-pi="'+pi+'">'
+        + '<textarea class="row-text" rows="1" oninput="autoResize(this)" onblur="syncEdit(this)">'+esc(p)+'</textarea>'
+        + '<button class="row-del" onclick="delRow('+si+',0,'+pi+')">[删除]</button></div>';
+    });
+    (sec.items || []).forEach(function(it, ii) {
+      var ch = it.type === 'done' ? '✓' : it.type === 'todo' ? '○' : '';
+      var toggle = ch ? '<button class="row-toggle" onclick="toggleType('+si+','+ii+')">'+ch+'</button>' : '';
+      rows += '<div class="row '+it.type+'" data-si="'+si+'" data-ii="'+ii+'">'
+        + toggle
+        + '<textarea class="row-text" rows="1" oninput="autoResize(this)" onblur="syncEdit(this)">'+esc(it.text)+'</textarea>'
+        + '<button class="row-del" onclick="delRow('+si+',1,'+ii+')">[删除]</button></div>';
+    });
+
+    el.innerHTML = '<div class="s-head">'
+      + '<span class="s-ico">'+sec.icon+'</span>'
+      + '<input class="s-title" value="'+esc(sec.title)+'" onblur="syncTitle('+si+',this)" onkeydown="if(event.key===\'Enter\')this.blur()"/>'
+      + '<button class="s-add" onclick="addRow('+si+')" title="添加行">＋</button>'
+      + '<button class="s-del" onclick="delSection('+si+')" title="删除区块">×</button></div>'
+      + '<div class="content">'+rows+'</div>';
+    root.appendChild(el);
+  });
+  // resize all textareas
+  document.querySelectorAll('.row-text').forEach(function(ta) { autoResize(ta); });
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function autoResize(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+}
+
+function syncTitle(si, input) { SECTIONS[si].title = input.value.trim(); }
+
+function syncEdit(ta) {
+  var row = ta.parentElement;
+  var si = parseInt(row.dataset.si);
+  if (row.dataset.pi !== undefined) {
+    SECTIONS[si].paragraphs[parseInt(row.dataset.pi)] = ta.value.trim();
+  } else {
+    SECTIONS[si].items[parseInt(row.dataset.ii)].text = ta.value.trim();
+  }
+}
+
+function syncAllEdits() {
+  document.querySelectorAll('.s-title').forEach(function(input) {
+    var section = input.closest('.section');
+    if (section) syncTitle(parseInt(section.dataset.si), input);
+  });
+  document.querySelectorAll('.row-text').forEach(function(ta) {
+    syncEdit(ta);
+  });
+}
+
+function toggleType(si, ii) {
+  var it = SECTIONS[si].items[ii];
+  it.type = it.type === 'done' ? 'todo' : it.type === 'todo' ? 'done' : it.type;
+  render();
+}
+
+function delRow(si, type, idx) {
+  if (type === 0) SECTIONS[si].paragraphs.splice(idx, 1);
+  else SECTIONS[si].items.splice(idx, 1);
+  render();
+}
+
+function delSection(si) {
+  SECTIONS.splice(si, 1);
+  render();
+}
+
+function addRow(si) {
+  SECTIONS[si].items.push({type:'todo', text:'', _id: uid()});
+  render();
+  // focus the new textarea
+  setTimeout(function() {
+    var rows = document.querySelectorAll('.section[data-si="'+si+'"] .row-text');
+    if (rows.length) rows[rows.length-1].focus();
+  }, 0);
+}
+
+function addSection() {
+  SECTIONS.push({title:'新段落', icon:'✏️', paragraphs:[], items:[]});
+  render();
+}
+
+function buildMd() {
+  var lines = ['# ' + document.getElementById('mainTitle').value.trim(), ''];
+  SECTIONS.forEach(function(sec) {
+    lines.push('## ' + sec.title, '');
+    (sec.paragraphs||[]).forEach(function(p) { if(p) lines.push(p, ''); });
+    (sec.items||[]).forEach(function(it) {
+      if (it.type === 'done') lines.push('- [x] ' + it.text);
+      else if (it.type === 'todo') lines.push('- [ ] ' + it.text);
+      else if (it.text) lines.push('- ' + it.text);
+    });
+    lines.push('');
+  });
+  return lines.join('\n');
+}
+
+function autoSave() {
+  var md = buildMd();
+  var blob = new Blob([md], {type:'text/markdown'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'switch-chat.md';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('已下载文件');
+}
+
+function saveMd() {
+  var md = buildMd();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(md).then(function() { toast('已复制到剪贴板'); })
+      } else {
+    // fallback copy with textarea
+    var ta = document.createElement('textarea');
+    ta.value = md; ta.style.position='fixed'; ta.style.left='-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('已复制到剪贴板'); }
+    catch(e) { toast('复制失败'); }
+    ta.remove();
+  }
+}
+
+function copyContinueCommand(message) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(CONTINUE_COMMAND).then(function() { toast(message); });
+    return;
+  }
+  var ta = document.createElement('textarea');
+  ta.value = CONTINUE_COMMAND; ta.style.position='fixed'; ta.style.left='-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast(message); }
+  catch(e) { toast('已回写，复制继续命令失败'); }
+  ta.remove();
+}
+
+function writeBack() {
+  syncAllEdits();
+  if (!SAVE_ENDPOINT) {
+    toast('请用 --open 启动回写服务');
+    return;
+  }
+  fetch(SAVE_ENDPOINT, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      title:document.getElementById('mainTitle').value.trim(),
+      sections:SECTIONS
+    })
+  }).then(function(res) {
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }).then(function() {
+    copyContinueCommand('新会话粘贴即可');
+  }).catch(function() {
+    toast('回写失败');
+  });
+}
+
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(function() { el.classList.remove('show'); }, 2000);
+}
+
+document.getElementById('mainTitle').addEventListener('blur', function() {
+  document.title = this.value.trim();
+});
+
+render();
+</script>
+</body>
+</html>
