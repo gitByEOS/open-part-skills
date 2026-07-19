@@ -78,6 +78,32 @@ document.addEventListener("drop", (e) => {
   if (e.dataTransfer.files.length) queueFiles(e.dataTransfer.files);
 });
 
+document.addEventListener("paste", (e) => {
+  const files = pickImagesFromClipboard(e.clipboardData?.items);
+  if (!files.length) return;
+  e.preventDefault();
+  queueFiles(files);
+});
+
+function pickImagesFromClipboard(items) {
+  return Array.from(items || [])
+    .filter((item) => item.kind === "file" && /^image\/(png|jpeg)$/.test(item.type))
+    .map((item) => normalizePastedFile(item.getAsFile()))
+    .filter(Boolean);
+}
+
+/** 剪贴板图片常无扩展名，补全以便 detectFormat */
+function normalizePastedFile(file) {
+  if (!file) return null;
+  const lower = file.name.toLowerCase();
+  if (lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg")) {
+    return file;
+  }
+  const ext = file.type === "image/png" ? "png" : "jpg";
+  const stem = file.name.replace(/\.[^.]+$/, "") || `paste-${Date.now()}`;
+  return new File([file], `${stem}.${ext}`, { type: file.type });
+}
+
 function queueFiles(fileList) {
   pendingFiles.push(...Array.from(fileList));
   if (!processing) processQueue();
