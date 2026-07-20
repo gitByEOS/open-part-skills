@@ -96,6 +96,14 @@ const skills = sortSkills([
     "new",
   ),
   skill(
+    "skill-port-to-public",
+    "Port to Public",
+    "port-to-public",
+    "临时通过 Cloudflare Quick Tunnel 将本机 loopback HTTP(S) 服务暴露到公网，支持启动、状态、验证与停止。",
+    "穿",
+    "new",
+  ),
+  skill(
     "skill-fetch-what-say",
     "Fetch What Say",
     "fetch-what-say",
