@@ -116,7 +116,7 @@ const skills = sortSkills([
     "esflow",
     "编排 Python DAG workflow，支持暂停协作、定点续跑、扇出与兜底链。",
     "流",
-    "new",
+    "hot",
   ),
   skill(
     "skill-git-review",
@@ -153,7 +153,6 @@ const skills = sortSkills([
     "okr-to-html",
     "将 OKR Markdown 生成为可切换 Objective 的单页 HTML 看板。",
     "讲",
-    "new",
   ),
   skill(
     "skill-meet-record-html",
@@ -161,7 +160,6 @@ const skills = sortSkills([
     "meet-record-html",
     "将面试/会谈问题 Markdown 生成为可现场填写总结、可临时追加问题的纪要 HTML。",
     "纪",
-    "new",
   ),
   skill(
     "skill-similar-judge",
@@ -183,7 +181,6 @@ const skills = sortSkills([
     "skill-publish-verify",
     "发布前黑盒验证：隔离 venv + 路径，agent 以新用户身份自验任意 skill，产出可用性报告。",
     "验",
-    "new",
   ),
   skill("skill-testcase", "Testcase", "testcase", "按规则补全测试用例覆盖，提升完整性与有效性。", "测"),
   skill(
@@ -206,6 +203,22 @@ const skills = sortSkills([
     "weather-search",
     "按地点与活动半径查周边天气与空气质量，输出 Markdown 报告与出门防护建议。",
     "天",
+  ),
+  skill(
+    "skill-lan-chat",
+    "LAN Chat",
+    "lan-chat",
+    "零依赖临时局域网聊天室，支持浏览器聊天、文件传输、粘贴图片，同 Wi-Fi 手机电脑即用。",
+    "传",
+    "new",
+  ),
+  skill(
+    "skill-md-to-png",
+    "MD to PNG",
+    "md-to-png",
+    "把 Markdown 渲染成 VitePress 风格 HTML，再调用 html-cut 截图为高清 PNG，方便手机查看。",
+    "渲",
+    "new",
   ),
 ]);
 

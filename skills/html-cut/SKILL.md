@@ -19,11 +19,11 @@ repository: https://github.com/gitByEOS/open-part-skills
 ### 远程网页与深浅色
 
 ```bash
-# 默认按暗色系统偏好渲染，全页高清截图
+# 默认按亮色偏好渲染，全页高清截图
 python3 scripts/capture.py https://example.com /tmp/example.png
 
-# 指定亮色偏好
-python3 scripts/capture.py https://example.com /tmp/example-light.png --color-scheme light
+# 指定暗色偏好
+python3 scripts/capture.py https://example.com /tmp/example-dark.png --color-scheme dark
 ```
 
 ### 本地开发服务
@@ -70,7 +70,7 @@ python3 scripts/capture.py http://localhost:3000 /tmp/app.png \
 | `--wait MS` | 导航完成后的额外等待时间，默认 `5000`；动态页面可调大 |
 | `--timeout MS` | 导航超时，默认 `45000` |
 | `--wait-until load\|domcontentloaded\|networkidle\|commit` | 导航完成条件，默认 `load` |
-| `--color-scheme dark\|light` | 模拟系统深浅色偏好，默认 `dark` |
+| `--color-scheme dark\|light` | 模拟系统深浅色偏好，默认 `light` |
 | `--full-page` / `--no-full-page` | 是否截取完整页面；默认全页，后者仅截取当前视口 |
 | `--visible` | 显示 Chromium 窗口，方便排查渲染问题 |
 

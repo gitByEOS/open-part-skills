@@ -63,8 +63,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--color-scheme",
         choices=COLOR_SCHEME_VALUES,
-        default="dark",
-        help="模拟系统深浅色偏好，默认 dark",
+        default="light",
+        help="模拟系统深浅色偏好，默认 light",
     )
     parser.add_argument(
         "--full-page",

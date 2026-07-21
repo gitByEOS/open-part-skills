@@ -33,7 +33,6 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过 fzf 支持搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
 | [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.3 | 2026-07-06 |
 | [mock-ollama](./skills/mock-ollama/SKILL.md) | 启动 mock-ollama 服务，模拟 Ollama API 代理到真实 LLM，监控请求响应数据并提供 Dashboard | 1.0.0 | 2026-06-09 |
-| [fetch-what-say](./skills/fetch-what-say/SKILL.md) |把网站媒体或本地视频，提取文本内容并生成摘要 | 1.0.0 | 2026-06-20 |
 | [holiday-of-12306](./skills/holiday-of-12306/SKILL.md) | 生成全年 12306 节假日抢票日历，又忘记抢票了！使用 Skill 一次性解决掉 | 1.1.0 | 2026-07-06 |
 | [voice-clone](./skills/voice-clone/SKILL.md) | 使用 Confucius4-TTS Gradio API 做参考音色克隆和文本转语音 | 1.0.0 | 2026-06-23 |
 | [similar-judge](./skills/similar-judge/SKILL.md) | 对比两份文本差异，输出相似度与词级差异 JSON，供 agent 程序化量化产物与目标的文本差距，可以用来循环迭代提示词 | 1.0.0 | 2026-06-28 |
@@ -42,6 +41,16 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [meet-record-html](./skills/meet-record-html/SKILL.md) | 将面试/会谈问题 Markdown 生成为可现场填写总结、可临时追加问题的纪要 HTML | 1.0.0 | 2026-07-07 |
 | [weather-search](./skills/weather-search/SKILL.md) | 按地点与活动半径查周边天气与空气质量，输出报告与出门防护建议 | 1.0.0 | 2026-07-09 |
 | [esflow](./skills/esflow/SKILL.md) | 教会Agent如何使用esflow，简化学习成本，直接从需求到落地 | 0.1.4 | 2026-07-09 |
+
+## Qbot Skills
+
+为24小时待命 QQ机器人 定制的技能组合，方便远程办公。
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
+| [fetch-what-say](./skills/fetch-what-say/SKILL.md) |把网站媒体或本地视频，提取文本内容并生成摘要 | 1.0.0 | 2026-06-20 |
+| [lan-chat](./skills/lan-chat/SKILL.md) | 局域网聊天室，支持文件传输，方便把产物发到主力机 | 1.0.0 | 2026-07-21 |
+| [md-to-png](./skills/md-to-png/SKILL.md) | 把 Markdown 渲染成 HTML，再调用 html-cut 截图，方便手机查看 | 1.0.0 | 2026-07-21 |
 
 ## MCPs
 
