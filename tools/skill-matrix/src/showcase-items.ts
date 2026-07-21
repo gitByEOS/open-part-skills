@@ -198,6 +198,14 @@ const skills = sortSkills([
     "声",
   ),
   skill(
+    "skill-voice-to-me",
+    "Voice To Me",
+    "voice-to-me",
+    "将回复生成自然 MP3 语音，并通过 QQ 发送给用户。",
+    "语",
+    "new",
+  ),
+  skill(
     "skill-weather-search",
     "Weather Search",
     "weather-search",

@@ -44,13 +44,14 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 
 ## Qbot Skills
 
-为24小时待命 QQ机器人 定制的技能组合，方便远程办公。
+为 24 小时待命 QQ 机器人定制的技能组合，方便远程办公。
 
 | 技能 | 说明 | 版本 | 上次更新 |
 |------|------|------|----------|
-| [fetch-what-say](./skills/fetch-what-say/SKILL.md) |把网站媒体或本地视频，提取文本内容并生成摘要 | 1.0.0 | 2026-06-20 |
+| [fetch-what-say](./skills/fetch-what-say/SKILL.md) | 把网站媒体或本地视频，提取文本内容并生成摘要 | 1.0.0 | 2026-06-20 |
 | [lan-chat](./skills/lan-chat/SKILL.md) | 局域网聊天室，支持文件传输，方便把产物发到主力机 | 1.0.0 | 2026-07-21 |
 | [md-to-png](./skills/md-to-png/SKILL.md) | 把 Markdown 渲染成 HTML，再调用 html-cut 截图，方便手机查看 | 1.0.0 | 2026-07-21 |
+| [voice-to-me](./skills/voice-to-me/SKILL.md) | 将回复合成语音并通过 QQ 格式发送  | 1.0.0 | 2026-07-21 |
 
 ## MCPs
 
