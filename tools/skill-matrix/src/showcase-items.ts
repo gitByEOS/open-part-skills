@@ -144,7 +144,7 @@ const skills = sortSkills([
     "skill-mock-ollama",
     "Mock Ollama",
     "mock-ollama",
-    "模拟 Ollama API 代理真实 LLM，监控请求响应并提供 Dashboard。",
+    "代理 Chat、Anthropic、Responses 三协议，支持 Claude、Codex、Cursor。",
     "模",
   ),
   skill(
