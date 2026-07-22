@@ -5,306 +5,276 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp" />
     <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
-    <title>视频压缩</title>
+    <title>videoya.web</title>
     <style>
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
       :root {
-        --bg: #0e0e11;
-        --surface: #1a1a20;
-        --surface-hover: #222228;
-        --border: #2a2a32;
-        --border-active: #4a4a58;
-        --text: #e8e8ed;
-        --text-dim: #888890;
-        --accent: #6c5ce7;
-        --accent-hover: #7c6cf7;
-        --success: #2ecc71;
-        --warning: #f39c12;
-        --radius: 12px;
-        --radius-sm: 8px;
+        --bg: #0d1117;
+        --panel: #161b22;
+        --panel-2: #1c2230;
+        --border: #2a3140;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --accent: #4e7af3;
+        --accent-2: #6d8df6;
+        --danger: #f87171;
+        --ok: #4ade80;
+        --warn: #f59e0b;
+        --radius: 14px;
+        --radius-sm: 9px;
+        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
       }
+
+      *, *::before, *::after { box-sizing: border-box; }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        line-height: 1.5;
         min-height: 100vh;
+        margin: 0;
+        background: radial-gradient(circle at 50% -20%, #142b3b 0, var(--bg) 28rem);
+        color: var(--text);
+        font-family: var(--sans);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
       }
+
+      button, input, select { font: inherit; }
 
       .page-shell {
         max-width: 860px;
         margin: 0 auto;
-        padding: 32px 24px 80px;
+        padding: 32px 24px 48px;
       }
 
-      /* Header */
-      .app-header {
-        text-align: center;
-        margin-bottom: 32px;
-      }
-      .app-header h1 {
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 6px;
-      }
-      .app-header .subtitle {
-        font-size: 14px;
-        color: var(--text-dim);
-      }
+      .app-header { text-align: center; margin-bottom: 32px; }
+      .app-header h1 { margin: 0; font-size: 32px; letter-spacing: -.02em; }
+      .app-header h1 .brand-dot { color: var(--accent); }
+      .app-header .subtitle { margin: 9px 0 0; color: var(--muted); font-size: 14px; }
 
-      /* Controls */
+      .warning-bar {
+        display: none;
+        gap: 9px;
+        align-items: flex-start;
+        margin-bottom: 18px;
+        padding: 11px 14px;
+        border: 1px solid rgba(245, 158, 11, .18);
+        border-radius: var(--radius-sm);
+        background: rgba(245, 158, 11, .045);
+        color: #c8bd99;
+        font-size: 13px;
+      }
+      .warning-bar::before { content: "⚠"; color: #c29a54; }
+
       .control-panel {
-        background: var(--surface);
+        margin-bottom: 18px;
+        padding: 18px;
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        padding: 20px;
-        margin-bottom: 20px;
+        background: rgba(22, 27, 34, .82);
       }
       .control-grid {
-        display: flex;
-        gap: 16px;
-        align-items: flex-end;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
       }
-      .field {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        min-width: 140px;
-      }
+      .field { position: relative; display: flex; min-width: 0; flex-direction: column; gap: 8px; }
       .field span {
+        color: var(--muted);
         font-size: 12px;
-        color: var(--text-dim);
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        font-weight: 650;
+        letter-spacing: .08em;
       }
-      .field select, .field input {
-        background: var(--bg);
+      .field::after {
+        position: absolute;
+        right: 20px;
+        bottom: 18px;
+        width: 7px;
+        height: 7px;
+        border-right: 1.5px solid #9bb6f6;
+        border-bottom: 1.5px solid #9bb6f6;
+        content: "";
+        pointer-events: none;
+        transform: rotate(45deg);
+      }
+      .field select {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 48px 8px 11px;
+        appearance: none;
         border: 1px solid var(--border);
-        color: var(--text);
-        padding: 8px 12px;
         border-radius: var(--radius-sm);
-        font-size: 14px;
         outline: none;
-        transition: border-color 0.15s;
+        background: #10151d;
+        color: var(--text);
+        font-size: 13px;
+        transition: border-color .16s ease, box-shadow .16s ease;
       }
-      .field select:focus, .field input:focus {
-        border-color: var(--accent);
-      }
+      .field select:hover, .field select:focus { border-color: var(--accent); }
+      .field select:focus { box-shadow: 0 0 0 3px rgba(78, 122, 243, .14); }
 
-      /* Drop zone */
       .drop-zone {
-        background: var(--surface);
-        border: 2px dashed var(--border);
-        border-radius: var(--radius);
-        padding: 48px 24px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s;
-        margin-bottom: 20px;
         position: relative;
+        display: flex;
+        min-height: 218px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 28px;
+        border: 1.5px dashed var(--border);
+        border-radius: var(--radius);
+        background: rgba(22, 27, 34, .72);
+        cursor: pointer;
+        text-align: center;
+        transition: border-color .18s ease, background .18s ease, transform .18s ease;
       }
-      .drop-zone:hover, .drop-zone.drag-over {
+      .drop-zone::before {
+        display: grid;
+        width: 44px;
+        height: 44px;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 14px;
+        background: rgba(78, 122, 243, .16);
+        color: #8eacff;
+        content: "↑";
+        font-size: 25px;
+        font-weight: 750;
+      }
+      .drop-zone:hover, .drop-zone.drag-over, .drop-zone:focus-visible {
+        outline: 0;
         border-color: var(--accent);
-        background: var(--surface-hover);
+        background: rgba(45, 212, 191, .08);
       }
       .drop-zone.drag-over { transform: scale(1.01); }
-      .drop-zone strong { display: block; font-size: 16px; margin-bottom: 4px; }
-      .drop-zone span { font-size: 13px; color: var(--text-dim); }
-      .drop-zone input[type="file"] {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        cursor: pointer;
-      }
+      .drop-zone strong { font-size: 17px; }
+      .drop-zone span { margin-top: 5px; color: var(--muted); font-size: 13px; }
+      .drop-zone input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; opacity: 0; }
 
-      /* File list */
-      .file-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-
-      .file-card {
-        background: var(--surface);
+      .file-list {
+        display: flex;
+        flex-direction: column;
+        margin-top: 18px;
+        overflow: hidden;
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        padding: 14px 18px;
+        background: var(--panel);
+      }
+      .file-list:empty { display: none; }
+
+      .file-card {
         display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 10px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px 12px;
         align-items: center;
+        padding: 13px 15px;
+        background: transparent;
       }
-      .file-card .file-info { display: flex; flex-direction: column; gap: 4px; }
-      .file-card .file-name {
-        font-weight: 500;
-        font-size: 14px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-      }
-      .file-card .file-meta {
-        font-size: 12px;
-        color: var(--text-dim);
-        display: flex;
-        gap: 12px;
-      }
+      .file-card + .file-card { border-top: 1px solid var(--border); }
+      .file-card.card-running { background: rgba(45, 212, 191, .055); }
+      .file-card .file-info { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+      .file-card .file-name { overflow: hidden; font-size: 14px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+      .file-card .file-meta { display: flex; flex-wrap: wrap; gap: 7px 11px; color: var(--muted); font-size: 12px; }
       .file-card .file-meta .size-before { text-decoration: line-through; }
-      .file-card .file-meta .size-after { color: var(--success); font-weight: 600; }
-      .file-card .file-meta .savings { color: var(--accent); }
+      .file-card .file-meta .size-after { color: var(--ok); font-weight: 650; }
+      .file-card .file-meta .savings { color: var(--accent); font-weight: 650; }
+      .file-card .file-actions { display: flex; flex-shrink: 0; align-items: center; gap: 8px; }
 
       .file-card .progress-wrap {
         grid-column: 1 / -1;
-        height: 4px;
-        background: var(--bg);
-        border-radius: 2px;
+        height: 6px;
         overflow: hidden;
+        border-radius: 99px;
+        background: #0c1118;
       }
       .file-card .progress-bar {
+        width: 0;
         height: 100%;
-        background: var(--accent);
-        width: 0%;
-        transition: width 0.3s;
-        border-radius: 2px;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        transition: width .25s ease;
       }
-      @keyframes progress-stripe {
-        from { background-position: 18px 0; }
-        to { background-position: 0 0; }
-      }
+      @keyframes progress-stripe { from { background-position: 18px 0; } to { background-position: 0 0; } }
       .file-card .progress-bar.striped {
-        background-image: linear-gradient(
-          -45deg,
-          rgba(255,255,255,0.26) 25%,
-          transparent 25%,
-          transparent 50%,
-          rgba(255,255,255,0.26) 50%,
-          rgba(255,255,255,0.26) 75%,
-          transparent 75%,
-          transparent
-        );
+        background-image: linear-gradient(-45deg, rgba(255,255,255,.26) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.26) 50%, rgba(255,255,255,.26) 75%, transparent 75%, transparent);
         background-size: 18px 18px;
-        animation: progress-stripe 0.45s linear infinite;
+        animation: progress-stripe .45s linear infinite;
       }
-
-      /* Running state highlight */
-      .file-card.card-running {
-        border-color: #3498db55;
-        background: #3498db08;
-      }
-
-      /* Disable remove button during compression */
-      .btn-remove:disabled {
-        opacity: 0.25;
-        cursor: not-allowed;
-        pointer-events: none;
-      }
-
-      .file-card .file-actions { display: flex; gap: 8px; }
 
       .btn {
-        padding: 8px 16px;
-        border: none;
+        min-height: 36px;
+        padding: 7px 13px;
+        border: 1px solid transparent;
         border-radius: var(--radius-sm);
-        font-size: 13px;
-        font-weight: 600;
         cursor: pointer;
-        transition: all 0.15s;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: opacity .16s ease, border-color .16s ease, color .16s ease;
         white-space: nowrap;
       }
-      .btn-primary {
-        background: var(--accent);
-        color: #fff;
-      }
-      .btn-primary:hover { background: var(--accent-hover); }
-      .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-      .btn-sm { padding: 6px 12px; font-size: 12px; }
-      .btn-success { background: var(--accent); color: #fff; }
-      .btn-success:hover { background: var(--accent-hover); }
-      .btn-outline {
-        background: transparent;
-        border: 1px solid var(--border);
-        color: var(--text);
-      }
-      .btn-outline:hover { background: var(--surface-hover); border-color: var(--border-active); }
-      .btn-remove {
-        background: transparent;
-        border: 1px solid var(--border);
-        color: var(--text-dim);
-      }
-      .btn-remove:hover { border-color: #e74c3c; color: #e74c3c; }
+      .btn:hover:not(:disabled) { opacity: .86; }
+      .btn:disabled { cursor: not-allowed; opacity: .42; }
+      .btn-primary { background: var(--accent); color: #06231f; }
+      .btn-success { background: var(--accent-2); color: #071d2b; }
+      .btn-outline { border-color: var(--border); background: transparent; color: var(--text); }
+      .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+      .btn-remove { border-color: var(--border); background: transparent; color: var(--muted); }
+      .btn-remove:hover { border-color: var(--danger); color: var(--danger); }
+      .btn-remove:disabled { pointer-events: none; }
+      .btn-sm { min-height: 30px; padding: 5px 10px; font-size: 12px; font-weight: 650; }
 
-      /* Actions bar */
       .actions-bar {
         display: flex;
-        gap: 12px;
         align-items: center;
-        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 14px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--panel);
       }
-      .actions-bar .count {
-        font-size: 13px;
-        color: var(--text-dim);
-        margin-left: auto;
-      }
+      .actions-bar .count { margin-left: auto; color: var(--muted); font-size: 13px; }
 
-      /* Status */
       .status-badge {
         display: inline-block;
-        padding: 2px 8px;
-        border-radius: 4px;
+        padding: 3px 8px;
+        border: 1px solid var(--border);
+        border-radius: 99px;
         font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
+        font-weight: 650;
       }
-      .status-pending { background: var(--border); color: var(--text-dim); }
-      .status-running { background: #3498db22; color: #3498db; }
-      .status-done { background: #3498db22; color: #3498db; }
-      .status-error { background: #e74c3c22; color: #e74c3c; }
+      .status-running { color: var(--accent-2); }
+      .status-done { color: var(--ok); }
+      .status-error { color: var(--danger); }
+      .status-pending { color: var(--muted); }
 
-      /* Empty state */
-      .empty-state {
-        text-align: center;
-        padding: 40px 20px;
-        color: var(--text-dim);
+      @media (max-width: 720px) {
+        .page-shell { padding: 20px 16px 40px; }
+        .control-grid { grid-template-columns: 1fr; }
       }
-      .empty-state .icon { font-size: 40px; display: block; margin-bottom: 8px; }
-
-      /* COEP warning */
-      .warning-bar {
-        background: #f39c1222;
-        border: 1px solid #f39c1244;
-        color: var(--warning);
-        border-radius: var(--radius-sm);
-        padding: 10px 14px;
-        font-size: 13px;
-        margin-bottom: 20px;
-        display: none;
-      }
-      .warning-bar a { color: var(--warning); text-decoration: underline; }
-
-      /* Responsive */
-      @media (max-width: 600px) {
-        .page-shell { padding: 20px 16px 60px; }
-        .control-grid { flex-direction: column; }
-        .field { min-width: 100%; }
+      @media (max-width: 520px) {
         .file-card { grid-template-columns: 1fr; }
         .file-card .file-actions { justify-content: flex-end; }
+        .actions-bar { flex-wrap: wrap; }
+        .actions-bar .count { width: 100%; margin-left: 0; }
+        .actions-bar .btn { flex: 1; }
       }
     </style>
   </head>
   <body>
     <main class="page-shell">
       <header class="app-header">
-        <h1>视频压缩</h1>
-        <p class="subtitle">在本机浏览器实现视频压缩，无任何数据上传</p>
+        <h1>videoya<span class="brand-dot">.</span>web</h1>
+        <p class="subtitle">在本机浏览器压缩视频，不会上传你的文件</p>
       </header>
 
       <div id="warning-bar" class="warning-bar">
         当前环境未启用多线程隔离，已自动切换为单线程压缩。
+        如需更快速度，请使用 HTTPS 或 localhost。
       </div>
 
       <section class="control-panel">
         <div class="control-grid">
           <label class="field" for="quality">
-            <span>质量</span>
+            <span>压缩质量</span>
             <select id="quality">
               <option value="1">网络 (CRF 26)</option>
               <option value="2" selected>平衡 (CRF 23)</option>
@@ -333,8 +303,8 @@
 
       <div id="drop-zone" class="drop-zone" role="button" tabindex="0"
            aria-label="拖拽视频文件到这里或点击选择">
-        <strong>拖入视频文件</strong>
-        <span>支持 MP4, MOV, AVI, MKV, WebM 等格式</span>
+        <strong>选择或拖拽视频文件</strong>
+        <span>支持 MP4、MOV、AVI、MKV、WebM 等格式；全部在本机处理</span>
         <input id="file-input" type="file" accept="video/*,.mp4,.mov,.avi,.mkv,.webm,.flv,.wmv" multiple />
       </div>
 

@@ -70,7 +70,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [emoj](./tools/emoj/) | EMOJ 大全：搜索、分类浏览、点击复制 emoji | [emoj大全](https://gitByEOS.github.io/open-part-skills/emoj/) |
 | [codicon](./tools/codicon/) | 微软开源常用svg图标 | [codicon](https://gitByEOS.github.io/open-part-skills/codicon/) |
 | [pngya](./tools/pngya/) | 浏览器内图片压缩 | [图片压缩](https://gitByEOS.github.io/open-part-skills/pngya/) |
-| [video-compressor](./tools/video-compressor/) | 浏览器内视频压缩 | [视频压缩](https://gitByEOS.github.io/open-part-skills/video-compressor/) |
+| [videoya](./tools/videoya/) | 浏览器内视频压缩 | [videoya](https://gitByEOS.github.io/open-part-skills/videoya/) |
 | [Clash](https://github.com/gitByEOS/Clash) | 个人增强版 Claude Code 启动器，增强Team和跨会话协作等多种功能 | [需要安装](https://github.com/gitByEOS/Clash#readme) |
 | [FastRead](https://github.com/gitByEOS/FastRead) | 精选离线文字转语音，微软edge可选 | [需要下载](https://github.com/gitByEOS/FastRead/releases) |
 | [VideoCaptor](https://github.com/gitByEOS/VideoCaptor) | 从视频提取GIF，从录屏中截取动图 | [需要下载](https://github.com/gitByEOS/VideoCaptor/releases) |
