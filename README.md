@@ -30,6 +30,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [cc-claude](./skills/cc-claude/SKILL.md) | 让 Claude Code 支持自定义渠道和大模型选择; 已经迁移到 [gitByEOS/Clash](https://github.com/gitByEOS/Clash) | 1.0.0 | 2026-06-01 |
 | [html-cut](./skills/html-cut/SKILL.md) | 将网页或本地 HTML 渲染为高清 PNG 截图，支持全页、视口、分辨率与加载等待控制，给 Agent用方便手机查看 | 1.0.0 | 2026-07-19 |
 | [port-to-public](./skills/port-to-public/SKILL.md) | 临时通过 Cloudflare Quick Tunnel 将本机 loopback HTTP(S) 服务暴露到公网 | 1.0.0 | 2026-07-20 |
+| [tmux-serv](./skills/tmux-serv/SKILL.md) | 用全局脚本管理多项目 tmux 常驻服务，建立统一规范，提高管理效率 | 1.0.0 | 2026-07-23 |
 | [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过 fzf 支持搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
 | [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.3 | 2026-07-06 |
 | [mock-ollama](./skills/mock-ollama/SKILL.md) | 代理 Chat、Anthropic、Responses 三协议，支持 Claude Code、Codex/GPT-5.6、Cursor BYOK | 1.1.0 | 2026-07-22 |

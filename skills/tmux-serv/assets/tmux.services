@@ -1,0 +1,468 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+TMUX_SERVICES_VERSION="1.0.0"
+
+# >>> tmux-serv user services >>>
+configure_services() {
+    # 每个项目的启动器必须位于 tools/，并在前台运行服务。
+    # start_service "my-project" "api" "$HOME/dev/my-project/tools/start_api_server.sh"
+    :
+}
+# <<< tmux-serv user services <<<
+
+# >>> tmux-serv managed engine v1.0.0 >>>
+EX_USAGE=64
+EX_NOINPUT=66
+EX_UNAVAILABLE=69
+EX_SOFTWARE=70
+
+SERVICE_PROJECTS=()
+SERVICE_NAMES=()
+SERVICE_IDS=()
+SERVICE_SELECTORS=()
+SERVICE_SESSIONS=()
+SERVICE_LAUNCHERS=()
+SERVICE_DIRS=()
+TMUX_SOCKET_NAME=""
+NORMALIZED_LAUNCHER=""
+NORMALIZED_PROJECT_DIR=""
+FOUND_INDEX=""
+
+usage() {
+    cat <<'EOF'
+用法：
+  ~/.tmux.services                         仅启动缺失服务
+  ~/.tmux.services <service|project/service> 仅确保指定服务运行
+  ~/.tmux.services --restart <selector>       精确重启指定服务
+  ~/.tmux.services --restart-all              明确重启全部服务
+  ~/.tmux.services --stop <selector>          精确停止指定服务
+  ~/.tmux.services --status [selector]        查看全部或指定服务状态
+  ~/.tmux.services --logs <selector>          输出指定服务最近 200 行
+  ~/.tmux.services --attach <selector>        附着指定服务
+  ~/.tmux.services --check                  仅校验配置
+  ~/.tmux.services --version                输出模板版本
+
+service 名唯一时可直接使用短名，对应 serv-<service>；重名时使用 project/service，对应 serv-<project>-<service>。
+EOF
+}
+
+fail() {
+    local code="$1"
+    shift
+    printf '错误：%s\n' "$*" >&2
+    exit "$code"
+}
+
+validate_slug() {
+    local label="$1"
+    local value="$2"
+
+    if [[ ! "$value" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$ ]] ||
+       [[ "$value" == *--* ]] ||
+       [[ "${#value}" -gt 40 ]]; then
+        fail "$EX_USAGE" "$label 必须为 1-40 位小写字母、数字或单连字符，且不能以连字符开头或结尾：$value"
+    fi
+    return 0
+}
+
+normalize_launcher() {
+    local raw="$1"
+    local expanded=""
+    local launcher_dir=""
+    local launcher_name=""
+    local project_dir=""
+
+    case "$raw" in
+        *$'\n'*|*$'\r'*|*$'\t'*)
+            fail "$EX_USAGE" "launcher 路径不能包含制表符或换行"
+            ;;
+        \~/*)
+            [[ -n "${HOME:-}" ]] || fail "$EX_NOINPUT" "HOME 未设置，无法展开 launcher：$raw"
+            expanded="$HOME/${raw:2}"
+            ;;
+        /*)
+            expanded="$raw"
+            ;;
+        *)
+            fail "$EX_USAGE" "launcher 必须使用绝对路径或 ~/ 开头：$raw"
+            ;;
+    esac
+
+    [[ ! -L "$expanded" ]] || fail "$EX_NOINPUT" "launcher 不允许是符号链接：$expanded"
+    [[ -f "$expanded" ]] || fail "$EX_NOINPUT" "launcher 不存在或不是常规文件：$expanded"
+    [[ -x "$expanded" ]] || fail "$EX_NOINPUT" "launcher 不可执行：$expanded"
+
+    launcher_dir="$(cd -P -- "$(dirname -- "$expanded")" 2>/dev/null && pwd)" ||
+        fail "$EX_NOINPUT" "无法解析 launcher 目录：$expanded"
+    launcher_name="$(basename -- "$expanded")"
+    NORMALIZED_LAUNCHER="$launcher_dir/$launcher_name"
+
+    [[ "${launcher_dir##*/}" == "tools" ]] ||
+        fail "$EX_USAGE" "launcher 必须直接位于项目 tools/ 目录：$NORMALIZED_LAUNCHER"
+
+    project_dir="$(cd -P -- "$launcher_dir/.." 2>/dev/null && pwd)" ||
+        fail "$EX_NOINPUT" "无法解析项目目录：$launcher_dir/.."
+    NORMALIZED_PROJECT_DIR="$project_dir"
+    return 0
+}
+
+start_service() {
+    [[ "$#" -eq 3 ]] || fail "$EX_USAGE" "start_service 需要 project、service、launcher 三个参数"
+
+    local project="$1"
+    local service="$2"
+    local raw_launcher="$3"
+    local id=""
+    local count=0
+    local i=0
+
+    validate_slug "project" "$project"
+    validate_slug "service" "$service"
+    id="$project/$service"
+
+    normalize_launcher "$raw_launcher"
+
+    count="${#SERVICE_IDS[@]}"
+    for ((i = 0; i < count; i++)); do
+        if [[ "${SERVICE_IDS[$i]}" == "$id" ]]; then
+            fail "$EX_USAGE" "服务重复：$id"
+        fi
+    done
+
+    SERVICE_PROJECTS[$count]="$project"
+    SERVICE_NAMES[$count]="$service"
+    SERVICE_IDS[$count]="$id"
+    SERVICE_LAUNCHERS[$count]="$NORMALIZED_LAUNCHER"
+    SERVICE_DIRS[$count]="$NORMALIZED_PROJECT_DIR"
+    return 0
+}
+
+finalize_services() {
+    local count="${#SERVICE_IDS[@]}"
+    local i=0
+    local j=0
+    local matches=0
+    local selector=""
+    local session=""
+
+    for ((i = 0; i < count; i++)); do
+        matches=0
+        for ((j = 0; j < count; j++)); do
+            if [[ "${SERVICE_NAMES[$j]}" == "${SERVICE_NAMES[$i]}" ]]; then
+                matches=$((matches + 1))
+            fi
+        done
+
+        if [[ "$matches" -eq 1 ]]; then
+            selector="${SERVICE_NAMES[$i]}"
+            session="serv-${SERVICE_NAMES[$i]}"
+        else
+            selector="${SERVICE_IDS[$i]}"
+            session="serv-${SERVICE_PROJECTS[$i]}-${SERVICE_NAMES[$i]}"
+        fi
+        [[ "${#session}" -le 100 ]] || fail "$EX_USAGE" "session 名过长：$session"
+        for ((j = 0; j < i; j++)); do
+            if [[ "${SERVICE_SESSIONS[$j]}" == "$session" ]]; then
+                fail "$EX_USAGE" "派生 session 冲突，请调整 project 或 service：$session"
+            fi
+        done
+        SERVICE_SELECTORS[$i]="$selector"
+        SERVICE_SESSIONS[$i]="$session"
+    done
+    return 0
+}
+
+load_services() {
+    declare -F configure_services >/dev/null || fail "$EX_USAGE" "缺少 configure_services 函数"
+    configure_services || fail "$EX_USAGE" "加载服务配置失败"
+    finalize_services
+    return 0
+}
+
+init_tmux_options() {
+    TMUX_SOCKET_NAME="${TMUX_SERV_SOCKET_NAME:-}"
+    if [[ -n "$TMUX_SOCKET_NAME" ]]; then
+        [[ "$TMUX_SOCKET_NAME" =~ ^[A-Za-z0-9_.-]+$ ]] ||
+            fail "$EX_USAGE" "TMUX_SERV_SOCKET_NAME 含非法字符：$TMUX_SOCKET_NAME"
+    fi
+}
+
+tmux_cmd() {
+    if [[ -n "$TMUX_SOCKET_NAME" ]]; then
+        command tmux -L "$TMUX_SOCKET_NAME" "$@"
+    else
+        command tmux "$@"
+    fi
+}
+
+require_tmux() {
+    command -v tmux >/dev/null 2>&1 || fail "$EX_UNAVAILABLE" "缺少依赖：tmux"
+}
+
+validate_selector() {
+    local selector="$1"
+    local project=""
+    local service=""
+
+    case "$selector" in
+        */*)
+            project="${selector%%/*}"
+            service="${selector#*/}"
+            [[ "$service" != */* ]] || fail "$EX_USAGE" "服务选择器最多包含一个 /：$selector"
+            validate_slug "project" "$project"
+            validate_slug "service" "$service"
+            ;;
+        *)
+            validate_slug "service" "$selector"
+            ;;
+    esac
+}
+
+find_service() {
+    local selector="$1"
+    local count="${#SERVICE_IDS[@]}"
+    local i=0
+    local matches=0
+
+    validate_selector "$selector"
+    FOUND_INDEX=""
+    for ((i = 0; i < count; i++)); do
+        if [[ "$selector" == */* ]]; then
+            [[ "${SERVICE_IDS[$i]}" == "$selector" ]] || continue
+        else
+            [[ "${SERVICE_NAMES[$i]}" == "$selector" ]] || continue
+        fi
+        FOUND_INDEX="$i"
+        matches=$((matches + 1))
+    done
+
+    if [[ "$matches" -eq 0 ]]; then
+        fail "$EX_USAGE" "未知服务：$selector"
+    fi
+    if [[ "$matches" -gt 1 ]]; then
+        fail "$EX_USAGE" "服务名不唯一，请使用 <project>/<service>：$selector"
+    fi
+    return 0
+}
+
+has_session() {
+    local index="$1"
+    tmux_cmd has-session -t "=${SERVICE_SESSIONS[$index]}" 2>/dev/null
+}
+
+launch_service() {
+    local index="$1"
+    local id="${SERVICE_SELECTORS[$index]}"
+    local session="${SERVICE_SESSIONS[$index]}"
+    local launcher="${SERVICE_LAUNCHERS[$index]}"
+    local project_dir="${SERVICE_DIRS[$index]}"
+    local pane_command=""
+
+    printf -v pane_command 'exec %q' "$launcher"
+    if ! tmux_cmd new-session -d -s "$session" -n "${SERVICE_NAMES[$index]}" \
+        -c "$project_dir" "$pane_command"; then
+        printf '启动失败：%s\n' "$id" >&2
+        return "$EX_SOFTWARE"
+    fi
+
+    sleep 1
+    if ! has_session "$index"; then
+        printf '启动后立即退出：%s（请直接运行 %s 排查）\n' "$id" "$launcher" >&2
+        return "$EX_SOFTWARE"
+    fi
+
+    printf '已启动：%s (%s)\n' "$id" "$session"
+}
+
+ensure_service() {
+    local index="$1"
+    if has_session "$index"; then
+        printf '已运行，跳过：%s (%s)\n' "${SERVICE_SELECTORS[$index]}" "${SERVICE_SESSIONS[$index]}"
+        return 0
+    fi
+    launch_service "$index"
+}
+
+stop_service() {
+    local index="$1"
+    if ! has_session "$index"; then
+        printf '未运行，跳过：%s (%s)\n' "${SERVICE_SELECTORS[$index]}" "${SERVICE_SESSIONS[$index]}"
+        return 0
+    fi
+
+    tmux_cmd kill-session -t "=${SERVICE_SESSIONS[$index]}" || {
+        printf '停止失败：%s\n' "${SERVICE_SELECTORS[$index]}" >&2
+        return "$EX_SOFTWARE"
+    }
+    printf '已停止：%s (%s)\n' "${SERVICE_SELECTORS[$index]}" "${SERVICE_SESSIONS[$index]}"
+}
+
+restart_service() {
+    local index="$1"
+    if has_session "$index"; then
+        tmux_cmd kill-session -t "=${SERVICE_SESSIONS[$index]}" || {
+            printf '停止失败：%s\n' "${SERVICE_SELECTORS[$index]}" >&2
+            return "$EX_SOFTWARE"
+        }
+    fi
+    launch_service "$index"
+}
+
+print_status() {
+    local only_index="${1:-}"
+    local count="${#SERVICE_IDS[@]}"
+    local i=0
+    local state=""
+
+    printf 'SERVICE\tSESSION\tSTATUS\tLAUNCHER\n'
+    for ((i = 0; i < count; i++)); do
+        if [[ -n "$only_index" && "$i" -ne "$only_index" ]]; then
+            continue
+        fi
+        if has_session "$i"; then
+            state="running"
+        else
+            state="stopped"
+        fi
+        printf '%s\t%s\t%s\t%s\n' \
+            "${SERVICE_SELECTORS[$i]}" "${SERVICE_SESSIONS[$i]}" "$state" "${SERVICE_LAUNCHERS[$i]}"
+    done
+}
+
+ensure_all() {
+    local count="${#SERVICE_IDS[@]}"
+    local i=0
+    if [[ "$count" -eq 0 ]]; then
+        printf '未配置服务\n'
+        return 0
+    fi
+    for ((i = 0; i < count; i++)); do
+        ensure_service "$i" || return "$?"
+    done
+}
+
+restart_all() {
+    local count="${#SERVICE_IDS[@]}"
+    local i=0
+    if [[ "$count" -eq 0 ]]; then
+        printf '未配置服务\n'
+        return 0
+    fi
+    for ((i = 0; i < count; i++)); do
+        restart_service "$i" || return "$?"
+    done
+}
+
+show_logs() {
+    local index="$1"
+    has_session "$index" || fail "$EX_UNAVAILABLE" "服务未运行：${SERVICE_IDS[$index]}"
+    tmux_cmd capture-pane -p -S -200 -t "=${SERVICE_SESSIONS[$index]}:" ||
+        fail "$EX_SOFTWARE" "读取日志失败：${SERVICE_IDS[$index]}"
+}
+
+attach_service() {
+    local index="$1"
+    has_session "$index" || fail "$EX_UNAVAILABLE" "服务未运行：${SERVICE_IDS[$index]}"
+    if [[ -n "${TMUX:-}" ]]; then
+        tmux_cmd switch-client -t "=${SERVICE_SESSIONS[$index]}"
+    else
+        tmux_cmd attach-session -t "=${SERVICE_SESSIONS[$index]}"
+    fi
+}
+
+check_arg_count() {
+    local expected="$1"
+    shift
+    [[ "$#" -eq "$expected" ]] || {
+        usage >&2
+        exit "$EX_USAGE"
+    }
+}
+
+main() {
+    case "${1:-}" in
+        -h|--help)
+            check_arg_count 1 "$@"
+            usage
+            return 0
+            ;;
+        --version)
+            check_arg_count 1 "$@"
+            printf '%s\n' "$TMUX_SERVICES_VERSION"
+            return 0
+            ;;
+    esac
+
+    init_tmux_options
+    load_services
+
+    case "${1:-}" in
+        --check)
+            check_arg_count 1 "$@"
+            printf '配置有效：%s 个服务\n' "${#SERVICE_IDS[@]}"
+            ;;
+        "")
+            check_arg_count 0 "$@"
+            require_tmux
+            ensure_all
+            ;;
+        --restart-all)
+            check_arg_count 1 "$@"
+            require_tmux
+            restart_all
+            ;;
+        --restart)
+            check_arg_count 2 "$@"
+            require_tmux
+            find_service "$2"
+            restart_service "$FOUND_INDEX"
+            ;;
+        --stop)
+            check_arg_count 2 "$@"
+            require_tmux
+            find_service "$2"
+            stop_service "$FOUND_INDEX"
+            ;;
+        --status)
+            if [[ "$#" -gt 2 ]]; then
+                usage >&2
+                exit "$EX_USAGE"
+            fi
+            require_tmux
+            if [[ "$#" -eq 2 ]]; then
+                find_service "$2"
+                print_status "$FOUND_INDEX"
+            else
+                print_status
+            fi
+            ;;
+        --logs)
+            check_arg_count 2 "$@"
+            require_tmux
+            find_service "$2"
+            show_logs "$FOUND_INDEX"
+            ;;
+        --attach)
+            check_arg_count 2 "$@"
+            require_tmux
+            find_service "$2"
+            attach_service "$FOUND_INDEX"
+            ;;
+        -*)
+            printf '未知选项：%s\n' "$1" >&2
+            usage >&2
+            exit "$EX_USAGE"
+            ;;
+        *)
+            check_arg_count 1 "$@"
+            require_tmux
+            find_service "$1"
+            ensure_service "$FOUND_INDEX"
+            ;;
+    esac
+}
+
+main "$@"
+exit "$?"
+# <<< tmux-serv managed engine v1.0.0 <<<

@@ -104,6 +104,14 @@ const skills = sortSkills([
     "new",
   ),
   skill(
+    "skill-tmux-serv",
+    "tmux-serv",
+    "tmux-serv",
+    "用全局脚本管理多项目 tmux 常驻服务，用全局脚本管理多项目 tmux 常驻服务，建立统一规范，提高管理效率 。",
+    "驻",
+    "new",
+  ),
+  skill(
     "skill-fetch-what-say",
     "Fetch What Say",
     "fetch-what-say",
