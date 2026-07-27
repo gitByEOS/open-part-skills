@@ -29,20 +29,20 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [blog-narrator](./skills/blog-narrator/SKILL.md) | 把博客 Markdown 导出为逐行披露演示 HTML，支持轻量预览和 Edge TTS 分段配音合并 | 1.1.0 | 2026-07-07 |
 | [cc-claude](./skills/cc-claude/SKILL.md) | 让 Claude Code 支持自定义渠道和大模型选择; 已经迁移到 [gitByEOS/Clash](https://github.com/gitByEOS/Clash) | 1.0.0 | 2026-06-01 |
 | [html-cut](./skills/html-cut/SKILL.md) | 将网页或本地 HTML 渲染为高清 PNG 截图，支持全页、视口、分辨率与加载等待控制，给 Agent用方便手机查看 | 1.0.0 | 2026-07-19 |
-| [port-to-public](./skills/port-to-public/SKILL.md) | 临时通过 Cloudflare Quick Tunnel 将本机 loopback HTTP(S) 服务暴露到公网 | 1.0.0 | 2026-07-20 |
 | [tmux-serv](./skills/tmux-serv/SKILL.md) | 用全局脚本管理多项目 tmux 常驻服务，建立统一规范，提高管理效率 | 1.0.0 | 2026-07-23 |
 | [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过 fzf 支持搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
 | [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.3 | 2026-07-06 |
 | [mock-ollama](./skills/mock-ollama/SKILL.md) | 代理 Chat、Anthropic、Responses 三协议，支持 Claude Code、Codex/GPT-5.6、Cursor BYOK | 1.1.0 | 2026-07-22 |
 | [holiday-of-12306](./skills/holiday-of-12306/SKILL.md) | 生成全年 12306 节假日抢票日历，又忘记抢票了！使用 Skill 一次性解决掉 | 1.1.0 | 2026-07-06 |
 | [voice-clone](./skills/voice-clone/SKILL.md) | 使用 Confucius4-TTS Gradio API 做参考音色克隆和文本转语音 | 1.0.0 | 2026-06-23 |
-| [similar-judge](./skills/similar-judge/SKILL.md) | 对比两份文本差异，输出相似度与词级差异 JSON，供 agent 程序化量化产物与目标的文本差距，可以用来循环迭代提示词 | 1.0.0 | 2026-06-28 |
+| [similar-judge](./skills/similar-judge/SKILL.md) | 对比两份文本差异，输出相似度与词级差异 JSON，供 agent 量化产物与目标的文本差距，可以用来循环迭代提示词 | 1.0.0 | 2026-06-28 |
 | [skill-publish-verify](./skills/skill-publish-verify/SKILL.md) | 发布前黑盒验证：隔离 venv + 路径，agent 以新用户身份自验任意 skill，产出可用性报告 | 1.1.0 | 2026-07-08 |
 | [okr-to-html](./skills/okr-to-html/SKILL.md) | 将 OKR Markdown 生成为可切换 Objective 的单页 HTML 看板 | 1.0.0 | 2026-07-06 |
 | [meet-record-html](./skills/meet-record-html/SKILL.md) | 将面试/会谈问题 Markdown 生成为可现场填写总结、可临时追加问题的纪要 HTML | 1.0.0 | 2026-07-07 |
 | [weather-search](./skills/weather-search/SKILL.md) | 按地点与活动半径查周边天气与空气质量，输出报告与出门防护建议 | 1.0.0 | 2026-07-09 |
-| [esflow](./skills/esflow/SKILL.md) | 教会Agent如何使用esflow，简化学习成本，直接从需求到落地 | 0.1.4 | 2026-07-09 |
+| [esflow](./skills/esflow/SKILL.md) | 教会 Agent 如何使用 [esflow](https://github.com/gitByEOS/esflow)，简化学习成本，直接从需求到落地 | 0.1.4 | 2026-07-09 |
 | [summary-user-said](./skills/summary-user-said/SKILL.md) | 只读汇总本机 Cursor、Claude Code、Codex 用户发言，生成带证据引用的总结与原文双产物 | 1.0.0 | 2026-07-27 |
+| [clak](./skills/clak/SKILL.md) | 教会 Agent 如何使用 [clak](https://github.com/gitByEOS/esclak) 构建固定流程业务脚本，覆盖 TUI、无头 CLI、交互输入与生命周期测试 | 1.0.0 | 2026-07-27 |
 
 ## Qbot Skills
 
@@ -53,6 +53,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [fetch-what-say](./skills/fetch-what-say/SKILL.md) | 把网站媒体或本地视频，提取文本内容并生成摘要 | 1.0.0 | 2026-06-20 |
 | [lan-chat](./skills/lan-chat/SKILL.md) | 局域网聊天室，支持文件传输，方便把产物发到主力机 | 1.0.0 | 2026-07-21 |
 | [md-to-png](./skills/md-to-png/SKILL.md) | 把 Markdown 渲染成 HTML，再调用 html-cut 截图，方便手机查看 | 1.0.0 | 2026-07-21 |
+| [port-to-public](./skills/port-to-public/SKILL.md) | 临时通过 Cloudflare Quick Tunnel 将本机 loopback HTTP(S) 服务暴露到公网 | 1.0.0 | 2026-07-20 |
 | [voice-to-me](./skills/voice-to-me/SKILL.md) | 将回复合成语音并通过 QQ 格式发送  | 1.0.0 | 2026-07-21 |
 
 ## MCPs

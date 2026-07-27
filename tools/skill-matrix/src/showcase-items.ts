@@ -93,7 +93,6 @@ const skills = sortSkills([
     "html-cut",
     "将网页或本地 HTML 渲染为高清 PNG 截图，支持全页、视口、分辨率与加载等待控制。",
     "截",
-    "new",
   ),
   skill(
     "skill-port-to-public",
@@ -101,7 +100,6 @@ const skills = sortSkills([
     "port-to-public",
     "临时通过 Cloudflare Quick Tunnel 将本机 loopback HTTP(S) 服务暴露到公网，支持启动、状态、验证与停止。",
     "穿",
-    "new",
   ),
   skill(
     "skill-tmux-serv",
@@ -109,6 +107,14 @@ const skills = sortSkills([
     "tmux-serv",
     "用全局脚本管理多项目 tmux 常驻服务，用全局脚本管理多项目 tmux 常驻服务，建立统一规范，提高管理效率 。",
     "驻",
+    "new",
+  ),
+  skill(
+    "skill-clak",
+    "clak",
+    "clak",
+    "使用 clak 构建固定流程业务脚本，覆盖 TUI、无头 CLI、交互输入与生命周期测试。",
+    "流程",
     "new",
   ),
   skill(
@@ -234,7 +240,6 @@ const skills = sortSkills([
     "lan-chat",
     "零依赖临时局域网聊天室，支持浏览器聊天、文件传输、粘贴图片，同 Wi-Fi 手机电脑即用。",
     "传",
-    "new",
   ),
   skill(
     "skill-md-to-png",
@@ -242,9 +247,13 @@ const skills = sortSkills([
     "md-to-png",
     "把 Markdown 渲染成 VitePress 风格 HTML，再调用 html-cut 截图为高清 PNG，方便手机查看。",
     "渲",
-    "new",
   ),
 ]);
+
+const newSkills = skills.filter((item) => item.tag === "new");
+if (newSkills.length > 4) {
+  throw new Error(`Skill matrix supports at most four new skills; found ${newSkills.length}.`);
+}
 
 const mcps: ShowcaseItem[] = [
   mcp(
