@@ -184,6 +184,14 @@ const skills = sortSkills([
     "链",
   ),
   skill(
+    "skill-summary-user-said",
+    "Summary User Said",
+    "summary-user-said",
+    "汇总本地 Cursor、Claude Code、Codex 用户发言，生成带证据引用的总结与原文双产物。",
+    "述",
+    "new",
+  ),
+  skill(
     "skill-publish-verify",
     "Skill Publish Verify",
     "skill-publish-verify",

@@ -26,7 +26,6 @@
 ---
 name: <skill-name>
 description: <功能、触发语句与适用场景>
-author: EOS
 version: 1.0.0
 dependencies:
   - <运行时依赖>
