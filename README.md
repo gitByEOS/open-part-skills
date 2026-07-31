@@ -46,12 +46,21 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 
 ## Qbot Skills
 
-为 24 小时待命 QQ 机器人定制的技能组合，方便远程办公。
+为 24 小时待命 QQ 机器人定制的技能组合，方便远程办公，已经发布 `npm`。
+
+```bash
+npm install -g @eos./qbot # 1.安装
+
+qbot --help               # 2.确认可用
+
+qbot dashboard            # 3.进入界面，根据引导完成配置
+```
+
 
 | 技能 | 说明 | 版本 | 上次更新 |
 |------|------|------|----------|
 | [fetch-what-say](./skills/fetch-what-say/SKILL.md) | 把网站媒体或本地视频，提取文本内容并生成摘要 | 1.0.0 | 2026-06-20 |
-| [lan-chat](./skills/lan-chat/SKILL.md) | 局域网聊天室，支持文件传输，方便把产物发到主力机 | 1.0.0 | 2026-07-21 |
+| [lan-chat](./skills/lan-chat/SKILL.md) | 局域网聊天室，支持文件传输，方便把产物发到主力机 | 1.0.1 | 2026-07-31 |
 | [md-to-png](./skills/md-to-png/SKILL.md) | 把 Markdown 渲染成 HTML，再调用 html-cut 截图，方便手机查看 | 1.0.0 | 2026-07-21 |
 | [port-to-public](./skills/port-to-public/SKILL.md) | 临时通过 Cloudflare Quick Tunnel 将本机 loopback HTTP(S) 服务暴露到公网 | 1.0.0 | 2026-07-20 |
 | [voice-to-me](./skills/voice-to-me/SKILL.md) | 将回复合成语音并通过 QQ 格式发送  | 1.0.0 | 2026-07-21 |
@@ -78,6 +87,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [FastRead](https://github.com/gitByEOS/FastRead) | 精选离线文字转语音，微软edge可选 | [需要下载](https://github.com/gitByEOS/FastRead/releases) |
 | [VideoCaptor](https://github.com/gitByEOS/VideoCaptor) | 从视频提取GIF，从录屏中截取动图 | [需要下载](https://github.com/gitByEOS/VideoCaptor/releases) |
 | [hy-mt-server](https://github.com/gitByEOS/hy-mt-server) | 离线启动腾讯 HY-MT 翻译模型 | [需要部署](https://github.com/gitByEOS/hy-mt-server) |
+| [offline-confucius4-tts](https://github.com/gitByEOS/offline-confucius4-tts) | 离线启动 confucius4-tts 语音模型，定制更个性化音色 | [需要部署](https://github.com/gitByEOS/offline-confucius4-tts) |
 
 ## 交流 & 赞助
 

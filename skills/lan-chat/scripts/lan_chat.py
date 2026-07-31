@@ -231,6 +231,12 @@ class ChatHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    # 失败响应统一走这里：写结构化日志（含客户端 IP），再返回 JSON，便于远端定位
+    def fail_json(self, status: HTTPStatus, reason: str, **extra: object) -> None:
+        detail = " ".join(f"{k}={v}" for k, v in extra.items())
+        print(f"[lan-chat] /api/files {self.client_ip()} -> {status.value} {reason}{(' ' + detail) if detail else ''}", flush=True)
+        self.send_json({"error": reason, **extra}, status)
+
     def read_json(self) -> dict[str, object]:
         length = int(self.headers.get("Content-Length", "0"))
         if not 0 < length <= 4096:
@@ -343,15 +349,15 @@ class ChatHandler(BaseHTTPRequestHandler):
         except ValueError:
             length = 0
         if not match:
-            self.send_json({"error": "文件上传格式无效"}, HTTPStatus.BAD_REQUEST)
+            self.fail_json(HTTPStatus.BAD_REQUEST, "文件上传格式无效：缺少 multipart boundary")
             return
         if not 0 < length <= MAX_UPLOAD_BYTES + MAX_MULTIPART_OVERHEAD:
-            self.send_json({"error": "请选择不超过 2 GiB 的文件"}, HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
+            self.fail_json(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, "请选择不超过 2 GiB 的文件", content_length=length)
             return
         boundary = (match.group(1) or match.group(2)).encode("ascii", "strict")
         reader = MultipartReader(self.rfile, length)
         if reader.readline() != b"--" + boundary + b"\r\n":
-            self.send_json({"error": "文件上传格式无效"}, HTTPStatus.BAD_REQUEST)
+            self.fail_json(HTTPStatus.BAD_REQUEST, "文件上传格式无效：boundary 首行不匹配")
             return
         name = ""
         sender_id = ""
@@ -365,7 +371,7 @@ class ChatHandler(BaseHTTPRequestHandler):
                 disposition = headers.get("content-disposition", b"")
                 field = re.search(br'\bname="([^"]+)"', disposition)
                 if not field:
-                    raise ValueError
+                    raise ValueError("multipart 字段缺少 name")
                 field_name = field.group(1).decode("utf-8", "replace")
                 if field_name == "name":
                     value = reader.read_part(boundary, MAX_MULTIPART_OVERHEAD)
@@ -378,7 +384,7 @@ class ChatHandler(BaseHTTPRequestHandler):
                 elif field_name == "file":
                     filename_match = re.search(br'\bfilename="([^"]*)"', disposition)
                     if not filename_match or temp_path is not None:
-                        raise ValueError
+                        raise ValueError("file 字段缺少 filename 或重复上传")
                     filename = filename_match.group(1).decode("utf-8", "replace")
                     upload_dir.mkdir(mode=0o700, exist_ok=True)
                     with tempfile.NamedTemporaryFile(dir=upload_dir, prefix=".upload-", delete=False) as target:
@@ -396,17 +402,19 @@ class ChatHandler(BaseHTTPRequestHandler):
                 else:
                     reader.read_part(boundary, MAX_MULTIPART_OVERHEAD)
                     final_part = reader.finish_part()
-            if reader.remaining != 0 or not name or temp_path is None or not filename:
-                raise ValueError
+            if reader.remaining != 0:
+                raise ValueError("multipart body 未完整读取")
+            if not name or temp_path is None or not filename:
+                raise ValueError("昵称和文件不能为空")
         except OverflowError:
             if temp_path:
                 temp_path.unlink(missing_ok=True)
-            self.send_json({"error": "文件不能超过 2 GiB"}, HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
+            self.fail_json(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, "文件不能超过 2 GiB")
             return
-        except (OSError, ValueError):
+        except (OSError, ValueError) as error:
             if temp_path:
                 temp_path.unlink(missing_ok=True)
-            self.send_json({"error": "昵称和文件不能为空"}, HTTPStatus.BAD_REQUEST)
+            self.fail_json(HTTPStatus.BAD_REQUEST, str(error) or "文件上传解析失败")
             return
         file_id = uuid.uuid4().hex
         display_name = safe_filename(filename)

@@ -1,7 +1,7 @@
 ---
 name: lan-chat
 description: 创建、定制并运行零依赖的临时局域网聊天室，支持浏览器聊天、文件传输、粘贴图片与桌面/移动端响应式布局。用户需要局域网聊天页、临时 Wi-Fi 文件共享，或修改内置聊天 UI 时使用。
-version: 1.0.0
+version: 1.0.1
 dependencies:
   - python3
 repository: https://github.com/gitByEOS/open-part-skills
