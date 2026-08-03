@@ -56,6 +56,7 @@ qbot --help               # 2.确认可用
 qbot dashboard            # 3.进入界面，根据引导完成配置
 ```
 
+详细部署指南点击：👉🏻 [这里](https://gitByEOS.github.io/open-part-skills/qbot/) 
 
 | 技能 | 说明 | 版本 | 上次更新 |
 |------|------|------|----------|

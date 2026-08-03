@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QBot 部署指南 · 12 步上手</title>
+<style>
+  :root {
+    --bg: #f7f8fa; --card: #fff; --ink: #1a2233; --sub: #5b6678; --line: #e7eaf0;
+    --accent: #4f6ef7; --accent-soft: #eef2ff; --ok: #2bb673; --ok-soft: #e7f8ef;
+    --code-bg: #0f172a; --code-ink: #e6edf3;
+    --shadow: 0 1px 2px rgba(20,30,50,.04), 0 8px 24px rgba(20,30,50,.06);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", system-ui, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+  header { padding: 56px 0 32px; text-align: center; }
+  .badge { display: inline-block; padding: 6px 14px; background: var(--accent-soft); color: var(--accent);
+    border-radius: 999px; font-size: 13px; font-weight: 600; letter-spacing: .5px; }
+  header h1 { margin: 18px 0 10px; font-size: 34px; font-weight: 800; letter-spacing: -.5px; }
+  header p { margin: 0; color: var(--sub); font-size: 16px; }
+  .progress { position: sticky; top: 0; z-index: 10; background: rgba(247,248,250,.85);
+    backdrop-filter: blur(8px); padding: 14px 0; margin: 8px 0 24px; border-bottom: 1px solid var(--line); }
+  .progress .bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .progress .bar > i { display: block; height: 100%; width: 0;
+    background: linear-gradient(90deg, var(--accent), #7a8fff); border-radius: 999px; transition: width .3s ease; }
+  .progress .meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--sub); }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 28px 30px; margin-bottom: 18px; box-shadow: var(--shadow); scroll-margin-top: 80px; }
+  .step .head { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .step .num { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; background: var(--accent);
+    color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
+  .step.done .num { background: var(--ok); }
+  .step h2 { margin: 0; font-size: 19px; font-weight: 700; }
+  .step .desc { color: var(--sub); font-size: 15px; margin: 0 0 16px; }
+  .code { position: relative; background: var(--code-bg); color: var(--code-ink); border-radius: 12px;
+    padding: 16px 18px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 14px; line-height: 1.6;
+    overflow-x: auto; margin: 0 0 14px; white-space: pre; }
+  .code .copy { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,.1); color: var(--code-ink);
+    border: none; border-radius: 8px; padding: 5px 10px; font-size: 12px; cursor: pointer; transition: background .15s; }
+  .code .copy:hover { background: rgba(255,255,255,.2); }
+  .code .copy.ok { background: var(--ok); }
+  .ok-tip { display: flex; gap: 10px; align-items: flex-start; background: var(--ok-soft);
+    border-left: 3px solid var(--ok); border-radius: 8px; padding: 12px 14px; font-size: 14px; color: #1f7a4d; }
+  .ok-tip::before { content: "✓"; font-weight: 700; color: var(--ok); }
+  .ok-tip b { color: #155b3a; }
+  .note { font-size: 13px; color: var(--sub); background: var(--accent-soft); border-radius: 8px; padding: 10px 14px; margin: 10px 0 0; }
+  nav.toc { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin: 0 0 28px; }
+  nav.toc a { text-align: center; padding: 10px 4px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; text-decoration: none; color: var(--sub); font-size: 12px; font-weight: 600; transition: all .15s; }
+  nav.toc a:hover { color: var(--accent); border-color: var(--accent); }
+  footer { text-align: center; padding: 40px 0 60px; color: var(--sub); font-size: 14px; }
+  footer a { color: var(--accent); text-decoration: none; }
+  @media (max-width: 600px) { header h1 { font-size: 26px; } .step { padding: 22px 18px; }
+    nav.toc { grid-template-columns: repeat(3, 1fr); } }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <span class="badge">新手部署 · 约 10 分钟</span>
+  <h1>把 QBot 跑起来</h1>
+  <p>从 npm 安装到 QQ 收到第一条回复，共 12 步，每步都很短</p>
+</div></header>
+
+<div class="wrap">
+  <div class="progress">
+    <div class="bar"><i id="bar"></i></div>
+    <div class="meta"><span id="doneCount">已完成 0 / 12</span><span>跟着做就行</span></div>
+  </div>
+  <nav class="toc">
+    <a href="#s1">1 环境</a><a href="#s2">2 装 qbot</a><a href="#s3">3 Codex</a><a href="#s4">4 验证</a><a href="#s5">5 控制台</a>
+    <a href="#s6">6 凭据</a><a href="#s7">7 导入</a><a href="#s8">8 启动</a><a href="#s9">9 READY</a><a href="#s10">10 对话</a>
+    <a href="#s11">11 项目</a><a href="#s12">12 了解更多</a>
+  </nav>
+
+  <section class="step" id="s1"><div class="head"><div class="num">1</div><h2>确认你的 Mac 准备好了</h2></div>
+    <p class="desc">需要 Node.js 22.5 或更高版本，打开「终端」检查：</p>
+    <div class="code"><button class="copy">复制</button>node --version</div>
+    <div class="ok-tip"><b>看到</b> <code>v22.5.x</code> 或更高就过关。低于 22.5 先去 nodejs.org 装新版。</div>
+  </section>
+
+  <section class="step" id="s2"><div class="head"><div class="num">2</div><h2>全局安装 qbot</h2></div>
+    <p class="desc">一条命令装好 qbot 命令行工具：</p>
+    <div class="code"><button class="copy">复制</button>npm install -g @eos./qbot</div>
+    <div class="ok-tip"><b>看到</b> 安装完成、无红色报错就行。卡住可换 <code>sudo</code> 或配 npm prefix。</div>
+  </section>
+
+  <section class="step" id="s3"><div class="head"><div class="num">3</div><h2>安装并登录 Codex CLI</h2></div>
+    <p class="desc">QBot 让 Codex 干活，先装好 Codex 并登录。两行依次执行：</p>
+    <div class="code"><button class="copy">复制</button>npm install -g @openai/codex
+codex login</div>
+    <div class="ok-tip"><b>看到</b> 登录成功提示即可。已装过可跳过，用 <code>codex login status</code> 确认。</div>
+  </section>
+
+  <section class="step" id="s4"><div class="head"><div class="num">4</div><h2>验证 qbot 可用</h2></div>
+    <p class="desc">装完重开一个终端，确认命令能找到：</p>
+    <div class="code"><button class="copy">复制</button>qbot --version
+qbot --help</div>
+    <div class="ok-tip"><b>看到</b> 版本号和帮助文字就 OK。</div>
+    <p class="note">若提示 <code>command not found</code>，把 <code>$(npm config get prefix)/bin</code> 加进 PATH 后重开终端。</p>
+  </section>
+
+  <section class="step" id="s5"><div class="head"><div class="num">5</div><h2>打开 QBot 控制台</h2></div>
+    <p class="desc">控制台是首次配置主入口，会自动建好配置目录和文件：</p>
+    <div class="code"><button class="copy">复制</button>qbot dashboard</div>
+    <div class="ok-tip"><b>看到</b> 浏览器自动打开控制台。没自动开就手动访问终端打印的本地地址。</div>
+  </section>
+
+  <section class="step" id="s6"><div class="head"><div class="num">6</div><h2>填写机器人凭据</h2></div>
+    <p class="desc">通过「扫码接入」获取你的专属凭据，填入「配置」这两项，然后点击右上角保存配置：</p>
+    <div class="code"><button class="copy">复制</button>QQ_APP_ID     = 你的 AppID
+QQ_APP_SECRET = 你的 AppSecret</div>
+    <div class="ok-tip"><b>看到</b> 保存成功即可。白名单先留空，下一步启动后拉取你的 OpenID。</div>
+  </section>
+
+  <section class="step" id="s7"><div class="head"><div class="num">7</div><h2>启动服务并拉取 OpenID</h2></div>
+    <p class="desc">启动网关后用你的 QQ 给机器人发条消息，再到控制台拉取你的 OpenID：</p>
+    <div class="code"><button class="copy">复制</button>qbot start</div>
+    <p class="desc">用任意 QQ 号给机器人发条消息，在自动获取区域，依次点击 拉取 → 采用 → 测试：</p>
+    <div class="ok-tip"><b>收到 QQ 消息即证明配置成功</b>。</div>
+    <p class="note">私聊用 <code>user_openid</code>，群聊用 <code>member_openid</code>，都不是 QQ 号。</p>
+  </section>
+
+  <section class="step" id="s8"><div class="head"><div class="num">8</div><h2>重启网关使白名单生效</h2></div>
+    <p class="desc">在运行 <code>qbot start</code> 的终端按 <code>Ctrl+C</code> 停止，再重新启动让白名单生效：</p>
+    <div class="code"><button class="copy">复制</button>qbot start</div>
+    <div class="ok-tip"><b>看到</b> 一串启动日志、没立刻退出就行。下一步看关键标志。</div>
+  </section>
+
+  <section class="step" id="s9"><div class="head"><div class="num">9</div><h2>看到 READY 就成功了</h2></div>
+    <p class="desc">在启动日志里找这一行，出现就代表 QQ 网关已就绪：</p>
+    <div class="code">QQ bot is online (READY)</div>
+    <div class="ok-tip"><b>看到</b> 这行就部署完成。没出现就检查 AppID/AppSecret 和网络，或跑 <code>qbot doctor</code> 体检。</div>
+  </section>
+
+  <section class="step" id="s10"><div class="head"><div class="num">10</div><h2>在 QQ 里发条消息</h2></div>
+    <p class="desc">用白名单里的账号给机器人发这条消息试试：</p>
+    <div class="code"><button class="copy">复制</button>五分钟后提醒我喝水</div>
+    <div class="ok-tip"><b>看到</b> 机器人回复确认就部署成功 🎉。到点会自动私聊提醒你。</div>
+    <p class="note">常用命令：<code>/reset</code> 清上下文、<code>/new &lt;任务&gt;</code> 开新会话、<code>/stop</code> 中断任务。</p>
+  </section>
+
+  <section class="step" id="s11"><div class="head"><div class="num">11</div><h2>配置项目路径</h2></div>
+    <p class="desc">想让机器人在指定项目里读写代码，在控制台「配置设置」里填项目根目录，改完点右上角「保存配置」：</p>
+    <div class="code"><button class="copy">复制</button>QQ_PROJECT_ROOT = /Users/你/Projects</div>
+    <p class="desc">保存后自动热加载，无需重启网关。在 QQ 里就能用这些命令切换项目：</p>
+    <div class="code"><button class="copy">复制</button>/dir            列出项目
+/dir 2          切换到第 2 个
+/dir new demo   新建名为 demo 的项目</div>
+    <div class="ok-tip"><b>看到</b> 机器人回复项目列表就生效。每个项目独立上下文，切回会恢复原对话。</div>
+    <p class="note">项目目录不是安全沙箱，所有白名单用户都能让 Codex 读写所选项目，只配可信用户。</p>
+  </section>
+
+  <section class="step" id="s12"><div class="head"><div class="num">12</div><h2>了解更多</h2></div>
+    <p class="desc">打开控制台查看完整功能手册，了解 QBot 还能做什么：</p>
+    <div class="code"><button class="copy">复制</button>qbot dashboard</div>
+    <p class="note">还能：多机器人实例（<code>qbot new &lt;名字&gt;</code>）、附件回传、常驻局域网网页服务、流式回复、定时提醒等。</p>
+  </section>
+</div>
+
+<footer><div class="wrap">遇到任何问题或者需求新功能，可以进群联系我，群号: 1105239118</div></footer>
+
+<script>
+  var steps = document.querySelectorAll('.step');
+  var bar = document.getElementById('bar');
+  var doneCount = document.getElementById('doneCount');
+  var done = new Array(steps.length).fill(false);
+
+  function update() {
+    var n = done.filter(Boolean).length;
+    bar.style.width = (n / steps.length * 100) + '%';
+    doneCount.textContent = '已完成 ' + n + ' / ' + steps.length;
+    steps.forEach(function (s, i) { s.classList.toggle('done', done[i]); });
+  }
+
+  // 复制按钮
+  document.querySelectorAll('.code .copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var code = btn.parentElement.innerText.replace('复制', '').replace('已复制', '').trim();
+      navigator.clipboard.writeText(code).then(function () {
+        btn.textContent = '已复制';
+        btn.classList.add('ok');
+        setTimeout(function () { btn.textContent = '复制'; btn.classList.remove('ok'); }, 1500);
+      });
+    });
+  });
+
+  // 点击步骤标记完成
+  steps.forEach(function (s, i) {
+    s.addEventListener('click', function (e) {
+      if (e.target.closest('.copy') || e.target.closest('.code')) return;
+      done[i] = !done[i];
+      update();
+    });
+  });
+
+  // 进入视口自动标记完成
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) {
+        var i = Array.prototype.indexOf.call(steps, en.target);
+        if (i >= 0 && !done[i]) { done[i] = true; update(); }
+      }
+    });
+  }, { threshold: 0.6 });
+  steps.forEach(function (s) { io.observe(s); });
+</script>
+</body>
+</html>
