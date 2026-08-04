@@ -6,7 +6,7 @@
     "webfetch-plus": "../../bin/webfetch-plus.mjs"
   },
   "dependencies": {
-    "cloakbrowser": "0.3.28",
+    "cloakbrowser": "0.5.3",
     "playwright-core": "1.60.0"
   }
 }
