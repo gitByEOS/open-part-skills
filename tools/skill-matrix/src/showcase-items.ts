@@ -61,7 +61,7 @@ const skills = sortSkills([
     "skill-webfetch-plus",
     "WebFetch Plus",
     "webfetch-plus",
-    "使用 Browser 抓取普通 WebFetch 失败的网页内容，并输出适合大模型阅读的正文文本。",
+    "抓取普通 WebFetch 失败网页，自动复用本地会话，支持隐身抓取与人工验证。",
     "抓",
     "hot",
   ),

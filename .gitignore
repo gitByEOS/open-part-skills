@@ -11,6 +11,9 @@ runs/
 browser/
 .wfp_*
 
+# 测试文件
+*.test.mjs
+
 # python
 __pycache__/
 *.pyc
