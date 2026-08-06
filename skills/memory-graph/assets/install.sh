@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-PACKAGE="memory-graph-0.2.1-darwin-universal"
+PACKAGE="memory-graph-0.2.2-darwin-universal"
 ZIP="$ROOT/$PACKAGE.zip"
 INSTALL_ROOT="${MEMORY_GRAPH_HOME:-$HOME/.memory-graph/tools}"
 TARGET="$INSTALL_ROOT/memory-graph"

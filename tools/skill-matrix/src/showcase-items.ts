@@ -151,7 +151,7 @@ const skills = sortSkills([
     "skill-memory-graph",
     "Memory Graph",
     "memory-graph",
-    "Agent 外挂记忆图谱：link 关联历史、patch 沉淀记忆、apply 写入、look 管理。",
+    "Agent 外挂记忆图谱：link 关联历史、patch 沉淀记忆、apply 写入、look 管理；组合关键词优先返回全匹配结果；look 会阻塞终端并提供本地 WebUI。",
     "忆",
   ),
   skill(
