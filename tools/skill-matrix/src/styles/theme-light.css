@@ -1,54 +1,54 @@
 /* ═══════════════════════════════════════════════
-   theme-light.css - Stripe 金融科技风格
+   theme-light.css - 暗色清爽：玄墨底 · 蓝 skill · 绿 MCP
    ═══════════════════════════════════════════════ */
 
 .theme-light {
-  /* ── Stripe 品牌色 ── */
-  --color-stripe-purple: #533afd;
-  --color-deep-navy: #061b31;
-  --color-pure-white: #ffffff;
-  --color-brand-dark: #1c1e54;
-  --color-dark-navy: #0d253d;
+  /* ── 主色 ── */
+  --color-stripe-purple: #533afd; /* 顶栏/斜角条原版紫 */
+  --color-deep-navy: #e8e2d0;     /* 苍羽白 · 标题 */
+  --color-pure-white: #ffffff;    /* 实白 · 彩底上的字 */
+  --color-brand-dark: #e8e2d0;
+  --color-dark-navy: #3d7a58;     /* MCP 中绿 */
   --color-ruby: #ea2261;
   --color-purple-hover: #4434d4;
   --color-purple-light: #b9b9f9;
-  --color-purple-mid: #665efd;
-  --color-label: #273951;
-  --color-body: #64748d;
-  --color-border: #e5edf5;
-  --color-border-soft: #d6d9fc;
+  --color-purple-mid: #2f6bc4;    /* Skill 深蓝 */
+  --color-label: #d4cec0;
+  --color-body: #d0caba;
+  --color-border: rgba(232, 226, 208, 0.12);
+  --color-border-soft: rgba(232, 226, 208, 0.28);
+  --color-surface: #1a1d26;       /* 卡片面 */
+  --color-page: #12141a;          /* 玄黑页底 */
 
-  /* ── 差异化色调 ── */
-  --tint-rule: #273951;
-  --tint-rule-soft: rgba(39, 57, 81, 0.08);
-  --tint-rule-border: rgba(39, 57, 81, 0.18);
-  --tint-skill: #6366f1;
-  --tint-skill-soft: rgba(99, 102, 241, 0.06);
-  --tint-skill-border: rgba(99, 102, 241, 0.18);
+  /* ── MCP 绿 / Skill 蓝 ── */
+  --tint-rule: #6bc492;           /* MCP · 浅苍翠绿 */
+  --tint-rule-soft: rgba(107, 196, 146, 0.12);
+  --tint-rule-border: rgba(107, 196, 146, 0.32);
+  --tint-skill: #4d8fe8;          /* Skill · 苍穹蓝 */
+  --tint-skill-soft: rgba(77, 143, 232, 0.14);
+  --tint-skill-border: rgba(77, 143, 232, 0.36);
   --tint-soul: #8b5cf6;
   --tint-soul-secondary: #10b981;
-  --tint-soul-soft: rgba(139, 92, 246, 0.08);
-  --tint-soul-border: rgba(139, 92, 246, 0.25);
+  --tint-soul-soft: rgba(139, 92, 246, 0.1);
+  --tint-soul-border: rgba(139, 92, 246, 0.28);
 
-  /* ── 通用阴影 ── */
-  --shadow-stripe-blue: rgba(50, 50, 93, 0.25);
-  --shadow-dark-blue: rgba(3, 3, 39, 0.25);
-  --shadow-black: rgba(0, 0, 0, 0.1);
+  /* ── 阴影 ── */
+  --shadow-stripe-blue: rgba(0, 0, 0, 0.28);
+  --shadow-dark-blue: rgba(0, 0, 0, 0.5);
+  --shadow-black: rgba(0, 0, 0, 0.22);
   --shadow-card:
-    0 4px 6px var(--shadow-black),
-    0 10px 30px var(--shadow-stripe-blue),
-    0 2px 4px rgba(0, 0, 0, 0.06);
+    0 1px 0 rgba(255, 255, 255, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.28);
   --shadow-card-hover:
-    0 8px 16px var(--shadow-black),
-    0 20px 50px var(--shadow-stripe-blue),
-    0 4px 8px rgba(0, 0, 0, 0.08);
+    0 1px 0 rgba(255, 255, 255, 0.06),
+    0 14px 36px rgba(0, 0, 0, 0.36);
   --shadow-modal:
-    0 20px 60px var(--shadow-dark-blue),
+    0 24px 60px var(--shadow-dark-blue),
     0 8px 24px var(--shadow-black);
   --transition-fast: 200ms ease;
 
   color: var(--color-body);
-  background: var(--color-pure-white);
+  background: var(--color-page);
   font-family:
     Inter,
     -apple-system,
@@ -70,9 +70,10 @@
 /* ── Shell ── */
 .theme-light .shell {
   padding: 16px 32px 72px;
-  background: var(--color-pure-white);
+  background: var(--color-page);
 }
 
+/* 顶部紫星原版 */
 .theme-light .shell::before {
   position: absolute;
   top: 0;
@@ -147,7 +148,7 @@
   padding: 20px;
   border: 1px solid var(--color-border);
   border-radius: 14px;
-  background: var(--color-pure-white);
+  background: var(--color-surface);
   box-shadow: var(--shadow-card);
   transition:
     transform 200ms ease,
@@ -164,13 +165,21 @@
 
 .theme-light .showcaseCard.rule,
 .theme-light .showcaseCard.skill {
-  background: var(--color-pure-white);
+  background: var(--color-surface);
   border-color: var(--color-border);
 }
 
+.theme-light .showcaseCard.rule:hover {
+  border-color: var(--tint-rule-border);
+}
+
+.theme-light .showcaseCard.skill:hover {
+  border-color: var(--tint-skill-border);
+}
+
 .theme-light .showcaseCard.soul {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(16, 185, 129, 0.02) 100%);
-  border-color: rgba(139, 92, 246, 0.25);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%), var(--color-surface);
+  border-color: rgba(139, 92, 246, 0.28);
   border-width: 1px;
 }
 
@@ -183,42 +192,69 @@
   background: radial-gradient(circle at 50% 0%, var(--tint-soul-soft), transparent 70%);
 }
 
-/* ── Card Tag ── */
+/* ── Card Tag：角袋裁切，避免圆角穿帮 ── */
 .theme-light .cardTag {
-  top: 16px;
-  right: -24px;
-  width: 90px;
-  padding: 4px 0;
+  top: 0;
+  right: 0;
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  overflow: hidden;
   border: none;
   border-radius: 0;
-  background: var(--color-stripe-purple);
+  background: transparent;
   color: var(--color-pure-white);
+  transform: none;
+  pointer-events: none;
 }
 
-.theme-light .cardTag.hot {
+.theme-light .cardTagLabel {
+  position: absolute;
+  top: 16px;
+  right: -30px;
+  width: 100px;
+  padding: 5px 0;
+  background: var(--color-stripe-purple);
+  color: var(--color-pure-white);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(45deg);
+}
+
+.theme-light .cardTag.hot .cardTagLabel {
   background: linear-gradient(135deg, #ea2261, #f97316);
 }
 
-/* 细腻差异化: 所有 new 标签蓝绿渐变 */
-.theme-light .cardTag.new {
+.theme-light .cardTag.new .cardTagLabel {
   background: linear-gradient(135deg, #8b5cf6, #10b981);
 }
 
 .theme-light .cardTagSparkle {
-  color: rgba(255, 255, 255, 0.7);
+  position: absolute;
+  color: rgba(255, 255, 255, 0.75);
+  z-index: 1;
 }
 
 .theme-light .cardTag.hot .cardTagSparkle {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 /* ── Orb ── */
 .theme-light .orb {
   width: 42px;
   height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  max-width: 42px;
+  max-height: 42px;
+  flex: 0 0 42px;
   font-weight: 500;
   color: var(--color-pure-white);
-  box-shadow: 0 2px 6px rgba(83, 58, 253, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
 }
 
 .theme-light .orb.rule {
@@ -241,11 +277,11 @@
 }
 
 .theme-light .showcaseCard.rule:hover .orb {
-  box-shadow: 0 4px 12px var(--tint-rule-soft);
+  box-shadow: 0 4px 14px rgba(107, 196, 146, 0.32);
 }
 
 .theme-light .showcaseCard.skill:hover .orb {
-  box-shadow: 0 4px 12px var(--tint-skill-soft);
+  box-shadow: 0 4px 14px rgba(77, 143, 232, 0.4);
 }
 
 .theme-light .showcaseCard.soul:hover .orb {
@@ -254,22 +290,22 @@
 
 /* ── Card Header & Body ── */
 .theme-light .cardHeader h2 {
-  font-weight: 400;
-  color: var(--color-deep-navy);
+  font-weight: 500;
+  color: #f2ebe0;
   letter-spacing: -0.01em;
 }
 
 .theme-light .cardBody {
-  color: var(--color-body);
+  color: #d8d2c4;
   line-height: 1.55;
 }
 
 .theme-light .showcaseCard.rule .cardHeader h2 {
-  color: var(--tint-rule);
+  color: #8fd4ae;
 }
 
 .theme-light .showcaseCard.skill .cardHeader h2 {
-  color: var(--tint-skill);
+  color: #7eb0f5;
 }
 
 .theme-light .showcaseCard.soul .cardHeader h2 {
@@ -280,24 +316,24 @@
 }
 
 .theme-light .showcaseCard.rule .cardBody {
-  opacity: 0.7;
+  opacity: 1;
 }
 
 .theme-light .showcaseCard.skill .cardBody {
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .theme-light .showcaseCard.soul .cardBody {
-  opacity: 0.78;
+  opacity: 1;
 }
 
 /* ── Buttons by Type ── */
 .theme-light .showcaseCard.rule .magicBtn {
-  background: var(--tint-rule);
+  background: #5aad7f;
 }
 
 .theme-light .showcaseCard.rule .magicBtn:hover {
-  background: var(--color-deep-navy);
+  background: #6bc492;
 }
 
 .theme-light .showcaseCard.skill .magicBtn {
@@ -305,7 +341,7 @@
 }
 
 .theme-light .showcaseCard.skill .magicBtn:hover {
-  background: var(--color-stripe-purple);
+  background: #3b7ad4;
 }
 
 .theme-light .showcaseCard.soul .magicBtn {
@@ -321,8 +357,8 @@
 .theme-light code {
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: #f6f9fc;
-  color: var(--color-deep-navy);
+  background: rgba(8, 10, 14, 0.72);
+  color: #e0dacd;
   font-size: 0.72rem;
 }
 
@@ -350,7 +386,7 @@
 /* ── Modal ── */
 .theme-light .modalBackdrop {
   backdrop-filter: blur(12px);
-  background: rgba(6, 27, 49, 0.6);
+  background: rgba(6, 8, 12, 0.78);
 }
 
 .theme-light .detailModal {
@@ -359,15 +395,15 @@
   padding: 28px;
   border: 1px solid var(--color-border);
   border-radius: 16px;
-  background: var(--color-pure-white);
+  background: var(--color-surface);
   box-shadow: var(--shadow-modal);
 }
 
 .theme-light .detailType {
   border-radius: 8px;
   padding: 6px 14px;
-  background: rgba(83, 58, 253, 0.08);
-  color: var(--color-stripe-purple);
+  background: rgba(83, 58, 253, 0.14);
+  color: #a59bff;
   font-size: 0.78rem;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -391,7 +427,7 @@
 .theme-light .documentPreview {
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: #f6f9fc;
+  background: rgba(8, 10, 14, 0.72);
   scrollbar-color: var(--color-stripe-purple) transparent;
 }
 
@@ -399,7 +435,7 @@
   padding: 20px;
   border: 0;
   background: transparent;
-  color: var(--color-deep-navy);
+  color: #c9c3b4;
   font-size: 0.82rem;
   line-height: 1.65;
 }
@@ -457,11 +493,12 @@
   height: 36px;
   border: none;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-body);
 }
 
 .theme-light .closeButton:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.1);
   transform: scale(1.06);
 }
 
@@ -472,10 +509,10 @@
 
 .theme-light .menuPanel {
   border: 1px solid var(--color-border);
-  background: var(--color-pure-white);
+  background: var(--color-surface);
   box-shadow:
-    0 8px 32px rgba(50, 50, 93, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.08);
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .theme-light .menuDivider {
@@ -488,12 +525,12 @@
 }
 
 .theme-light .menuItem:hover:not(.disabled) {
-  background: rgba(83, 58, 253, 0.06);
+  background: rgba(83, 58, 253, 0.12);
 }
 
 .theme-light .menuItem.active {
-  background: rgba(83, 58, 253, 0.12);
-  color: var(--color-stripe-purple);
+  background: rgba(83, 58, 253, 0.18);
+  color: #a59bff;
 }
 
 .theme-light .menuItem.disabled {
@@ -502,7 +539,7 @@
 }
 
 .theme-light .menuItemValue {
-  color: var(--color-stripe-purple);
+  color: #a59bff;
 }
 
 /* ── Responsive ── */
@@ -552,13 +589,18 @@
   .theme-light .orb {
     width: 36px;
     height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    max-width: 36px;
+    max-height: 36px;
+    flex: 0 0 36px;
     font-size: 0.8rem;
     border-radius: 10px;
   }
 
   .theme-light .cardHeader h2 {
     font-size: 0.9rem;
-    font-weight: 400;
+    font-weight: 500;
   }
 
   .theme-light .cardBody {

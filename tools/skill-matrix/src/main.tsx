@@ -78,19 +78,21 @@ function CardTag({ tag }: { tag: CardTagValue }) {
 
   return (
     <span className={`cardTag ${tag}`}>
-      {tag}
-      {Array.from({ length: 4 }, (_, index) => (
-        <span
-          className="cardTagSparkle"
-          style={sparklePresets[presetIndexesRef.current[index]][index]}
-          aria-hidden="true"
-          key={index}
-          ref={(element) => {
-            sparklesRef.current[index] = element;
-          }}
-          onAnimationIteration={() => refreshSparkle(index)}
-        />
-      ))}
+      <span className="cardTagLabel">
+        {tag}
+        {Array.from({ length: 4 }, (_, index) => (
+          <span
+            className="cardTagSparkle"
+            style={sparklePresets[presetIndexesRef.current[index]][index]}
+            aria-hidden="true"
+            key={index}
+            ref={(element) => {
+              sparklesRef.current[index] = element;
+            }}
+            onAnimationIteration={() => refreshSparkle(index)}
+          />
+        ))}
+      </span>
     </span>
   );
 }

@@ -1,304 +1,170 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071011">
+  <meta name="description" content="EOS. 在线工具箱：精选开源数字工具与本地浏览器应用">
   <title>EOS.在线工具箱</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root {
-      --sidebar-bg: #e4e6ea;
-      --sidebar-bg-deep: #d8dbe0;
-      --sidebar-border: #c4c9d1;
-      --sidebar-text: #3d4349;
-      --sidebar-text-dim: #6b7280;
-      --sidebar-hover: rgba(255, 255, 255, 0.55);
-      --sidebar-active-bg: #e9eaef;
-      --sidebar-active-text: #4338ca;
-      --sidebar-accent: #6366f1;
-      --content-bg: #0e0e11;
+      --xuan:#07090c;--xuan-2:#181a18;--mo:#181a18;--mo-green:#123b35;--deep-green:#0b2927;
+      --white:#eeeade;--white-dim:#aaa99e;--blue:#3d7ea8;--blue-light:#7aafc9;
+      --jade:#69a287;--jade-light:#a1c5ae;--red:#a7433e;--red-light:#d06c5e;
+      --gold:#c5a15b;--gold-light:#e0c783;--gold-dark:#795d31;
+      --line:rgba(197,161,91,.28);--line-hi:rgba(224,199,131,.56);
+      --rail:214px;--rail-fold:74px;--bar:74px;
+      --serif:"FZKai-Z03","STKaiti","KaiTi","Songti SC",serif;
+      --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
     }
-    body { height: 100vh; margin: 0; overflow: hidden; background: var(--content-bg); }
-    .sidebar {
-      height: 100vh;
-      width: 180px;
-      min-width: 180px;
-      position: relative;
-      overflow: hidden;
-      flex-shrink: 0;
-      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", system-ui, -apple-system, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      font-feature-settings: "kern";
-      background:
-        linear-gradient(165deg, #eceef1 0%, var(--sidebar-bg) 38%, var(--sidebar-bg-deep) 100%);
-      border-right: none;
-      box-shadow: 4px 0 24px rgba(15, 23, 42, 0.06);
-      transition: width 0.28s cubic-bezier(0.22, 0.9, 0.28, 1), min-width 0.28s cubic-bezier(0.22, 0.9, 0.28, 1), border-color 0.18s ease, box-shadow 0.28s ease;
-    }
-    .sidebar.collapsed { width: 0; min-width: 0; box-shadow: none; }
-    .sidebar-header {
-      position: relative;
-      z-index: 3;
-      width: 180px;
-      min-width: 180px;
-      height: 48px;
-      padding: 0 10px;
-      display: flex;
-      align-items: center;
-      border-bottom: none;
-      background: transparent;
-      overflow: hidden;
-      flex-shrink: 0;
-      filter: drop-shadow(0 6px 10px rgba(30, 27, 75, 0.28));
-    }
-    .sidebar-header::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 0 2px,
-        radial-gradient(circle at 50% 130%, rgba(99, 102, 241, 0.35), transparent 60%),
-        linear-gradient(135deg, #1e1b4b 0%, #312e81 52%, #1e1b4b 100%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .sidebar-header > * {
-      position: relative;
-      z-index: 2;
-    }
-    .sidebar-brand-icon {
-      filter: drop-shadow(0 1px 6px rgba(99, 102, 241, 0.55));
-    }
-    .sidebar-header-title {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      line-height: 1.25;
-      color: #f8fafc;
-      text-shadow: 0 2px 16px rgba(99, 102, 241, 0.5);
-    }
-    .sidebar-header-title .brand-mark {
-      font-weight: 650;
-      letter-spacing: 0.04em;
-      font-family: "SF Pro Display", "Segoe UI", system-ui, -apple-system, sans-serif;
-      color: #f8fafc;
-    }
-    .sidebar-header-title,
-    .sidebar-nav-wrap {
-      transition: opacity 0.18s ease, transform 0.24s cubic-bezier(0.22, 0.9, 0.28, 1);
-      white-space: nowrap;
-    }
-    .sidebar-nav-wrap {
-      position: relative;
-      z-index: 1;
-      width: 180px;
-      min-width: 180px;
-      flex: 1;
-      min-height: 0;
-      margin-top: -1px;
-      padding: 0 0 48px;
-      background: linear-gradient(180deg, #dcdee3 0%, var(--sidebar-bg) 14px, var(--sidebar-bg) 100%);
-      border-right: 1px solid var(--sidebar-border);
-      box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
-    }
-    .sidebar-nav-wrap::before {
-      content: "";
-      position: absolute;
-      top: -8px;
-      left: 0;
-      right: 0;
-      height: 20px;
-      pointer-events: none;
-      z-index: 1;
-      background: linear-gradient(
-        180deg,
-        rgba(30, 27, 75, 0.26) 0%,
-        rgba(30, 27, 75, 0.12) 38%,
-        rgba(15, 23, 42, 0.04) 72%,
-        transparent 100%
-      );
-    }
-    .sidebar-nav-wrap .nav {
-      position: relative;
-      z-index: 0;
-    }
-    .sidebar.collapsed .sidebar-header-title,
-    .sidebar.collapsed .sidebar-nav-wrap {
-      opacity: 0;
-      transform: translateX(-12px);
-      pointer-events: none;
-    }
-    .sidebar-toggle {
-      position: fixed;
-      left: 8px;
-      bottom: 10px;
-      width: 30px;
-      height: 30px;
-      padding: 0;
-      border: 1px solid var(--sidebar-border);
-      border-radius: 8px;
-      background: linear-gradient(180deg, #f5f6f8 0%, #dfe2e8 100%);
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 2;
-    }
-    .sidebar-toggle:hover {
-      background: linear-gradient(180deg, #fafbfc 0%, #e8ebf0 100%);
-      border-color: #b8bec8;
-    }
-    .sidebar-toggle-icon { width: 18px; height: 18px; display: block; transition: transform 0.18s ease, opacity 0.18s ease; opacity: 0.72; }
-    .sidebar-toggle-open-icon { transform: rotate(90deg); }
-    .sidebar-toggle-home-icon { display: none; }
-    .sidebar.collapsed .sidebar-toggle {
-      left: 8px;
-      bottom: 10px;
-      z-index: 10;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    }
-    .sidebar.collapsed .sidebar-toggle-open-icon { display: none; }
-    .sidebar.collapsed .sidebar-toggle-home-icon { width: 24px; height: 24px; display: block; }
-    .sidebar .nav-link {
-      cursor: pointer;
-      padding: 10px 14px;
-      border-radius: 0;
-      margin-bottom: 0;
-      transition: background 0.15s ease, color 0.15s ease;
-      font-size: 14px;
-      line-height: 1.45;
-      color: var(--sidebar-text);
-      font-weight: 500;
-      border: none;
-      border-bottom: 1px solid rgba(196, 201, 209, 0.35);
-      text-decoration: none;
-    }
-    .sidebar .nav-link:hover {
-      background: rgba(255, 255, 255, 0.45);
-      color: var(--sidebar-text);
-    }
-    .sidebar .nav-link.active {
-      background: linear-gradient(90deg, rgba(99, 102, 241, 0.14) 0%, rgba(99, 102, 241, 0.05) 42%, var(--sidebar-active-bg) 100%);
-      color: var(--sidebar-active-text);
-      font-weight: 600;
-      border-bottom-color: rgba(196, 201, 209, 0.35);
-      box-shadow: inset 3px 0 0 var(--sidebar-accent);
-    }
-    .content-area {
-      height: 100vh;
-      overflow: hidden !important;
-      padding: 0;
-      position: relative;
-      flex: 1;
-      min-width: 0;
-      background: var(--content-bg);
-    }
-    .tab-content {
-      display: none;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      height: 100%;
-      overflow: hidden !important;
-      background: var(--content-bg);
-    }
-    .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
-    .tab-content iframe { width: 100%; height: 100%; border: none; display: block; background: var(--content-bg); }
+    *{box-sizing:border-box}html,body{width:100%;height:100%}body{margin:0;overflow:hidden;background:var(--xuan);color:var(--white);font-family:var(--sans);-webkit-font-smoothing:antialiased}button,a{font:inherit;color:inherit}button{border:0}.skip{position:fixed;top:8px;left:8px;z-index:1000;padding:9px 14px;background:var(--gold-light);color:var(--xuan);transform:translateY(-140%);text-decoration:none}.skip:focus{transform:none}
+    body::after{position:fixed;inset:0;z-index:999;content:"";pointer-events:none;opacity:.065;mix-blend-mode:screen;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E")}
+    .app{position:relative;display:flex;width:100%;height:100dvh;overflow:hidden;background:var(--xuan)}
+    .app::before{position:absolute;top:-18%;right:-12%;z-index:0;width:58%;height:52%;border-radius:50%;background:radial-gradient(ellipse at 50% 50%,rgba(61,126,168,.26),rgba(61,126,168,.08) 42%,transparent 70%);content:"";pointer-events:none;filter:blur(2px);animation:glowSway 9s ease-in-out infinite;will-change:transform}
+    .app>*{position:relative;z-index:1}
+    @keyframes glowSway{0%,100%{transform:translate(0,0) scale(1)}35%{transform:translate(-18px,10px) scale(1.05)}70%{transform:translate(12px,-8px) scale(.97)}}
+
+    /* 卷轴目录 */
+    .sidebar{position:relative;z-index:30;width:var(--rail);min-width:var(--rail);height:100%;overflow:hidden;border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(24,26,24,.96),transparent 30%),linear-gradient(150deg,var(--xuan-2),var(--xuan) 68%,var(--xuan-2));box-shadow:14px 0 42px rgba(0,0,0,.32);contain:layout paint style;transition:width .16s ease-out,min-width .16s ease-out}
+    .sidebar::before{position:absolute;inset:0;content:"";pointer-events:none;background:linear-gradient(rgba(224,199,131,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(224,199,131,.02) 1px,transparent 1px);background-size:26px 26px;mask-image:linear-gradient(#000,transparent 86%)}
+    .rail-inner{position:relative;display:flex;width:var(--rail);height:100%;flex-direction:column}
+    .brand{position:relative;display:flex;height:var(--bar);flex:0 0 var(--bar);align-items:center;gap:11px;padding:0 17px;border-bottom:1px solid var(--line)}
+    .brand::after{position:absolute;right:13px;bottom:-3px;left:13px;height:5px;border-top:1px solid rgba(224,199,131,.2);border-bottom:1px solid rgba(224,199,131,.1);content:""}
+    .brand-seal{position:relative;display:block;width:46px;height:46px;flex:0 0 46px;overflow:hidden;border:1px solid var(--gold);border-radius:50%;background:var(--xuan-2);box-shadow:inset 0 0 0 3px rgba(197,161,91,.11),0 5px 14px rgba(0,0,0,.5),0 0 22px rgba(61,126,168,.14)}.brand-seal::after{position:absolute;inset:3px;border:1px solid rgba(224,199,131,.34);border-radius:50%;content:"";pointer-events:none}.brand-seal img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 44%;filter:saturate(.9) contrast(1.06)}.brand-copy{white-space:nowrap}.brand-copy b{display:block;font-family:Georgia,var(--serif);font-size:21px;letter-spacing:.1em}.brand-copy b i{color:var(--red-light);font-style:normal}.brand-copy small{display:block;margin-top:5px;color:var(--white-dim);font-size:9px;letter-spacing:.28em}
+    .nav-wrap{min-height:0;flex:1;overflow:auto;padding:13px 10px;scrollbar-width:thin;scrollbar-color:var(--gold-dark) transparent}.nav-caption{margin:2px 9px 9px;color:rgba(224,199,131,.48);font-size:8px;letter-spacing:.2em;white-space:nowrap}.nav{display:flex;flex-direction:column;gap:5px}.nav-link{position:relative;display:grid;min-height:44px;grid-template-columns:26px 1fr auto;align-items:center;gap:9px;padding:8px 9px;border:1px solid transparent;border-radius:4px;color:var(--white-dim);text-decoration:none;transition:.16s}.nav-link::before{position:absolute;top:8px;bottom:8px;left:-1px;width:2px;background:var(--gold);content:"";opacity:0}.nav-link:hover{border-color:rgba(197,161,91,.18);background:rgba(238,234,222,.035);color:var(--white)}.nav-link.active{border-color:rgba(197,161,91,.29);background:linear-gradient(90deg,rgba(197,161,91,.13),rgba(61,126,168,.05));color:var(--gold-light)}.nav-link.active::before{opacity:1}.nav-icon{display:grid;width:26px;height:26px;place-items:center;border:1px solid rgba(197,161,91,.18);border-radius:50%}.nav-icon svg{width:15px;height:15px}.nav-label{overflow:hidden;font-family:var(--serif);font-size:12px;letter-spacing:.06em;white-space:nowrap}.nav-num{color:rgba(238,234,222,.28);font-family:Georgia,serif;font-size:8px}
+    .rail-foot{display:flex;height:61px;flex:0 0 61px;align-items:center;gap:9px;padding:9px 12px;border-top:1px solid var(--line)}.rail-motto{min-width:0;flex:1;white-space:nowrap}.rail-motto b{display:block;font-family:var(--serif);font-size:11px;font-weight:500;letter-spacing:.07em}.rail-motto small{display:block;margin-top:3px;color:rgba(238,234,222,.35);font-size:8px;letter-spacing:.11em}.rail-toggle,.menu-btn{display:grid;width:34px;height:34px;flex:0 0 34px;place-items:center;border:1px solid var(--line);border-radius:50%;background:rgba(197,161,91,.04);color:var(--gold-light);cursor:pointer}.rail-toggle:hover,.menu-btn:hover{border-color:var(--line-hi);background:rgba(197,161,91,.1)}.rail-toggle svg,.menu-btn svg{width:16px;transition:transform .25s}
+    .sidebar.collapsed{width:var(--rail-fold);min-width:var(--rail-fold)}.sidebar.collapsed .rail-inner{width:var(--rail-fold)}.sidebar.collapsed .brand{justify-content:center;padding:0}.sidebar.collapsed .brand-copy,.sidebar.collapsed .nav-caption,.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-num,.sidebar.collapsed .rail-motto{display:none}.sidebar.collapsed .nav-wrap{padding:13px 9px}.sidebar.collapsed .nav-link{display:flex;justify-content:center;padding:8px}.sidebar.collapsed .rail-foot{justify-content:center;padding:9px}.sidebar.collapsed .rail-toggle svg{transform:rotate(180deg)}
+
+    /* 工作区顶栏 */
+    .workspace{position:relative;display:flex;min-width:0;height:100%;flex:1;flex-direction:column;contain:layout}.menu-btn{display:none}.mobile-floating{position:absolute;top:12px;left:12px;z-index:20;background:rgba(7,9,12,.88);backdrop-filter:blur(8px)}
+    html.rail-animating body::after{opacity:0}
+    html.rail-animating .app::before{animation:none}
+    html.rail-animating .landscape{filter:none}
+    html.rail-animating .scroll-stage::after{filter:none}
+    html.rail-animating .mechanism{backdrop-filter:none;transition:none}
+    html.rail-animating .mechanism .device-ring{animation:none}
+    html.rail-animating .scroll-badge{backdrop-filter:none;transition:none}
+    html.rail-animating .route .main-path{filter:none}
+
+    .panels{position:relative;min-width:0;min-height:0;flex:1;overflow:hidden;background:var(--xuan)}.tab-content{display:none;width:100%;height:100%;overflow:hidden;background:var(--xuan);opacity:0;transform:translateY(12px);transition:opacity .25s,transform .25s}.tab-content.active{display:block;opacity:1;transform:none}.tool-panel{position:relative}.tool-panel iframe{position:relative;z-index:2;display:block;width:100%;height:100%;border:0;background:#0e0e11}.loading{position:absolute;inset:0;z-index:1;display:grid;place-items:center;color:var(--white-dim);font-family:var(--serif);font-size:12px;letter-spacing:.12em}.loading span::before{display:block;width:28px;height:28px;margin:0 auto 12px;border:1px solid var(--line);border-top-color:var(--gold);border-radius:50%;content:"";animation:spin .8s linear infinite}.tool-panel.loaded .loading{display:none}@keyframes spin{to{transform:rotate(360deg)}}
+
+    /* 工具总览 */
+    .overview{position:relative;overflow:auto;background:var(--xuan);scrollbar-width:thin;scrollbar-color:var(--gold-dark) var(--xuan)}.scroll-stage{position:relative;width:100%;min-width:1010px;min-height:100%;height:max(720px,100%);overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 76% 16%,rgba(238,234,222,.06),transparent 23%),radial-gradient(ellipse at 37% 43%,rgba(61,126,168,.08),transparent 29%),radial-gradient(ellipse at 64% 69%,rgba(167,67,62,.045),transparent 25%),linear-gradient(180deg,var(--xuan) 0%,var(--xuan-2) 50%,var(--xuan) 100%);box-shadow:inset 0 0 110px rgba(0,0,0,.56)}
+    .scroll-stage::before{position:absolute;inset:7% 5% 9%;z-index:-1;border-radius:32%;background:radial-gradient(ellipse at 50% 48%,rgba(238,234,222,.035),transparent 61%);box-shadow:0 42px 90px rgba(0,0,0,.35);content:"";pointer-events:none}.scroll-stage::after{position:absolute;right:-8%;bottom:-23%;left:-8%;z-index:8;height:38%;background:linear-gradient(180deg,transparent,rgba(7,9,12,.42) 29%,rgba(7,9,12,.94));content:"";pointer-events:none;filter:blur(1px)}
+    .landscape{position:absolute;inset:0;z-index:-3;width:100%;height:100%;opacity:.3;filter:saturate(.38) contrast(.82) brightness(.7)}.stars{position:absolute;inset:0 0 45%;z-index:-2;opacity:.18;background-image:radial-gradient(circle,rgba(238,234,222,.72) 0 1px,transparent 1.4px),radial-gradient(circle,rgba(120,160,220,.8) 0 1px,transparent 1.5px);background-position:0 0,31px 19px;background-size:63px 57px,91px 83px;mask-image:linear-gradient(#000,transparent)}
+    .scroll-frame{position:absolute;inset:18px;z-index:1;border:1px solid rgba(197,161,91,.25);border-radius:18px;pointer-events:none;box-shadow:0 20px 52px rgba(0,0,0,.26),inset 0 0 0 5px rgba(197,161,91,.015),inset 0 0 90px rgba(0,0,0,.42)}.scroll-frame::before,.scroll-frame::after{position:absolute;width:72px;height:72px;content:""}.scroll-frame::before{top:10px;left:10px;border-top:1px solid var(--gold);border-left:1px solid var(--gold);border-radius:12px 0 0}.scroll-frame::after{right:10px;bottom:10px;border-right:1px solid var(--gold);border-bottom:1px solid var(--gold);border-radius:0 0 12px}
+    .corner-mark{position:absolute;z-index:2;color:rgba(224,199,131,.44);font-family:var(--serif);font-size:9px;letter-spacing:.24em}.corner-mark.nw{top:38px;left:39px}.corner-mark.se{display:none}
+    .scroll-intro{position:absolute;top:7.5%;left:4.3%;z-index:5;width:270px;padding:17px 20px 18px;border-left:2px solid var(--gold);background:linear-gradient(90deg,rgba(7,12,14,.78),rgba(7,12,14,.18));text-shadow:0 2px 12px #000}.scroll-intro .stamp-line{display:flex;align-items:center;gap:9px;color:var(--gold);font-size:8px;font-weight:600;letter-spacing:.22em}.scroll-intro .stamp-line::before{width:25px;height:1px;background:var(--red-light);content:""}.scroll-intro h2{margin:9px 0 6px;font-family:var(--serif);font-size:29px;font-weight:500;letter-spacing:.13em;line-height:1.2}.scroll-intro h2 em{color:var(--gold-light);font-style:normal}.scroll-intro p{margin:0;color:rgba(238,234,222,.64);font-family:var(--serif);font-size:11px;line-height:1.75;letter-spacing:.04em}.scroll-intro .micro{display:flex;gap:12px;margin-top:12px;color:rgba(161,197,174,.72);font-size:8px;letter-spacing:.08em}.scroll-intro .micro b{color:var(--white);font-family:Georgia,serif;font-size:13px;font-weight:400}
+    .route{position:absolute;inset:0;z-index:2;width:100%;height:100%;pointer-events:none}.route .main-path{fill:none;stroke:url(#routeGold);stroke-width:1.3;stroke-dasharray:5 7;filter:url(#routeGlow);opacity:.68}.route-pins{display:none}.route-pins .pin{position:absolute;width:12px;height:12px;box-sizing:border-box;border:1px solid var(--gold);border-radius:50%;background:#0a1213;box-shadow:0 0 10px rgba(224,199,131,.28);transform:translate(-50%,-50%)}.route-pins .p1{top:31%;left:24%}.route-pins .p2{top:20%;left:48%}.route-pins .p3{top:33%;right:12%;left:auto;transform:translate(50%,-50%)}.route-pins .p4{top:69%;left:13%}.route-pins .p5{top:73%;left:43%}.route-pins .p6{top:66%;right:13%;left:auto;transform:translate(50%,-50%)}
+
+    .mechanism{--accent:197,161,91;position:absolute;z-index:7;display:flex;width:224px;min-height:105px;align-items:center;gap:12px;padding:12px 13px;border:1px solid rgba(var(--accent),.48);border-radius:5px;background:linear-gradient(145deg,rgba(36,38,35,.96) 0%,rgba(16,19,18,.94) 38%,rgba(7,9,12,.9) 100%);box-shadow:0 6px 0 rgba(0,0,0,.38),0 18px 36px rgba(0,0,0,.48),-9px -9px 28px rgba(var(--accent),.035),inset 1px 1px 0 rgba(238,234,222,.07),inset -14px -16px 28px rgba(0,0,0,.27);color:var(--white);cursor:pointer;text-align:left;backdrop-filter:blur(10px);transform:perspective(700px) rotateX(1.2deg) translateZ(0);transition:transform .22s,border-color .2s,box-shadow .22s}.mechanism::before{position:absolute;inset:4px;border-top:1px solid rgba(238,234,222,.08);border-right:1px solid rgba(var(--accent),.11);border-bottom:1px solid rgba(0,0,0,.42);border-left:1px solid rgba(var(--accent),.15);content:"";pointer-events:none}.mechanism::after{position:absolute;top:-3px;right:13px;width:30px;height:5px;border:1px solid rgba(var(--accent),.58);background:linear-gradient(180deg,rgb(var(--accent)),#181a18);box-shadow:0 3px 8px rgba(0,0,0,.4);content:""}.mechanism:hover,.mechanism:focus-visible{z-index:10;border-color:rgba(var(--accent),.95);box-shadow:0 9px 0 rgba(0,0,0,.34),0 28px 48px rgba(0,0,0,.58),0 0 35px rgba(var(--accent),.18),inset 1px 1px 0 rgba(238,234,222,.12);transform:perspective(700px) rotateX(0) translateY(-8px) scale(1.025)}.mechanism .device{position:relative;display:grid;width:64px;height:64px;flex:0 0 64px;place-items:center;color:rgb(var(--accent))}.mechanism .device::before,.mechanism .device::after{position:absolute;border:1px solid rgba(var(--accent),.55);content:""}.mechanism .device::before{inset:4px;border-radius:50%;background:radial-gradient(circle at 36% 30%,rgba(238,234,222,.09),transparent 30%),linear-gradient(145deg,rgba(var(--accent),.14),rgba(7,9,12,.52));box-shadow:3px 5px 12px rgba(0,0,0,.48),inset 1px 1px 0 rgba(238,234,222,.1),inset -4px -5px 12px rgba(0,0,0,.36)}.mechanism .device::after{inset:11px;transform:rotate(45deg);box-shadow:2px 3px 7px rgba(0,0,0,.35),inset 1px 1px 0 rgba(var(--accent),.15)}.mechanism .device svg{position:relative;z-index:2;width:29px;height:29px}.mechanism .device-ring{position:absolute;inset:0;border:1px dashed rgba(var(--accent),.42);border-radius:50%;animation:orbit 24s linear infinite}@keyframes orbit{to{transform:rotate(360deg)}}.mechanism-copy{min-width:0}.mechanism-copy small{display:block;color:rgba(var(--accent),.82);font-size:7px;font-weight:700;letter-spacing:.17em}.mechanism-copy strong{display:block;margin-top:5px;font-family:var(--serif);font-size:15px;font-weight:500;letter-spacing:.07em}.mechanism-copy p{margin:5px 0 0;color:rgba(238,234,222,.53);font-size:8px;line-height:1.5}.mechanism-copy .enter{display:block;margin-top:7px;color:rgb(var(--accent));font-size:8px;letter-spacing:.08em}.mechanism-copy .enter::after{content:"  →"}
+    .mechanism .card-tag{position:absolute;top:-26px;left:0;z-index:3;display:flex;align-items:center;gap:6px;color:rgba(224,199,131,.54);font-family:var(--serif);font-size:8px;letter-spacing:.15em;white-space:nowrap;pointer-events:none}.mechanism .card-tag::before{width:16px;height:1px;background:currentColor;content:""}.mechanism .card-pin{position:absolute;top:50%;left:0;z-index:3;width:12px;height:12px;box-sizing:border-box;border:1px solid rgba(var(--accent),.85);border-radius:50%;background:#0a1213;box-shadow:0 0 10px rgba(var(--accent),.28);transform:translate(-50%,-50%);pointer-events:none}.m1{--accent:61,126,168;top:29%;left:23%}.m2{--accent:238,234,222;top:18%;left:47%}.m3{--accent:197,161,91;top:31%;right:7%}.m4{--accent:105,162,135;bottom:20%;left:12%}.m5{--accent:167,67,62;bottom:10%;left:42%}.m6{--accent:131,179,195;right:8%;bottom:19%}
+    .m2 .device::before{border-radius:46% 54% 50% 50%}.m3 .device::before{border-radius:3px;transform:rotate(45deg)}.m4 .device::before{box-shadow:inset 0 0 0 7px rgba(var(--accent),.07)}.m5 .device-ring{border-color:rgba(var(--accent),.62)}.m6 .device::after{transform:none;border-radius:3px}
+    .node-tag{display:none}
+    .scroll-badge{position:absolute;top:4.5%;right:3.8%;z-index:6;display:flex;align-items:center;gap:10px;padding:9px 13px 9px 10px;border:1px solid rgba(197,161,91,.38);border-radius:2px;background:linear-gradient(135deg,rgba(24,26,24,.94),rgba(7,9,12,.88));box-shadow:0 8px 24px rgba(0,0,0,.32),inset 1px 1px 0 rgba(238,234,222,.06);color:var(--gold-light);font-family:var(--serif);font-size:12px;letter-spacing:.16em;text-decoration:none;backdrop-filter:blur(8px);cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s}.scroll-badge:hover{border-color:rgba(224,199,131,.62);box-shadow:0 10px 28px rgba(0,0,0,.4),0 0 18px rgba(197,161,91,.14),inset 1px 1px 0 rgba(238,234,222,.1);transform:translateY(-1px)}.scroll-badge::before{display:grid;width:24px;height:24px;place-items:center;border:1px solid rgba(197,161,91,.5);background:rgba(197,161,91,.07);color:var(--gold);content:"府";font-size:11px;letter-spacing:0}.scroll-badge::after{position:absolute;right:5px;bottom:4px;width:4px;height:4px;border-right:1px solid var(--gold);border-bottom:1px solid var(--gold);content:""}
+    .scroll-metrics{position:absolute;bottom:4.2%;left:3.7%;z-index:5;display:flex;border:1px solid rgba(197,161,91,.23);background:rgba(5,10,11,.66)}.metric{display:flex;min-width:92px;align-items:baseline;gap:6px;padding:9px 12px;border-right:1px solid rgba(197,161,91,.16)}.metric:last-child{border:0}.metric b{color:var(--gold-light);font-family:Georgia,serif;font-size:16px;font-weight:400}.metric span{color:rgba(238,234,222,.45);font-size:7px;letter-spacing:.08em}.inscription{position:absolute;right:4.2%;bottom:4.2%;z-index:5;display:flex;flex-direction:column;align-items:center;color:rgba(224,199,131,.72);font-family:var(--serif);font-size:13px;letter-spacing:.14em;text-align:center;text-shadow:0 2px 12px #000}.inscription small{display:block;margin-top:5px;color:rgba(238,234,222,.3);font-family:var(--sans);font-size:7px;letter-spacing:.14em;text-align:center}
+    .scrim{display:none}:focus-visible{outline:2px solid var(--gold-light);outline-offset:3px}
+
+    @media(max-width:1180px){:root{--rail:190px}.rail-inner{width:var(--rail)}.scroll-intro{width:250px}.mechanism{width:205px}.m1{left:22%}.m2{left:46%}.m3{right:5%}.m6{right:6%}.route-pins .p1{left:23%}.route-pins .p2{left:47%}.route-pins .p3{right:11%}.route-pins .p6{right:13%}}
+    @media(max-width:860px){:root{--bar:66px}.sidebar{position:fixed;inset:0 auto 0 0;width:min(84vw,300px);min-width:min(84vw,300px);transform:translateX(-105%)}.sidebar.mobile-open{transform:none}.rail-inner,.sidebar.collapsed .rail-inner{width:min(84vw,300px)}.sidebar.collapsed{width:min(84vw,300px);min-width:min(84vw,300px)}.sidebar.collapsed .brand{justify-content:flex-start;padding:0 17px}.sidebar.collapsed .brand-copy,.sidebar.collapsed .nav-caption,.sidebar.collapsed .nav-label,.sidebar.collapsed .nav-num,.sidebar.collapsed .rail-motto{display:block}.sidebar.collapsed .nav-wrap{padding:13px 10px}.sidebar.collapsed .nav-link{display:grid;justify-content:initial;padding:8px 9px}.sidebar.collapsed .rail-foot{justify-content:flex-start;padding:9px 12px}.sidebar.collapsed .rail-toggle svg{transform:none}.scrim{position:fixed;inset:0;z-index:25;display:block;background:rgba(2,6,8,.74);opacity:0;pointer-events:none;backdrop-filter:blur(3px);transition:opacity .2s}body.nav-open .scrim{opacity:1;pointer-events:auto}.menu-btn{display:grid}.scroll-stage{min-width:0;height:auto;min-height:1480px}.scroll-frame{inset:10px}.corner-mark.nw{top:28px;left:27px}.corner-mark.se{right:25px;bottom:20px}.scroll-intro{top:4.5%;left:7%;width:86%;padding:15px 17px}.scroll-intro h2{font-size:26px}.landscape{height:100%;object-fit:cover}.route,.route-pins{display:none}.mechanism{position:absolute;width:76%;min-height:112px}.m1{top:27%;left:8%}.m2{top:38%;right:7%;left:auto}.m3{top:49%;left:8%;right:auto}.m4{top:60%;right:7%;bottom:auto;left:auto}.m5{top:71%;left:8%;bottom:auto}.m6{top:82%;right:7%;bottom:auto}.node-tag{display:none}.scroll-badge{top:1.8%;right:5%}.scroll-metrics{bottom:2.4%;left:6%}.inscription{right:6%;bottom:7.7%}}
+    @media(max-width:480px){.scroll-stage{min-height:1510px}.scroll-intro h2{font-size:24px}.mechanism{width:84%;padding:11px}.m1,.m3,.m5{left:6%}.m2,.m4,.m6{right:6%}.mechanism .device{width:58px;height:58px;flex-basis:58px}.scroll-metrics{right:6%;display:grid;grid-template-columns:repeat(3,1fr)}.metric{min-width:0;justify-content:center;padding:8px 5px}.inscription{bottom:7.2%;font-size:11px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.app::before{animation:none;transform:none}}
   </style>
 </head>
 <body>
-  <div class="d-flex" style="width: 100%; height: 100vh; overflow: hidden;">
-    <div class="sidebar d-flex flex-column">
-      <div class="sidebar-header">
-        <img src="res/icons/tool.svg" width="24" height="24" class="sidebar-brand-icon me-2" alt="">
-        <h5 class="sidebar-header-title"><span class="brand-mark">EOS.</span>工具箱</h5>
+<a class="skip" href="#panels">跳到主要内容</a>
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="工具目录">
+    <div class="rail-inner">
+      <div class="brand">
+        <span class="brand-seal"><img src="res/avatar-eagle.webp" alt="EOS 鹰首头像"></span>
+        <span class="brand-copy"><b>EOS<i>.</i></b><small>在线工具箱</small></span>
       </div>
-      <div class="sidebar-nav-wrap flex-grow-1 overflow-auto">
-        <nav class="nav flex-column" id="tool-nav"></nav>
+      <div class="nav-wrap">
+        <p class="nav-caption">卷中目录 · CONTENTS</p>
+        <nav class="nav" id="tool-nav">
+          <a class="nav-link active" href="#overview" data-tab="overview"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 17c4-6 7-6 10 0 3-4 5-4 8 0M5 14c2-5 4-8 7-10 2 2 4 6 6 10M4 20h16"/></svg></span><span class="nav-label">工具总览</span><span class="nav-num">HOME</span></a>
+        </nav>
       </div>
-      <button id="sidebar-toggle" class="sidebar-toggle" type="button" title="收起侧边栏" aria-label="收起侧边栏">
-        <img class="sidebar-toggle-icon sidebar-toggle-open-icon" src="res/icons/menu_pos.png" alt="">
-        <img class="sidebar-toggle-icon sidebar-toggle-home-icon" src="res/icons/tool.svg" alt="">
-      </button>
+      <div class="rail-foot"><div class="rail-motto"><b>网页工具，随取随用</b><small>OPEN · LOCAL · CRAFT</small></div><button class="rail-toggle" id="rail-toggle" type="button" aria-label="收起目录" aria-expanded="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m12.5 4.5-5 5 5 5" stroke-linecap="round"/></svg></button></div>
     </div>
-    <div class="content-area" id="tool-panels"></div>
-  </div>
+  </aside>
+  <button class="scrim" id="scrim" type="button" aria-label="关闭目录"></button>
 
-  <script>
-    // 新增工具：在此追加一项即可出现在侧边栏
-    const TOOLS = [
-      { id: 'skill-matrix', label: 'Skills 矩阵', path: 'skill-matrix/dist/index.html' },
-      { id: 'emoj', label: 'EMOJ 大全', path: 'emoj/index.html' },
-      { id: 'codicon', label: 'CodIcon 图标', path: 'codicon/codicon.html' },
-      { id: 'pngya', label: '图片压缩', path: 'pngya/index.html' },
-      { id: 'videoya', label: '视频压缩', path: 'videoya/index.html' },
-      { id: 'qbot', label: 'QBot 部署指南', path: 'qbot/index.html' }
-    ];
+  <section class="workspace">
+    <button class="menu-btn mobile-floating" id="menu-btn" type="button" aria-label="打开目录" aria-expanded="false"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h14M4 11h14M4 16h14" stroke-linecap="round"/></svg></button>
+    <main class="panels" id="panels">
+      <section class="tab-content overview active" id="overview" aria-label="工具总览">
+        <div class="scroll-stage" id="mechanisms">
+          <div class="stars"></div>
+          <svg class="landscape" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs>
+              <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#07090c"/><stop offset=".48" stop-color="#181a18"/><stop offset="1" stop-color="#07090c"/></linearGradient>
+              <radialGradient id="moon"><stop stop-color="#eeeade" stop-opacity=".82"/><stop offset=".6" stop-color="#78a0dc" stop-opacity=".15"/><stop offset="1" stop-color="#78a0dc" stop-opacity="0"/></radialGradient>
+              <linearGradient id="mountBlue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#203d56"/><stop offset="1" stop-color="#102428"/></linearGradient>
+              <linearGradient id="mountGreen" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#234c43"/><stop offset="1" stop-color="#0a1b1a"/></linearGradient>
+              <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#112f31"/><stop offset="1" stop-color="#061010"/></linearGradient>
+              <filter id="mist"><feGaussianBlur stdDeviation="13"/></filter>
+              <pattern id="waves" width="90" height="22" patternUnits="userSpaceOnUse"><path d="M0 12c15-10 30-10 45 0s30 10 45 0" fill="none" stroke="#78a0dc" stroke-opacity=".13"/></pattern>
+            </defs>
+            <rect width="1600" height="900" fill="url(#sky)"/>
+            <circle cx="1260" cy="165" r="108" fill="url(#moon)"/><circle cx="1260" cy="165" r="42" fill="#dcd9ce" fill-opacity=".22" stroke="#e0c783" stroke-opacity=".38"/>
+            <path d="M0 425 130 305l64 52 115-139 105 136 111-92 111 138 145-194 122 173 118-119 108 107 91-86 105 138 95-52v171H0Z" fill="url(#mountBlue)" opacity=".82"/>
+            <path d="m0 492 124-98 85 64 132-166 93 105 79-56 103 120 117-125 80 87 110-182 111 160 96-61 107 101 90-47 173 115v128H0Z" fill="#142d2e" opacity=".9"/>
+            <path d="m0 595 156-112 83 78 130-129 90 90 89-48 102 98 137-166 112 135 78-76 125 111 128-126 91 95 109-52 170 132v135H0Z" fill="url(#mountGreen)"/>
+            <g fill="none" stroke="#a1c5ae" stroke-opacity=".16"><path d="m120 480 36-55 34 38 20-24M344 429l25-42 35 39M750 487l37-53 30 39M1160 479l70-69 62 65"/><path d="M530 506c34-28 62-25 86 9M912 521c38-42 77-41 117 2"/></g>
+            <g fill="#050c0d" opacity=".9"><path d="M912 477h85v12h-85zM924 459h61l-8 18h-45zM947 427h14v32h-14zM933 440h43l-7 9h-29z"/><path d="M281 514h67v8h-67zM292 498h45l-6 16h-32z"/></g>
+            <g stroke="#c5a15b" stroke-opacity=".32"><path d="M949 489v57M962 489v57M284 522v34M345 522v34"/></g>
+            <path d="M0 635c191-58 325-34 478 5s297-15 447-2 275 47 675-3v265H0Z" fill="url(#water)"/>
+            <path d="M0 654c194-48 337-9 469 15 175 32 309-19 458-8 165 12 310 48 673-1" fill="none" stroke="#e0c783" stroke-opacity=".15"/>
+            <rect y="645" width="1600" height="255" fill="url(#waves)"/>
+            <g filter="url(#mist)" fill="#eeeade"><path d="M-70 492c132-72 242-65 327 20 92-46 201-38 294 30-235 48-423 47-621 4Z" opacity=".09"/><path d="M764 453c120-66 242-55 327 32 96-54 218-39 317 41-244 40-437 32-644-7Z" opacity=".08"/></g>
+            <g fill="#050b0c"><path d="M53 656c43-96 84-157 126-182-16 49-4 100 33 153-51-22-102-13-159 29Z"/><path d="M1410 619c28-93 63-151 107-176-12 54 2 104 42 151-52-15-102-6-149 25Z"/></g>
+            <g fill="#a7433e" opacity=".8"><path d="m1413 489 10-23 7 25-8 14Z"/><path d="m1450 516 17-21-1 28-15 10Z"/><path d="m1378 529 12-22 6 27-11 8Z"/></g>
+          </svg>
+          <div class="scroll-frame"></div><span class="corner-mark nw">OPEN PART · TOOLS</span><span class="corner-mark se">EOS. DIGITAL SHAN HAI</span>
 
-    function resolveToolPath(rel) {
-      let path = location.pathname;
-      if (!path.endsWith('/')) {
-        path = path.endsWith('.html')
-          ? path.slice(0, path.lastIndexOf('/') + 1)
-          : path + '/';
-      }
-      return new URL(rel, location.origin + path).href;
-    }
+          <header class="scroll-intro" id="scroll-intro"><span class="stamp-line">山海图纸</span><h2><em>开卷有益</em></h2><p>六款独立工具覆盖技能浏览、图标检索、图片视频压缩与机器人部署指南。</p></header>
 
-    function loadTabIframe(content) {
-      const iframe = content.querySelector('iframe');
-      if (!iframe) return;
-      const pending = iframe.getAttribute('data-src');
-      if (!pending) return;
-      iframe.src = resolveToolPath(pending);
-      iframe.removeAttribute('data-src');
-    }
+          <svg class="route" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="routeGold" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#3d7ea8"/><stop offset=".35" stop-color="#e0c783"/><stop offset=".7" stop-color="#a7433e"/><stop offset="1" stop-color="#69a287"/></linearGradient><filter id="routeGlow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path class="main-path" d="M470 318C620 230 704 204 850 235s265 19 400 98c-110 62-223 107-313 184-141 122-274 72-394 35-93-29-180 18-261 104"/></svg>
+          <div class="route-pins" aria-hidden="true"><i class="pin p1"></i><i class="pin p2"></i><i class="pin p3"></i><i class="pin p4"></i><i class="pin p5"></i><i class="pin p6"></i></div>
 
-    function buildShell() {
-      const nav = document.getElementById('tool-nav');
-      const panels = document.getElementById('tool-panels');
-      TOOLS.forEach((tool, index) => {
-        const link = document.createElement('a');
-        link.className = 'nav-link' + (index === 0 ? ' active' : '');
-        link.href = '#' + tool.id;
-        link.setAttribute('data-tab', tool.id);
-        link.textContent = tool.label;
-        nav.appendChild(link);
+          <div id="mechanism-list"></div>
 
-        const panel = document.createElement('div');
-        panel.id = tool.id;
-        panel.className = 'tab-content' + (index === 0 ? ' active' : '');
-        panel.innerHTML = '<iframe data-src="' + tool.path + '"></iframe>';
-        panels.appendChild(panel);
-      });
-      loadTabIframe(panels.querySelector('.tab-content.active'));
-    }
-
-    buildShell();
-  </script>
-  <script src="js/ui-utils.js"></script>
-  <script>
-    UIUtils.initTabs();
-
-    const sidebar = document.querySelector('.sidebar');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-
-    function updateSidebarToggle() {
-      const isCollapsed = sidebar.classList.contains('collapsed');
-      const title = isCollapsed ? '展开侧边栏' : '收起侧边栏';
-      sidebarToggle.title = title;
-      sidebarToggle.setAttribute('aria-label', title);
-      sidebarToggle.setAttribute('aria-pressed', isCollapsed ? 'true' : 'false');
-    }
-
-    sidebarToggle.addEventListener('click', function() {
-      sidebar.classList.toggle('collapsed');
-      updateSidebarToggle();
-    });
-    updateSidebarToggle();
-  </script>
+          <a class="scroll-badge" href="https://github.com/gitByEOS/open-part-skills" target="_blank" rel="noopener noreferrer">前往洞府</a>
+          <div class="scroll-metrics"><span class="metric"><b>06</b><span>在卷工具</span></span><span class="metric"><b>0</b><span>外部依赖</span></span><span class="metric"><b>∞</b><span>持续生长</span></span></div>
+          <div class="inscription" id="inscription">保持专注，保持简单<small>EOS. DIGITAL SHAN HAI</small></div>
+        </div>
+      </section>
+    </main>
+  </section>
+</div>
+<script>
+const TOOLS=[
+{id:'skill-matrix',label:'Skills 矩阵',path:'skill-matrix/dist/index.html',code:'SKILLS',tag:'VISUAL · MATRIX',place:'SKILLS · BLUE',desc:'可视化浏览 Skills 分类与能力分布',icon:'matrix'},
+{id:'emoj',label:'EMOJ 大全',path:'emoj/index.html',code:'EMOJI',tag:'SEARCH · COPY',place:'EMOJI · WHITE',desc:'搜索、分类浏览并一键复制 Emoji',icon:'emoji'},
+{id:'codicon',label:'CodIcon 图标',path:'codicon/codicon.html',code:'ICONS',tag:'DEVELOP · ICONS',place:'ICONS · GOLD',desc:'查找并复制微软 Codicon 图标',icon:'code'},
+{id:'pngya',label:'图片压缩',path:'pngya/index.html',code:'IMAGE',tag:'LOCAL · IMAGE',place:'IMAGE · JADE',desc:'在浏览器本地压缩 PNG 与 JPG',icon:'image'},
+{id:'videoya',label:'视频压缩',path:'videoya/index.html',code:'VIDEO',tag:'LOCAL · VIDEO',place:'VIDEO · RED',desc:'在浏览器本地压缩视频，无需上传',icon:'video'},
+{id:'qbot',label:'机器人部署指南',path:'qbot/index.html',code:'GUIDE',tag:'DEPLOY · AGENT',place:'GUIDE · CYAN',desc:'查看 QBot 安装、配置与部署步骤',icon:'terminal'}];
+const ICONS={
+matrix:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4v16M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>',
+emoji:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><path d="M8.5 14.5c2 2 5 2 7 0M8.5 9h.01M15.5 9h.01" stroke-linecap="round"/></svg>',
+code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m8 6-5 6 5 6M16 6l5 6-5 6M14 3l-4 18"/></svg>',
+image:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m5 18 5-5 3.5 3 2.5-2 3 4"/></svg>',
+video:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="m17 10 4-2v8l-4-2M9 9l4 3-4 3Z"/></svg>',
+terminal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M13 15h4"/></svg>'};
+function build(){const nav=document.getElementById('tool-nav'),panels=document.getElementById('panels'),list=document.getElementById('mechanism-list');TOOLS.forEach((t,i)=>{const a=document.createElement('a');a.className='nav-link';a.href='#'+t.id;a.dataset.tab=t.id;a.title=t.label;a.innerHTML='<span class="nav-icon" aria-hidden="true">'+ICONS[t.icon]+'</span><span class="nav-label">'+t.label+'</span><span class="nav-num">0'+(i+1)+'</span>';nav.appendChild(a);const panel=document.createElement('section');panel.id=t.id;panel.className='tab-content tool-panel';panel.setAttribute('aria-label',t.label);panel.innerHTML='<div class="loading"><span>正在打开 · '+t.label+'</span></div><iframe data-src="'+t.path+'" title="'+t.label+'" loading="lazy"></iframe>';panel.querySelector('iframe').addEventListener('load',()=>panel.classList.add('loaded'));panels.appendChild(panel);const b=document.createElement('button');b.type='button';b.className='mechanism m'+(i+1);b.dataset.open=t.id;b.setAttribute('aria-label','打开'+t.label);b.innerHTML='<span class="card-tag">'+t.place+'</span><i class="card-pin" aria-hidden="true"></i><span class="device"><i class="device-ring"></i>'+ICONS[t.icon]+'</span><span class="mechanism-copy"><small>0'+(i+1)+' · '+t.tag+'</small><strong>'+t.label+'</strong><p>'+t.desc+'</p><span class="enter">打开工具</span></span>';list.appendChild(b)})}build();
+</script>
+<script src="js/ui-utils.js"></script>
+<script>
+UIUtils.initTabs();
+const sidebar=document.getElementById('sidebar'),toggle=document.getElementById('rail-toggle'),menu=document.getElementById('menu-btn'),scrim=document.getElementById('scrim'),mq=matchMedia('(max-width:860px)');
+function meta(id){if(id==='overview')return['工具总览','DIGITAL TOOLBOX · 在线工具'];const i=TOOLS.findIndex(t=>t.id===id);return i<0?['工具总览','DIGITAL TOOLBOX · 在线工具']:[TOOLS[i].label,'TOOL 0'+(i+1)+' · '+TOOLS[i].code]}
+function setMeta(id){const m=meta(id);document.title=id==='overview'?'EOS.在线工具箱':m[0]+' · EOS.工具箱'}
+function closeNav(){sidebar.classList.remove('mobile-open');document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false')}function openNav(){sidebar.classList.remove('collapsed');sidebar.classList.add('mobile-open');document.body.classList.add('nav-open');menu.setAttribute('aria-expanded','true')}
+document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click',function(){setMeta(this.dataset.tab);if(mq.matches)closeNav()}));document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{const a=document.querySelector('.nav-link[data-tab="'+b.dataset.open+'"]');if(a)a.click()}));
+toggle.addEventListener('click',()=>{if(mq.matches)closeNav();else{const root=document.documentElement;root.classList.add('rail-animating');sidebar.classList.toggle('collapsed');const open=!sidebar.classList.contains('collapsed');toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'收起目录':'展开目录');const done=()=>{root.classList.remove('rail-animating');sidebar.removeEventListener('transitionend',onEnd)};const onEnd=(e)=>{if(e.target===sidebar&&(e.propertyName==='width'||e.propertyName==='min-width'))done()};sidebar.addEventListener('transitionend',onEnd);window.setTimeout(done,220)}});menu.addEventListener('click',openNav);scrim.addEventListener('click',closeNav);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sidebar.classList.contains('mobile-open')){closeNav();menu.focus()}});mq.addEventListener('change',()=>{closeNav();sidebar.classList.remove('collapsed')});const initial=location.hash.slice(1);setMeta(document.getElementById(initial)?initial:'overview');
+</script>
 </body>
 </html>

@@ -114,7 +114,7 @@ const skills = sortSkills([
     "clak",
     "clak",
     "使用 clak 构建固定流程业务脚本，覆盖 TUI、无头 CLI、交互输入与生命周期测试。",
-    "流程",
+    "控",
     "new",
   ),
   skill(
@@ -146,7 +146,7 @@ const skills = sortSkills([
     "12306 节假日抢票日历：查起售时间并生成 ICS 导入日历。",
     "票",
   ),
-  skill("skill-juya", "Juya", "juya", "获取橘鸦 Juya AI 早报，生成早茶风格排版 HTML。", "橘"),
+  skill("skill-juya", "Juya", "juya", "获取橘鸦 Juya AI 早报，生成早茶风格排版 HTML。", "报"),
   skill(
     "skill-memory-graph",
     "Memory Graph",
@@ -159,7 +159,7 @@ const skills = sortSkills([
     "Mock Ollama",
     "mock-ollama",
     "代理 Chat、Anthropic、Responses 三协议，支持 Claude、Codex、Cursor。",
-    "模",
+    "代",
   ),
   skill(
     "skill-okr-to-html",

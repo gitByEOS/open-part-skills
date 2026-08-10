@@ -6,10 +6,10 @@
 <title>QBot 部署指南 · 12 步上手</title>
 <style>
   :root {
-    --bg: #f7f8fa; --card: #fff; --ink: #1a2233; --sub: #5b6678; --line: #e7eaf0;
-    --accent: #4f6ef7; --accent-soft: #eef2ff; --ok: #2bb673; --ok-soft: #e7f8ef;
-    --code-bg: #0f172a; --code-ink: #e6edf3;
-    --shadow: 0 1px 2px rgba(20,30,50,.04), 0 8px 24px rgba(20,30,50,.06);
+    --bg: #0d1117; --card: #161b22; --ink: #e6edf3; --sub: #8b949e; --line: #2a3140;
+    --accent: #6d8df6; --accent-soft: rgba(78,122,243,.12); --ok: #62d69b; --ok-soft: rgba(55,181,117,.16);
+    --code-bg: #090d13; --code-ink: #dce5ee;
+    --shadow: 0 1px 2px rgba(0,0,0,.18), 0 10px 28px rgba(0,0,0,.2);
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", system-ui, sans-serif;
@@ -20,7 +20,7 @@
     border-radius: 999px; font-size: 13px; font-weight: 600; letter-spacing: .5px; }
   header h1 { margin: 18px 0 10px; font-size: 34px; font-weight: 800; letter-spacing: -.5px; }
   header p { margin: 0; color: var(--sub); font-size: 16px; }
-  .progress { position: sticky; top: 0; z-index: 10; background: rgba(247,248,250,.85);
+  .progress { position: sticky; top: 0; z-index: 10; background: rgba(13,17,23,.88);
     backdrop-filter: blur(8px); padding: 14px 0; margin: 8px 0 24px; border-bottom: 1px solid var(--line); }
   .progress .bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
   .progress .bar > i { display: block; height: 100%; width: 0;
@@ -28,6 +28,7 @@
   .progress .meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--sub); }
   .step { background: var(--card); border: 1px solid var(--line); border-radius: 18px;
     padding: 28px 30px; margin-bottom: 18px; box-shadow: var(--shadow); scroll-margin-top: 80px; }
+  .step:hover { border-color: #374151; }
   .step .head { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
   .step .num { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 50%; background: var(--accent);
     color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; }
@@ -41,10 +42,13 @@
     border: none; border-radius: 8px; padding: 5px 10px; font-size: 12px; cursor: pointer; transition: background .15s; }
   .code .copy:hover { background: rgba(255,255,255,.2); }
   .code .copy.ok { background: var(--ok); }
-  .ok-tip { display: flex; gap: 10px; align-items: flex-start; background: var(--ok-soft);
-    border-left: 3px solid var(--ok); border-radius: 8px; padding: 12px 14px; font-size: 14px; color: #1f7a4d; }
-  .ok-tip::before { content: "✓"; font-weight: 700; color: var(--ok); }
-  .ok-tip b { color: #155b3a; }
+  .ok-tip { display: flex; gap: 11px; align-items: flex-start; background: var(--ok-soft);
+    border: 1px solid rgba(98,214,155,.28); border-left: 3px solid var(--ok); border-radius: 8px;
+    padding: 12px 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,.025); font-size: 14px; color: #b9dec9; }
+  .ok-tip::before { display: inline-flex; width: 20px; height: 20px; flex: 0 0 20px; align-items: center;
+    justify-content: center; margin-top: 2px; border-radius: 50%; background: rgba(98,214,155,.16);
+    content: "✓"; font-size: 12px; font-weight: 800; color: #8ce5b6; }
+  .ok-tip b { color: #e0f4e8; }
   .note { font-size: 13px; color: var(--sub); background: var(--accent-soft); border-radius: 8px; padding: 10px 14px; margin: 10px 0 0; }
   nav.toc { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin: 0 0 28px; }
   nav.toc a { text-align: center; padding: 10px 4px; background: var(--card); border: 1px solid var(--line);
