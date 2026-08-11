@@ -58,16 +58,29 @@
   footer a { color: var(--accent); text-decoration: none; }
   @media (max-width: 600px) { header h1 { font-size: 26px; } .step { padding: 22px 18px; }
     nav.toc { grid-template-columns: repeat(3, 1fr); } }
+  /* 左右 tab 切换 */
+  .tabs { display: flex; gap: 10px; justify-content: center; margin-bottom: 8px; }
+  .tab-btn { flex: 1; max-width: 220px; padding: 12px 18px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; color: var(--sub); font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s; }
+  .tab-btn:hover { border-color: #374151; color: var(--ink); }
+  .tab-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .view { display: none; }
+  .view.active { display: block; }
+  #features-frame { width: 100%; min-height: 70vh; border: 0; display: block; background: transparent; }
 </style>
 </head>
 <body>
 <header><div class="wrap">
-  <span class="badge">新手部署 · 约 10 分钟</span>
-  <h1>把 QBot 跑起来</h1>
-  <p>从 npm 安装到 QQ 收到第一条回复，共 12 步，每步都很短</p>
+  <div class="tabs">
+    <button class="tab-btn active" data-view="guide">部署指南</button>
+    <button class="tab-btn" data-view="features">机器人能力</button>
+  </div>
+  <h1 id="page-title">把 QBot 跑起来</h1>
+  <p id="page-desc">从 npm 安装到 QQ 收到第一条回复，共 12 步，每步都很短</p>
 </div></header>
 
 <div class="wrap">
+  <div id="guide" class="view active">
   <div class="progress">
     <div class="bar"><i id="bar"></i></div>
     <div class="meta"><span id="doneCount">已完成 0 / 12</span><span>跟着做就行</span></div>
@@ -161,12 +174,49 @@ QQ_APP_SECRET = 你的 AppSecret</div>
     <div class="code"><button class="copy">复制</button>qbot dashboard</div>
     <p class="note">还能：多机器人实例（<code>qbot new &lt;名字&gt;</code>）、附件回传、常驻局域网网页服务、流式回复、定时提醒等。</p>
   </section>
+  </div><!-- /guide -->
+
+  <div id="features" class="view">
+    <iframe id="features-frame" src="features.html" title="QBot 功能清单" loading="lazy"></iframe>
+  </div>
 </div>
 
 <footer><div class="wrap">遇到任何问题或者需求新功能，可以进群联系我，群号: 1105239118</div></footer>
 
 <script>
-  var steps = document.querySelectorAll('.step');
+  // 左右 tab 切换：视图 + 标题同步
+  var pageTitle = document.getElementById('page-title');
+  var pageDesc = document.getElementById('page-desc');
+  var featuresFrame = document.getElementById('features-frame');
+  var viewMeta = {
+    guide: { title: '把 QBot 跑起来', desc: '从 npm 安装到 QQ 收到第一条回复，共 12 步，每步都很短' },
+    features: { title: '功能清单', desc: '汇总 QBot 当前已经支持的能力，内容直接来自版本 v0.2.0' }
+  };
+  function fitFeaturesFrame() {
+    try {
+      var doc = featuresFrame.contentDocument;
+      if (!doc || !doc.body) return;
+      featuresFrame.style.height = Math.max(doc.body.scrollHeight, 480) + 'px';
+    } catch (e) { /* file 协议同源可读 */ }
+  }
+  featuresFrame.addEventListener('load', fitFeaturesFrame);
+  document.querySelectorAll('.tab-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var view = btn.dataset.view;
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.toggle('active', v.id === view); });
+      var meta = viewMeta[view];
+      if (meta) {
+        pageTitle.textContent = meta.title;
+        pageDesc.textContent = meta.desc;
+        document.title = meta.title + ' · QBot';
+      }
+      if (view === 'features') fitFeaturesFrame();
+      window.scrollTo(0, 0);
+    });
+  });
+
+  var steps = document.querySelectorAll('#guide .step');
   var bar = document.getElementById('bar');
   var doneCount = document.getElementById('doneCount');
   var done = new Array(steps.length).fill(false);

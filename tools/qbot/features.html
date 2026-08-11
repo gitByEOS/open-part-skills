@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>功能清单 · QBot</title>
+<style>:root{color-scheme:dark;--bg:#0c1119;--panel:#151c27;--line:rgba(178,190,207,.09);
+--text:#f2f1ec;--muted:#929ca9;--muted-2:#687483;--accent:#4d79f4;--accent-2:#7899f7}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+-webkit-font-smoothing:antialiased}
+.panel{padding:0;border:1px solid var(--line);border-radius:17px;background:var(--panel);overflow:hidden}
+.feature-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.feature-table thead{background:rgba(255,255,255,.018)}
+.feature-table thead th{padding:16px 24px;color:var(--muted-2);font-size:8px;font-weight:700;
+text-align:left;text-transform:uppercase;letter-spacing:1.2px}
+.feature-table thead th:first-child{width:29%;border-right:1px solid var(--line)}
+.feature-table tbody tr{border-top:1px solid var(--line);transition:background .18s}
+.feature-table tbody tr:hover{background:rgba(77,121,244,.035)}
+.feature-module{padding:24px;border-right:1px solid var(--line);vertical-align:top;text-align:left}
+.feature-module div{display:flex;align-items:center;gap:12px}
+.feature-module i{display:grid;width:31px;height:31px;flex:0 0 auto;place-items:center;
+border-radius:10px;color:#aebcf0;background:rgba(80,88,148,.18);font-size:8px;font-style:normal}
+.feature-module span{color:var(--text);font-size:12px;font-weight:700;line-height:1.45}
+.feature-description{padding:21px 26px 23px;vertical-align:top}
+.feature-description p{margin:0 0 10px;color:var(--muted);font-size:9px;line-height:1.7}
+.feature-description ul{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.feature-description li{position:relative;padding-left:14px;color:#aab3bf;font-size:9px;line-height:1.7}
+.feature-description li::before{content:"";position:absolute;top:.68em;left:0;width:4px;height:4px;
+border-radius:50%;background:var(--accent-2)}
+.feature-empty{padding:36px 24px;color:var(--muted);text-align:center}
+.feature-table code{padding:2px 5px;border-radius:5px;color:#aebcf0;background:rgba(80,88,148,.2);
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
+@media(max-width:680px){
+.feature-table thead{display:none}
+.feature-table,.feature-table tbody,.feature-table tr,.feature-table th,.feature-table td{display:block;width:100%}
+.feature-table tbody tr{padding:18px}
+.feature-module{padding:0 0 15px;border-right:0}
+.feature-description{padding:15px 0 0;border-top:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+<div class="panel feature-table-panel">
+<table class="feature-table">
+<thead><tr><th scope="col">功能模块</th><th scope="col">能力说明</th></tr></thead>
+<tbody>
+<tr><th class="feature-module" scope="row"><div><i>01</i><span>多机器人实例</span></div></th><td class="feature-description"><ul><li><code>qbot new &lt;name&gt;</code> 创建命名实例，独立保存 QQ 凭据、会话、附件、待办、角色设定和工作区</li><li>每个实例独立分配浏览器抓取、管理台和常驻网页服务端口；实际分配记录在 <code>app_config.json</code></li><li><code>qbot start|dashboard|doctor &lt;name&gt;</code> 操作指定实例；默认无名称命令保持原有单实例行为</li><li>Codex 登录态与 <code>$CODEX_HOME</code> 是机器级共享状态，不属于实例隔离范围</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>02</i><span>对话与上下文</span></div></th><td class="feature-description"><ul><li>私聊延续上下文，群聊/频道共享上下文，消息排队处理</li><li><code>/new</code> <code>/reset</code> 清除当前上下文；<code>/new ter/sol/luna &lt;任务&gt;</code> 指定模型</li><li><code>/rotate</code> 触发 gateway 层轮换压缩：生成交接摘要并切换新 session，ctx 归零；可单独发，也可 <code>/rotate 继续做X</code></li><li><code>/stop</code> <code>/cancel</code> 中断当前及排队任务</li><li>上下文超 70% 自动轮换，生成交接摘要续接新会话</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>03</i><span>定时提醒</span></div></th><td class="feature-description"><ul><li>直接说要提醒的事和时间，Agent 登记后立即回复，到点自动私聊推送</li><li>支持&quot;提醒我 1 小时后喝水&quot;等单次提醒，以及带 IANA 时区的 cron 周期提醒</li><li>可查询、完成、取消待办</li><li>网关重启后历史逾期待办一次性补推</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>04</i><span>项目目录</span></div></th><td class="feature-description"><p>配置 <code>QQ_PROJECT_ROOT</code> 后：</p><ul><li><code>/dir</code> 列出项目，<code>/dir N</code> 切换，<code>/dir new &lt;名称&gt;</code> 创建新项目</li><li>每个项目独立上下文，切回恢复原状</li><li>运行时产物（日志、服务）隔离到独立目录，不污染所选项目</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>05</i><span>权限管理</span></div></th><td class="feature-description"><ul><li>Dashboard &quot;Git 写操作&quot;开关，默认关闭，热加载生效</li><li>开启后 Agent 可写 Git 元数据（暂存、提交），支持普通 clone 与 linked worktree</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>06</i><span>附件</span></div></th><td class="feature-description"><ul><li>可发图片、文本、代码、JSON/CSV/PDF 等文档</li><li>先发附件再在 10 分钟内发文字即可配对</li><li>压缩包和可执行文件会被拒绝</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>07</i><span>文件回传</span></div></th><td class="feature-description"><ul><li>用自然语言要求&quot;把报告发给我&quot;，Agent 生成文件后通过 QQ 回传</li><li>文件须在当前工作区内</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>08</i><span>角色设定</span></div></th><td class="feature-description"><ul><li>首次对话注入 soul.md，后续不重复</li><li>修改后下次对话自动注入新版本</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>09</i><span>常驻网页服务</span></div></th><td class="feature-description"><ul><li>要求&quot;做一个局域网网页，启动后把地址发给我&quot;，Agent 托管服务并回复真实地址</li><li>服务跨回合存活，可自然语言查询或停止</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>10</i><span>网页截图与浏览器操作</span></div></th><td class="feature-description"><ul><li>截图网页得 PNG 路径，用 <code>&lt;qqmedia&gt;</code> 回传 QQ；产物写入会话隔离目录（<code>$QQ_ISOLATION_ROOT</code>），路径校验防逃逸</li><li>单纯截图用只读 screenshot；需交互、等待或操作后状态时用 actions</li><li>actions 一次请求内可串联打开、填表、点击、条件等待、截图与取数</li><li>可提取正文、元素文本、表格（JSON），或在页面执行 JavaScript 取数</li><li>target 优先稳定选择器（id/name/aria/label/testid/role+name/文本/CSS）</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>11</i><span>流式回复</span></div></th><td class="feature-description"><ul><li>默认私聊实时更新回复</li><li><code>exec</code> 模式额外显示命令和文件修改进度</li><li>可关闭流式或 Markdown 适配客户端</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>12</i><span>安全</span></div></th><td class="feature-description"><ul><li>仅 <code>QQ_ALLOWED_SENDERS</code> 内的发送者可用</li><li>项目目录拒绝符号链接逃逸</li><li>运行时文件权限 <code>0600</code>，不公开提交</li></ul></td></tr><tr><th class="feature-module" scope="row"><div><i>13</i><span>软件更新</span></div></th><td class="feature-description"><ul><li>Dashboard 更新页查询 npm，展示逐版变更，不自动下载或安装</li><li><code>package.json</code> 的 <code>qbot.releaseNotes</code> 记录每版说明</li><li>本地版本领先 npm 时明确提示，不误报&quot;已是最新&quot;</li><li>默认机器人每 5 天检查一次，有新版本向白名单私聊推送升级命令</li></ul></td></tr>
+</tbody>
+</table>
+</div>
+</body>
+</html>
