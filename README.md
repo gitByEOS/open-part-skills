@@ -1,8 +1,16 @@
-# Open-Part-Skills
+<h1 align="center">Open-Part-Skills</h1>
+
+
+<p align="center">
+  <a href="https://gitbyeos.github.io/open-part-skills/">
+    <img src="https://raw.githubusercontent.com/gitByEOS/open-part-skills/main/tools/res/avatar-eagle.webp" width="32" height="32" alt="苍鹰头像" style="border-radius: 50%; vertical-align: middle;">
+    <img src="https://img.shields.io/badge/开卷有益-遇见山海-C5A15B?style=for-the-badge&labelColor=07090C&logoColor=07090C" alt="开卷有益 · 遇见山海" style="vertical-align: middle;">
+  </a>
+</p>
 
 EOS. 开放的部分 Skills，可用于 Claude Code、Cursor、CodeX 等工具。
 
--AI交流群：**1105239118**，有新内容更新会在里边通知，也可以提一些建议或者想法
+AI交流群：**1105239118**，有新内容更新会在里边通知，也可以提一些建议或者想法。
 
 ## 更新日记
 
