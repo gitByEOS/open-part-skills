@@ -7,6 +7,7 @@ on:
     branches: [main]
     paths:
       - 'tools/**'
+      - '!tools/esnote/**'
       - 'skills/**'
       - '.github/workflows/deploy-tools-pages.yml'
   workflow_dispatch:
@@ -55,6 +56,7 @@ jobs:
 
           for item in tools/*; do
             name=$(basename "$item")
+            [ "$name" = "esnote" ] && continue
             if [ -f "$item" ]; then
               cp "$item" _publish/
             elif [ -d "$item" ]; then
