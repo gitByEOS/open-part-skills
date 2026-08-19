@@ -22,9 +22,9 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 - 做这个一是为了测试 grok 能力，二是从零开始再整合一下 Skills，三是自己实际需求，VSCode越来越卡了， Sublime 插件也不满意，而且现在看Markdown的时间可能占80%；
 - 不得不感叹，在不需要外部资源依赖的情况下，模仿这块儿 AI 真是太强了。
 - 自此我的专武也从三件拓展为四件：专属代理`mock-ollama`、专属TUI`clash`、专属机器人`qbot`、专属Md+Term `esnote`
-- 以后想要什么东西全都可以自己加，不过现在还是依赖 `claudecli v2.1.191`，等 `dsh` 完善了可以考虑对接一下
+- 以后想要什么东西全都可以自己加，不过现在还是依赖 `claudecli v2.1.187`，等 `dsh` 完善了可以考虑对接一下
 
-**安装包** : [ESNote-v0.2.1](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.2.1.dmg) (1.7M, 仅MacOS)
+**安装包** : [ESNote-v0.2.2](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.2.2.dmg) (1.7M, 仅MacOS)
 
 ## 安装
 
@@ -110,7 +110,7 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 | [工具箱](./tools/) | 全部在线工具 | [工具箱入口](https://gitByEOS.github.io/open-part-skills/) |
 | [skill-matrix](./tools/skill-matrix/) | 为 Skill 增加可视化效果 | [Skills 矩阵](https://gitByEOS.github.io/open-part-skills/skill-matrix/dist/) |
 | [emoj](./tools/emoj/) | EMOJ 大全：搜索、分类浏览、点击复制 emoji | [emoj大全](https://gitByEOS.github.io/open-part-skills/emoj/) |
-| [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.2.1](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.2.1.dmg) |
+| [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.2.2](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.2.2.dmg) |
 | [codicon](./tools/codicon/) | 微软开源常用svg图标 | [codicon](https://gitByEOS.github.io/open-part-skills/codicon/) |
 | [pngya](./tools/pngya/) | 浏览器内图片压缩 | [图片压缩](https://gitByEOS.github.io/open-part-skills/pngya/) |
 | [videoya](./tools/videoya/) | 浏览器内视频压缩 | [videoya](https://gitByEOS.github.io/open-part-skills/videoya/) |
