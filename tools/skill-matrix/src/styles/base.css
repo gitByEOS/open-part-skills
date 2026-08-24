@@ -27,6 +27,15 @@ button {
   min-height: 100vh;
 }
 
+.skyStars {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 40%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .hero,
 .cardGrid {
   position: relative;

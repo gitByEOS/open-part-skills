@@ -1,0 +1,815 @@
+/* ═══════════════════════════════════════════════
+   theme-dark.css - 暗色清爽：玄墨底 · 蓝 skill · 绿 MCP
+   ═══════════════════════════════════════════════ */
+
+.theme-dark {
+  /* ── 魔术师牌桌：墨蓝、紫晶与旧金 ── */
+  --color-stripe-purple: #7185e5;
+  --color-deep-navy: #f0f3ff;
+  --color-pure-white: #fffaff;
+  --color-brand-dark: #f0f3ff;
+  --color-dark-navy: #42c6ba;
+  --color-ruby: #ff6b9d;
+  --color-purple-hover: #a7b5ff;
+  --color-purple-light: #bcc8ff;
+  --color-purple-mid: #4058b5;
+  --color-label: #a9b5d8;
+  --color-body: #d4daf0;
+  --color-border: rgba(135, 156, 255, 0.24);
+  --color-border-soft: rgba(213, 220, 255, 0.54);
+  --color-surface: rgba(20, 24, 53, 0.9);
+  --color-page: #02040a;
+
+  /* ── MCP 青 / Skill 紫 / Soul 金 ── */
+  --tint-rule: #64d5c4;
+  --tint-rule-soft: rgba(100, 213, 196, 0.12);
+  --tint-rule-border: rgba(100, 213, 196, 0.42);
+  --tint-skill: #7d91ee;
+  --tint-skill-soft: rgba(125, 145, 238, 0.14);
+  --tint-skill-border: rgba(125, 145, 238, 0.44);
+  --tint-soul: #edb17c;
+  --tint-soul-secondary: #c77da9;
+  --tint-soul-soft: rgba(237, 184, 106, 0.1);
+  --tint-soul-border: rgba(237, 184, 106, 0.38);
+
+  /* ── 阴影 ── */
+  --shadow-stripe-blue: rgba(0, 0, 0, 0.28);
+  --shadow-dark-blue: rgba(0, 0, 0, 0.5);
+  --shadow-black: rgba(0, 0, 0, 0.22);
+  --shadow-card:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 14px 30px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(82, 105, 201, 0.1);
+  --shadow-card-hover:
+    0 1px 0 rgba(255, 255, 255, 0.14) inset,
+    0 22px 48px rgba(0, 0, 0, 0.44),
+    0 0 36px rgba(76, 95, 219, 0.22);
+  --shadow-modal:
+    0 24px 60px var(--shadow-dark-blue),
+    0 8px 24px var(--shadow-black);
+  --transition-fast: 200ms ease;
+
+  color: var(--color-body);
+  background: var(--color-page);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    system-ui,
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01" 1;
+}
+
+.theme-dark button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* ── Shell ── */
+.theme-dark .shell {
+  isolation: isolate;
+  padding: 32px 32px 88px;
+  background: transparent;
+}
+
+/* 全屏星空底，卡片与内容浮在牌桌之上 */
+.theme-dark .shell::before {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  content: "";
+  background:
+    url("data:image/svg+xml,%3Csvg width='1440' height='720' viewBox='0 0 1440 720' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23d9c4c3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='matrix(1 0 0 1.3 504 -216)' d='M0 405 170 245 310 365 505 175 690 358 870 210 1080 360 1250 240 1440 370V720H0Z' fill='%23514253' fill-opacity='.08' stroke-opacity='.15' stroke-width='.8'/%3E%3Cpath transform='matrix(1 0 0 1.3 504 -216)' d='M0 492 210 285 350 430 560 225 745 420 950 265 1130 430 1280 300 1440 450V720H0Z' fill='%23302631' fill-opacity='.12' stroke-opacity='.2' stroke-width='.85'/%3E%3Cpath transform='matrix(1 0 0 1.3 504 -216)' d='M0 595 180 385 330 555 530 315 720 555 930 350 1090 550 1260 400 1440 560V720H0Z' fill='%231b181f' fill-opacity='.2' stroke-opacity='.24' stroke-width='.9'/%3E%3Cpath transform='matrix(1 0 0 1.3 504 -216)' d='M0 674 260 440 460 635 690 420 880 640 1100 460 1440 610V720H0Z' fill='%230d0d11' fill-opacity='.5' stroke-opacity='.28' stroke-width='.9'/%3E%3Cg transform='matrix(1 0 0 1.3 504 -216)' stroke-opacity='.17' stroke-width='.72'%3E%3Cpath d='M78 350 Q160 300 250 344 T430 323'/%3E%3Cpath d='M110 375 Q172 334 250 366 T412 350'/%3E%3Cpath d='M195 265 Q250 238 307 290 T410 280'/%3E%3Cpath d='M405 318 Q500 258 600 332 T770 318'/%3E%3Cpath d='M466 351 Q535 304 608 356 T748 347'/%3E%3Cpath d='M760 296 Q840 252 920 300 T1080 290'/%3E%3Cpath d='M805 330 Q875 292 950 334 T1070 326'/%3E%3Cpath d='M1035 340 Q1120 293 1190 350 T1340 330'/%3E%3C/g%3E%3Cg transform='matrix(1 0 0 1.3 504 -216)' stroke-opacity='.2' stroke-width='.78'%3E%3Cpath d='M30 530 Q120 475 220 530 T405 512'/%3E%3Cpath d='M80 557 Q150 510 240 551 T410 540'/%3E%3Cpath d='M420 505 Q520 448 620 515 T800 502'/%3E%3Cpath d='M475 540 Q555 490 640 542 T790 532'/%3E%3Cpath d='M820 518 Q910 455 1010 520 T1190 505'/%3E%3Cpath d='M910 548 Q1000 500 1080 548 T1250 532'/%3E%3C/g%3E%3Cg stroke='%23e7d8bb' stroke-opacity='.12' stroke-width='.72'%3E%3Cpath d='M0 615 C190 575 330 655 520 610 S850 570 1040 618 1270 655 1440 610'/%3E%3Cpath d='M0 642 C190 602 330 682 520 637 S850 597 1040 645 1270 682 1440 637'/%3E%3Cpath d='M0 669 C190 629 330 709 520 664 S850 624 1040 672 1270 709 1440 664'/%3E%3Cpath d='M0 696 C190 656 330 736 520 691 S850 651 1040 699 1270 736 1440 691'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center bottom / 100% 72% no-repeat,
+    radial-gradient(circle at 50% -10%, rgba(38, 48, 88, 0.08), transparent 36%),
+    radial-gradient(ellipse at 50% 61%, rgba(177, 120, 93, 0.07), transparent 27%),
+    radial-gradient(circle at 12% 26%, rgba(42, 62, 118, 0.07), transparent 32%),
+    radial-gradient(circle at 88% 54%, rgba(68, 48, 118, 0.07), transparent 34%),
+    linear-gradient(160deg, #010208 0%, #04060e 52%, #0a0816 100%);
+  pointer-events: none;
+}
+
+/* 星点只铺山脊以上；两层反向漂形成交错 */
+.theme-dark .skyStars {
+  mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
+}
+
+.theme-dark .skyStars::before,
+.theme-dark .skyStars::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  content: "";
+}
+
+.theme-dark .skyStars::before {
+  background: radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.86) 0 1px, transparent 1.7px) 0 0 / 170px 170px;
+  animation: starDrift 48s linear infinite;
+}
+
+.theme-dark .skyStars::after {
+  background: radial-gradient(circle at 73% 9%, rgba(255, 231, 184, 0.78) 0 1px, transparent 1.8px) 40px 24px / 230px 230px;
+  animation: starDrift 72s linear infinite reverse;
+}
+
+.theme-dark .shell::after {
+  position: absolute;
+  top: 42px;
+  left: 50%;
+  z-index: -1;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  content: "";
+  background: transparent;
+  box-shadow:
+    -220px 8px 0 0 rgba(255, 255, 255, 0.86),
+    0 4px 0 0.5px rgba(255, 231, 184, 0.8),
+    220px 10px 0 0 rgba(255, 255, 255, 0.78);
+  transform: translateX(-50%);
+  animation: heroOrnament 6.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ── 魔法光标（隐藏）── */
+.theme-dark .pointerGlow,
+.theme-dark .magicCursor {
+  display: none;
+}
+
+/* ── Hero ── */
+.theme-dark .hero {
+  width: 100%;
+  margin: 0 auto 42px;
+  padding: 54px 24px 12px;
+  background: radial-gradient(ellipse at center, rgba(48, 62, 110, 0.07), transparent 68%);
+}
+
+.theme-dark .hero::before {
+  display: block;
+  width: 92px;
+  height: 1px;
+  margin: 0 auto 22px;
+  content: "";
+  background: linear-gradient(90deg, transparent, var(--tint-soul), transparent);
+  box-shadow: 0 0 18px rgba(237, 184, 106, 0.75);
+  animation: heroGild 3.4s ease-in-out infinite;
+}
+
+.theme-dark .hero::after {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  content: "";
+  background: transparent;
+  box-shadow:
+    -240px -8px 0 0 rgba(255, 255, 255, 0.72),
+    250px 6px 0 1px rgba(255, 231, 184, 0.7),
+    -170px 64px 0 0 rgba(210, 235, 244, 0.55),
+    190px 72px 0 0 rgba(255, 255, 255, 0.5),
+    -70px -28px 0 0.5px rgba(255, 248, 231, 0.85),
+    80px -32px 0 0 rgba(255, 255, 255, 0.6),
+    -310px 40px 0 0 rgba(255, 231, 184, 0.4),
+    320px 36px 0 0 rgba(210, 235, 244, 0.42);
+  transform: translateX(-50%);
+  animation: heroMotes 4.2s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+.theme-dark .eyebrow {
+  margin: 0 0 14px;
+  color: var(--tint-soul);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.theme-dark h1 {
+  margin: 0;
+  font-size: 3.2rem;
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: #fff9ff;
+  background: linear-gradient(110deg, #fff8e7 0%, #b9c8ff 42%, #8b9cf4 74%, #fff8e7 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(91, 112, 236, 0.34);
+}
+
+.theme-dark .heroText {
+  max-width: 640px;
+  margin: 20px auto 0;
+  color: rgba(232, 225, 251, 0.78);
+  font-size: 1.13rem;
+  line-height: 1.6;
+  font-weight: 300;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.36);
+}
+
+@keyframes starDrift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes heroOrnament {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateX(-50%) translateY(-8px);
+  }
+}
+
+@keyframes heroGild {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: scaleX(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes heroMotes {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-8px);
+  }
+}
+
+/* ── Card Grid ── */
+.theme-dark .cardGrid {
+  gap: 16px;
+  padding: 24px 24px 80px;
+}
+
+/* ── Showcase Card ── */
+.theme-dark .showcaseCard {
+  padding: 21px;
+  border: 1px solid rgba(143, 163, 255, 0.3);
+  border-radius: 18px;
+  background:
+    linear-gradient(155deg, rgba(42, 52, 108, 0.48), rgba(10, 14, 37, 0.86) 48%, rgba(28, 22, 68, 0.88)),
+    var(--color-surface);
+  -webkit-backdrop-filter: blur(8px) saturate(115%);
+  backdrop-filter: blur(8px) saturate(115%);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.theme-dark .showcaseCard::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(118deg, transparent 0 13px, rgba(255, 239, 211, 0.018) 14px, transparent 15px 29px),
+    radial-gradient(ellipse at 20% 0%, rgba(238, 209, 166, 0.09), transparent 42%);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.theme-dark .showcaseCard:hover {
+  border-color: var(--color-border-soft);
+  box-shadow: var(--shadow-card-hover);
+  --lift: -4px;
+  --scale: 1.01;
+}
+
+.theme-dark .showcaseCard.rule,
+.theme-dark .showcaseCard.skill {
+  background:
+    linear-gradient(155deg, rgba(42, 52, 108, 0.48), rgba(10, 14, 37, 0.86) 48%, rgba(28, 22, 68, 0.88)),
+    var(--color-surface);
+  border-color: rgba(143, 163, 255, 0.3);
+}
+
+.theme-dark .showcaseCard.rule:hover {
+  border-color: var(--tint-rule-border);
+}
+
+.theme-dark .showcaseCard.skill:hover {
+  border-color: var(--tint-skill-border);
+}
+
+.theme-dark .showcaseCard.soul {
+  background: linear-gradient(135deg, rgba(237, 184, 106, 0.14) 0%, rgba(199, 125, 169, 0.12) 100%), var(--color-surface);
+  border-color: rgba(237, 184, 106, 0.38);
+  border-width: 1px;
+}
+
+.theme-dark .showcaseCard.soul::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 0%, var(--tint-soul-soft), transparent 70%);
+}
+
+/* ── Card Tag：角袋裁切，避免圆角穿帮 ── */
+.theme-dark .cardTag {
+  top: 0;
+  right: 0;
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-pure-white);
+  transform: none;
+  pointer-events: none;
+}
+
+.theme-dark .cardTagLabel {
+  position: absolute;
+  top: 16px;
+  right: -30px;
+  width: 100px;
+  padding: 5px 0;
+  background: var(--color-stripe-purple);
+  color: var(--color-pure-white);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(45deg);
+}
+
+.theme-dark .cardTag.hot .cardTagLabel {
+  background: linear-gradient(135deg, #ea2261, #f97316);
+}
+
+.theme-dark .cardTag.new .cardTagLabel {
+  background: linear-gradient(135deg, #8b5cf6, #10b981);
+}
+
+.theme-dark .cardTagSparkle {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.75);
+  z-index: 1;
+}
+
+.theme-dark .cardTag.hot .cardTagSparkle {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ── Orb ── */
+.theme-dark .orb {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  max-width: 42px;
+  max-height: 42px;
+  flex: 0 0 42px;
+  font-weight: 500;
+  color: #f8ffff;
+  border: 1px solid rgba(235, 250, 255, 0.28);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.28),
+    0 0 14px rgba(91, 112, 236, 0.24);
+}
+
+.theme-dark .orb.rule {
+  background: linear-gradient(135deg, var(--tint-rule), var(--color-dark-navy));
+  border: none;
+}
+
+.theme-dark .orb.skill {
+  background: linear-gradient(135deg, var(--tint-skill), var(--color-purple-mid));
+  border: none;
+}
+
+.theme-dark .orb.soul {
+  background: var(--tint-soul);
+  border: none;
+}
+
+.theme-dark .showcaseCard:hover .orb {
+  transform: scale(1.08);
+  border-color: rgba(235, 250, 255, 0.48);
+}
+
+.theme-dark .showcaseCard.rule:hover .orb {
+  box-shadow: 0 4px 18px rgba(100, 213, 196, 0.4);
+}
+
+.theme-dark .showcaseCard.skill:hover .orb {
+  box-shadow: 0 4px 18px rgba(93, 171, 201, 0.44);
+}
+
+.theme-dark .showcaseCard.soul:hover .orb {
+  box-shadow: 0 4px 12px var(--tint-soul-soft);
+}
+
+/* ── Card Header & Body ── */
+.theme-dark .cardHeader h2 {
+  font-weight: 650;
+  color: #f0f3ff;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0 12px rgba(122, 141, 239, 0.28);
+}
+
+.theme-dark .cardBody {
+  color: #d8e3e8;
+  line-height: 1.55;
+}
+
+.theme-dark .showcaseCard.rule .cardHeader h2 {
+  color: #a1eee1;
+}
+
+.theme-dark .showcaseCard.skill .cardHeader h2 {
+  color: #c6d0ff;
+}
+
+.theme-dark .showcaseCard.soul .cardHeader h2 {
+  background: linear-gradient(135deg, #f1c979 0%, #edb1c7 58%, #a7d7e8 100%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 500;
+}
+
+.theme-dark .showcaseCard.rule .cardBody {
+  opacity: 1;
+}
+
+.theme-dark .showcaseCard.skill .cardBody {
+  opacity: 1;
+}
+
+.theme-dark .showcaseCard.soul .cardBody {
+  opacity: 1;
+}
+
+/* ── Buttons by Type ── */
+.theme-dark .showcaseCard.rule .magicBtn {
+  background: rgba(100, 213, 196, 0.08);
+  border-color: rgba(100, 213, 196, 0.24);
+  color: rgba(207, 255, 247, 0.76);
+}
+
+.theme-dark .showcaseCard.rule .magicBtn:hover {
+  background: rgba(100, 213, 196, 0.26);
+}
+
+.theme-dark .showcaseCard.skill .magicBtn {
+  background: rgba(125, 145, 238, 0.08);
+  border-color: rgba(125, 145, 238, 0.24);
+  color: rgba(235, 237, 255, 0.76);
+}
+
+.theme-dark .showcaseCard.skill .magicBtn:hover {
+  background: rgba(125, 145, 238, 0.24);
+}
+
+.theme-dark .showcaseCard.soul .magicBtn {
+  background: rgba(237, 184, 106, 0.08);
+  border-color: rgba(237, 184, 106, 0.24);
+  color: rgba(255, 240, 210, 0.78);
+}
+
+.theme-dark .showcaseCard.soul .magicBtn:hover {
+  background: rgba(237, 184, 106, 0.27);
+}
+
+/* ── Code ── */
+.theme-dark code {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: rgba(4, 5, 18, 0.82);
+  color: #e7dfff;
+  font-size: 0.72rem;
+}
+
+/* ── Magic Button ── */
+.theme-dark .magicBtn {
+  border: 1px solid rgba(176, 188, 255, 0.2);
+  border-radius: 999px;
+  padding: 10px 18px;
+  background: rgba(92, 106, 190, 0.08);
+  color: rgba(232, 235, 255, 0.74);
+  font-size: 0.88rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.theme-dark .magicBtn:hover {
+  background: rgba(92, 106, 190, 0.22);
+  border-color: rgba(176, 188, 255, 0.42);
+  color: rgba(246, 252, 255, 0.94);
+  transform: translateY(-1px);
+}
+
+.theme-dark .magicBtn:active {
+  background: rgba(92, 106, 190, 0.28);
+}
+
+/* ── Modal ── */
+.theme-dark .modalBackdrop {
+  backdrop-filter: blur(12px);
+  background: rgba(6, 8, 12, 0.78);
+}
+
+.theme-dark .detailModal {
+  gap: 20px;
+  height: 82vh;
+  padding: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(59, 87, 198, 0.24), transparent 58%),
+    linear-gradient(155deg, rgba(40, 33, 46, 0.98), rgba(12, 12, 16, 0.98));
+  box-shadow: var(--shadow-modal);
+}
+
+.theme-dark .detailType {
+  border-radius: 8px;
+  padding: 6px 14px;
+  background: rgba(89, 157, 190, 0.14);
+  color: #a9d7e8;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.theme-dark .detailModal.rule .detailType {
+  background: var(--tint-rule-soft);
+  color: var(--tint-rule);
+}
+
+.theme-dark .detailModal.skill .detailType {
+  background: var(--tint-skill-soft);
+  color: var(--tint-skill);
+}
+
+.theme-dark .detailModal.soul .detailType {
+  background: var(--tint-soul-soft);
+  color: var(--tint-soul);
+}
+
+.theme-dark .documentPreview {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: rgba(4, 5, 18, 0.82);
+  scrollbar-color: var(--color-stripe-purple) transparent;
+}
+
+.theme-dark .documentPreview code {
+  padding: 20px;
+  border: 0;
+  background: transparent;
+  color: #d7d0e8;
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.theme-dark .documentPreview::-webkit-scrollbar-thumb {
+  background: var(--color-stripe-purple);
+  opacity: 0.4;
+}
+
+.theme-dark .documentPreview::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.theme-dark .detailModal.rule .documentPreview::-webkit-scrollbar-thumb {
+  background: var(--tint-rule);
+}
+
+.theme-dark .detailModal.skill .documentPreview::-webkit-scrollbar-thumb {
+  background: var(--tint-skill);
+}
+
+.theme-dark .detailModal.soul .documentPreview::-webkit-scrollbar-thumb {
+  background: var(--tint-soul);
+}
+
+.theme-dark .modalCommand .magicBtn {
+  border: none;
+  padding: 10px 0;
+  background: transparent;
+  color: var(--color-stripe-purple);
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.theme-dark .modalCommand .magicBtn:hover {
+  color: var(--color-purple-hover);
+  background: transparent;
+}
+
+.theme-dark .detailModal.rule .modalCommand .magicBtn {
+  color: var(--tint-rule);
+}
+
+.theme-dark .detailModal.skill .modalCommand .magicBtn {
+  color: var(--tint-skill);
+}
+
+.theme-dark .detailModal.soul .modalCommand .magicBtn {
+  color: var(--tint-soul);
+}
+
+.theme-dark .closeButton {
+  position: fixed;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-body);
+}
+
+.theme-dark .closeButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.06);
+}
+
+/* ── Menu ── */
+.theme-dark .menuButton {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.theme-dark .menuPanel {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.theme-dark .menuDivider {
+  background: var(--color-border);
+}
+
+.theme-dark .menuItem {
+  background: transparent;
+  color: var(--color-deep-navy);
+}
+
+.theme-dark .menuItem:hover:not(.disabled) {
+  background: rgba(89, 157, 190, 0.12);
+}
+
+.theme-dark .menuItem.active {
+  background: rgba(89, 157, 190, 0.18);
+  color: #a9d7e8;
+}
+
+.theme-dark .menuItem.disabled {
+  color: var(--color-body);
+  opacity: 0.5;
+}
+
+.theme-dark .menuItemValue {
+  color: #a9d7e8;
+}
+
+/* ── Responsive ── */
+@media (max-width: 620px) {
+  .theme-dark .shell {
+    padding: 0 0 max(48px, env(safe-area-inset-bottom));
+  }
+
+  .theme-dark .shell::before {
+    inset: 0;
+  }
+
+  .theme-dark .hero {
+    margin-bottom: 28px;
+    padding: max(48px, env(safe-area-inset-top) + 32px) 16px 28px;
+  }
+
+  .theme-dark .eyebrow {
+    margin-bottom: 10px;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .theme-dark h1 {
+    font-size: clamp(1.65rem, 7.5vw, 2.15rem);
+    line-height: 1.12;
+  }
+
+  .theme-dark .heroText {
+    margin-top: 14px;
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .theme-dark .cardGrid {
+    gap: 8px;
+    padding: 0 10px 40px;
+  }
+
+  .theme-dark .showcaseCard {
+    min-height: calc(var(--tile-w) * var(--tile-ar-min));
+    max-height: calc(var(--tile-w) * var(--tile-ar-max));
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .theme-dark .orb {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    max-width: 36px;
+    max-height: 36px;
+    flex: 0 0 36px;
+    font-size: 0.8rem;
+    border-radius: 10px;
+  }
+
+  .theme-dark .cardHeader h2 {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .theme-dark .cardBody {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .theme-dark .cardFooter code {
+    font-size: 0.58rem;
+  }
+
+  .theme-dark .showcaseCard .magicBtn {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    border-radius: 999px;
+  }
+
+  .theme-dark .showcaseCard:hover {
+    --lift: 0;
+    --scale: 1;
+  }
+
+  .theme-dark .detailModal {
+    gap: 14px;
+    height: min(92dvh, 100%);
+    max-height: min(92dvh, 100%);
+    padding: 16px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    border-radius: 20px 20px 0 0;
+  }
+
+  .theme-dark .closeButton {
+    position: absolute;
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    width: 44px;
+    height: 44px;
+  }
+
+  .theme-dark .modalCommand .magicBtn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .theme-dark h1 {
+    font-size: 1.55rem;
+  }
+
+  .theme-dark .heroText {
+    font-size: 0.86rem;
+  }
+}

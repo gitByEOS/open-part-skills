@@ -2,7 +2,7 @@ import { StrictMode, useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles/base.css";
-import "./styles/theme-light.css";
+import "./styles/theme-dark.css";
 
 import { fetchShowcaseDocument } from "./fetch-document";
 import { showcaseItems } from "./showcase-items";
@@ -304,7 +304,7 @@ function App() {
     useMouseGlow(isModalOpen);
 
   useEffect(() => {
-    document.documentElement.className = "theme-light";
+    document.documentElement.className = "theme-dark";
   }, []);
 
   useEffect(() => {
@@ -357,6 +357,7 @@ function App() {
 
   return (
     <main className={`shell ${isModalOpen ? "modalOpen" : ""}`}>
+      <span className="skyStars" aria-hidden="true" />
       <span className="pointerGlow" ref={glowRef} aria-hidden="true" />
       <div className="magicCursor" ref={cursorRef} aria-hidden="true">
         <svg className="magicCursorWand" viewBox="0 0 24 24" fill="none">
