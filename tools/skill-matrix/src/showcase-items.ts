@@ -81,11 +81,11 @@ const skills = sortSkills([
     "讲",
   ),
   skill(
-    "skill-cc-claude",
-    "CC Claude",
-    "cc-claude",
-    "自定义 Anthropic 兼容渠道的 Claude Code（已迁移至 Clash 仓库，skill 仍保留说明）。",
-    "渠",
+    "skill-bad-solution",
+    "Bad Solution",
+    "bad-solution",
+    "以反思模式审查方案结构性缺陷，给出失败链与最小替代设计。",
+    "省",
   ),
   skill(
     "skill-html-cut",
