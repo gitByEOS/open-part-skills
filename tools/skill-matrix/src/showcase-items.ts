@@ -115,7 +115,6 @@ const skills = sortSkills([
     "clak",
     "使用 clak 构建固定流程业务脚本，覆盖 TUI、无头 CLI、交互输入与生命周期测试。",
     "控",
-    "new",
   ),
   skill(
     "skill-fetch-what-say",
@@ -195,7 +194,6 @@ const skills = sortSkills([
     "summary-user-said",
     "汇总本地 Cursor、Claude Code、Codex 用户发言，生成带证据引用的总结与原文双产物。",
     "述",
-    "new",
   ),
   skill(
     "skill-publish-verify",
@@ -203,6 +201,14 @@ const skills = sortSkills([
     "skill-publish-verify",
     "发布前黑盒验证：隔离 venv + 路径，agent 以新用户身份自验任意 skill，产出可用性报告。",
     "验",
+  ),
+  skill(
+    "skill-task-polling",
+    "Task Polling",
+    "task-polling",
+    "以 docs/task.md 为唯一事实源，使用 /loop 自动领取、执行和完成单个本地任务。",
+    "轮",
+    "new",
   ),
   skill("skill-testcase", "Testcase", "testcase", "按规则补全测试用例覆盖，提升完整性与有效性。", "测"),
   skill(
@@ -225,7 +231,6 @@ const skills = sortSkills([
     "voice-to-me",
     "将回复生成自然 MP3 语音，并通过 QQ 发送给用户。",
     "语",
-    "new",
   ),
   skill(
     "skill-weather-search",

@@ -14,11 +14,25 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-**时间** : 2026-08-25
+## **时间** : 2026-09-04
 
-**小记** : 
-- 新增 `bad-solution` 当对 Agent 给出的方案不满意时，强制触发反思机制，适用于代码开发
+**小记** :
+- 新增 Skill `task-polling`，这个一个简单的约束，缺有大大的收益
 
+### 解决了什么问题
+有了这套规范后，不管什么想法或者问题直接往 `## 未领取` 写就可以了，更容易进入心流
+
+就不会：
+- 做功能时，出现 bug，容易迷失方向
+- 注意力被当前跑偏任务分散
+- 中途中断了或者跑偏，又要把大段文字重新敲一遍
+- 完成的任务，没记录，让三方 Agent 评审没有依据
+- 一次性修改大量文件，提交不知道写什么，发版本 CHANGELOG 不知道改了啥
+- 确认不做的功能，Agent 反复问
+
+这样多开N个项目推进更方便，面向 Markdown 编程
+
+[更多小记](./docs/note.md)
 
 ## 安装
 
@@ -47,6 +61,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [similar-judge](./skills/similar-judge/SKILL.md) | 对比两份文本差异，输出相似度与词级差异 JSON，供 agent 量化产物与目标的文本差距，可以用来循环迭代提示词 | 1.0.0 | 2026-06-28 |
 | [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过 fzf 支持搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
 | [skill-publish-verify](./skills/skill-publish-verify/SKILL.md) | 发布前黑盒验证：隔离 venv + 路径，agent 以新用户身份自验任意 skill，产出可用性报告 | 1.1.0 | 2026-07-08 |
+| [task-polling](./skills/task-polling/SKILL.md) | 以 docs/task.md 为唯一事实源，使用 /loop 自动领取、执行和完成单个本地任务 | 1.0.0 | 2026-09-04 |
 | [switch-chat](./skills/switch-chat/SKILL.md) | 切换会话交接任务时使用，生成可快速编辑网页，让新会话能无缝继承工作 | 1.0.0 | 2026-05-19 |
 | [testcase](./skills/testcase/SKILL.md) | 通过本skill的规则来完善用户测试用例的完整性和有效性 | 1.0.0 | 2026-05-19 |
 | [tmux-serv](./skills/tmux-serv/SKILL.md) | 用全局脚本管理多项目 tmux 常驻服务，建立统一规范，提高管理效率 | 1.0.0 | 2026-07-23 |
