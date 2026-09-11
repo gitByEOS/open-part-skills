@@ -14,23 +14,14 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-09-04
+## **时间** : 2026-09-11
 
 **小记** :
-- 新增 Skill `task-polling`，这个一个简单的约束，缺有大大的收益
+- `ESNote` 更新到 v0.3.0，日常使用中做了些优化
+- 新增 Finder 空格预览 `.md`，随手一按就能看，不用先开编辑器
+- 修复已知 bug：外部变更冲突面板按钮导致崩溃、`⌘R` 退出预览时编辑区跳到顶部
 
-### 解决了什么问题
-有了这套规范后，不管什么想法或者问题直接往 `## 未领取` 写就可以了，更容易进入心流
-
-就不会：
-- 做功能时，出现 bug，容易迷失方向
-- 注意力被当前跑偏任务分散
-- 中途中断了或者跑偏，又要把大段文字重新敲一遍
-- 完成的任务，没记录，让三方 Agent 评审没有依据
-- 一次性修改大量文件，提交不知道写什么，发版本 CHANGELOG 不知道改了啥
-- 确认不做的功能，Agent 反复问
-
-这样多开N个项目推进更方便，面向 Markdown 编程
+**安装包** : [ESNote-v0.3.0](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.0.dmg) (1.9M, 仅MacOS)
 
 [更多小记](./docs/note.md)
 
@@ -119,7 +110,7 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 | [工具箱](./tools/) | 全部在线工具 | [工具箱入口](https://gitByEOS.github.io/open-part-skills/) |
 | [skill-matrix](./tools/skill-matrix/) | 为 Skill 增加可视化效果 | [Skills 矩阵](https://gitByEOS.github.io/open-part-skills/skill-matrix/dist/) |
 | [emoj](./tools/emoj/) | EMOJ 大全：搜索、分类浏览、点击复制 emoji | [emoj大全](https://gitByEOS.github.io/open-part-skills/emoj/) |
-| [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.2.3](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.2.3.dmg) |
+| [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.3.0](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.0.dmg) |
 | [codicon](./tools/codicon/) | 微软开源常用svg图标 | [codicon](https://gitByEOS.github.io/open-part-skills/codicon/) |
 | [pngya](./tools/pngya/) | 浏览器内图片压缩 | [图片压缩](https://gitByEOS.github.io/open-part-skills/pngya/) |
 | [videoya](./tools/videoya/) | 浏览器内视频压缩 | [videoya](https://gitByEOS.github.io/open-part-skills/videoya/) |
