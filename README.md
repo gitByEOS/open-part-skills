@@ -14,14 +14,12 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-09-11
+## **时间** : 2026-09-18
 
 **小记** :
-- `ESNote` 更新到 v0.3.0，日常使用中做了些优化
-- 新增 Finder 空格预览 `.md`，随手一按就能看，不用先开编辑器
-- 修复已知 bug：外部变更冲突面板按钮导致崩溃、`⌘R` 退出预览时编辑区跳到顶部
-
-**安装包** : [ESNote-v0.3.0](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.0.dmg) (1.9M, 仅MacOS)
+- `qbot` 支持了语音文件格式接收，完善了开会手机录音发给 `qbot`，然后总结成文档回传给我的工作流，可以避免遗漏重要事项
+- `meet-digest` 是配套的从 `.wav` 原文件最后归纳为 `.md` 的 Skill
+- `qbot` 针对性修复了长程任务的输出bug，qq 要是单条 msg 5000 chars 的限制去掉就好了
 
 [更多小记](./docs/note.md)
 
@@ -92,6 +90,7 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 | [html-cut](./skills/html-cut/SKILL.md) | 将网页或本地 HTML 渲染为高清 PNG 截图，支持全页、视口、分辨率与加载等待控制，给 Agent用方便手机查看 | 1.0.0 | 2026-07-19 |
 | [lan-chat](./skills/lan-chat/SKILL.md) | 局域网聊天室，支持文件传输，方便把产物发到主力机 | 1.0.1 | 2026-07-31 |
 | [md-to-png](./skills/md-to-png/SKILL.md) | 把 Markdown 渲染成 HTML，再调用 html-cut 截图，方便手机查看 | 1.0.0 | 2026-07-21 |
+| [meet-digest](./skills/meet-digest/SKILL.md) | 把会议录音转写成带时间轴全文，再提炼可追溯的会议总结与待办 | 1.0.0 | 2026-09-18 |
 | [port-to-public](./skills/port-to-public/SKILL.md) | 临时通过 Cloudflare Quick Tunnel 将本机 loopback HTTP(S) 服务暴露到公网 | 1.0.0 | 2026-07-20 |
 | [voice-to-me](./skills/voice-to-me/SKILL.md) | 将回复合成语音并通过 QQ 格式发送  | 1.0.0 | 2026-07-21 |
 

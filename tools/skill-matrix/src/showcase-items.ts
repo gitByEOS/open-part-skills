@@ -253,6 +253,14 @@ const skills = sortSkills([
     "把 Markdown 渲染成 VitePress 风格 HTML，再调用 html-cut 截图为高清 PNG，方便手机查看。",
     "渲",
   ),
+  skill(
+    "skill-meet-digest",
+    "Meet Digest",
+    "meet-digest",
+    "把会议录音 wav 转写成带时间轴全文，再提炼可追溯的结构化会议总结。",
+    "会",
+    "new",
+  ),
 ]);
 
 const newSkills = skills.filter((item) => item.tag === "new");

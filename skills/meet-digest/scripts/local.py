@@ -1,0 +1,6 @@
+PYTHON = ""
+FFMPEG = ""
+DOWNLOAD_ROOT = ""
+MODEL = ""
+DEVICE = ""
+COMPUTE_TYPE = ""

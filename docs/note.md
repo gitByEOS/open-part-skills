@@ -1,5 +1,14 @@
 # 往期小记
 
+## **时间** : 2026-09-11
+
+**小记** :
+- `ESNote` 更新到 v0.3.0，日常使用中做了些优化
+- 新增 Finder 空格预览 `.md`，随手一按就能看，不用先开编辑器
+- 修复已知 bug：外部变更冲突面板按钮导致崩溃、`⌘R` 退出预览时编辑区跳到顶部
+
+**安装包** : [ESNote-v0.3.0](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.0.dmg) (1.9M, 仅MacOS)
+
 ## **时间** : 2026-09-04
 
 **小记** :
