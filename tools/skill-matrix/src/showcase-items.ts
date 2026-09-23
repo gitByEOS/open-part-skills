@@ -107,7 +107,6 @@ const skills = sortSkills([
     "tmux-serv",
     "用全局脚本管理多项目 tmux 常驻服务，用全局脚本管理多项目 tmux 常驻服务，建立统一规范，提高管理效率 。",
     "驻",
-    "new",
   ),
   skill(
     "skill-clak",
@@ -159,6 +158,7 @@ const skills = sortSkills([
     "mindmap",
     "将缩进列表 Markdown 生成为可搜索、折叠与切换主题的单文件大纲网页。",
     "图",
+    "new",
   ),
   skill(
     "skill-mock-ollama",

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="{{THEME}}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>{{CSS}}</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="title-row">
+      <h1 id="doc-title"></h1>
+      <span id="stats" class="stats"></span>
+    </div>
+    <p id="doc-intro" class="intro"></p>
+    <nav id="nav-chips" class="nav-chips"></nav>
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.2 3.2"/></svg>
+        <input id="search" type="search" placeholder="搜索节点，自动展开命中路径" autocomplete="off">
+        <kbd>/</kbd>
+        <span id="hit-count" class="hit-count"></span>
+      </div>
+      <div class="seg" id="level-seg">
+        <button data-limit="1">L1</button><button data-limit="2">L2</button><button data-limit="3">L3</button><button data-limit="99">全部</button>
+      </div>
+      <button id="theme-toggle" class="icon-btn" title="切换明暗主题">
+        <svg class="icon-sun" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3.2"/><path d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M12.8 3.2l-1.1 1.1M4.3 11.7l-1.1 1.1"/></svg>
+        <svg class="icon-moon" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 9.5A5.5 5.5 0 1 1 6.5 2.5a4.4 4.4 0 0 0 7 7Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="tree"></main>
+<footer>{{FOOTER}}</footer>
+<script type="application/json" id="doc-data">{{DATA}}</script>
+<script>{{JS}}</script>
+</body>
+</html>

@@ -14,12 +14,19 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-09-18
+## **时间** : 2026-09-23
 
 **小记** :
-- `qbot` 支持了语音格式附件接收，完善了开会手机录音发给 `qbot` 然后 Agent 总结成文档回传给我的工作场景，可以避免遗漏重要事项
-- `meet-digest` 是配套的从 `.wav` 原文件最后归纳为 `.md` 的 Skill
-- `qbot` 针对性修复了长程任务的输出bug，qq 要是单条 msg 5000 chars 的限制去掉就好了
+- 新增 SKILL `mindmap`，生成一个 `.md` 文件和一个 `.html` 文件
+- 一个利于 agent 阅读，一个利于人阅读，`.html` 完全由脚本生成，可指定到 ignore 目录下
+- 顺手优化了下 [skill-matrix](https://gitbyeos.github.io/open-part-skills/#skill-matrix) 细节
+
+### 解决了什么问题
+1. AI 总是生成总结性的文字，从而忽略细节和结构性
+2. 减少大段落文本，合适的结构，更少的token，带来更大信息量
+3. html 支持折叠，想看细节看细节，想看大纲看大纲
+4. 探索项目时，文件和代码用树形结构表达更简洁，远优于表格和段落
+5. 用拓扑深度硬要求，轻松解决 ai 看懂了，说不明白的问题
 
 [更多小记](./docs/note.md)
 
@@ -65,6 +72,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [holiday-of-12306](./skills/holiday-of-12306/SKILL.md) | 生成全年 12306 节假日抢票日历，又忘记抢票了！使用 Skill 一次性解决掉 | 1.1.0 | 2026-07-06 |
 | [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.3 | 2026-07-06 |
 | [meet-record-html](./skills/meet-record-html/SKILL.md) | 将面试/会谈问题 Markdown 生成为可现场填写总结、可临时追加问题的纪要 HTML | 1.0.0 | 2026-07-07 |
+| [mindmap](./skills/mindmap/SKILL.md) | 将缩进列表 Markdown 生成为可搜索、折叠与切换主题的单文件大纲网页 | 1.0.0 | 2026-09-23 |
 | [okr-to-html](./skills/okr-to-html/SKILL.md) | 将 OKR Markdown 生成为可切换 Objective 的单页 HTML 看板 | 1.0.0 | 2026-07-06 |
 | [summary-user-said](./skills/summary-user-said/SKILL.md) | 只读汇总本机 Cursor、Claude Code、Codex 用户发言，生成带证据引用的总结与原文双产物 | 1.0.0 | 2026-07-27 |
 | [voice-clone](./skills/voice-clone/SKILL.md) | 使用 Confucius4-TTS Gradio API 做参考音色克隆和文本转语音 | 1.0.0 | 2026-06-23 |
