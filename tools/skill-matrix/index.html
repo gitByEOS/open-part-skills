@@ -8,6 +8,20 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function () {
+        var url = new URL(location.href);
+        var item = url.searchParams.get("item");
+        if (!item && url.hash) {
+          var hash = url.hash.slice(1);
+          if (hash.indexOf("item=") === 0) item = new URLSearchParams(hash).get("item");
+          else if (hash && hash.indexOf("/") === -1) item = hash;
+        }
+        if (!item) return;
+        url.searchParams.set("item", item);
+        history.replaceState(null, "", (url.pathname || "/") + url.search);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

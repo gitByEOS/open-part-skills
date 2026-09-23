@@ -12,5 +12,6 @@ export type ShowcaseItem = {
   displayCommand: string;
   installCommand: string;
   icon: string;
+  slug: string;
   tag?: "new" | "hot";
 };

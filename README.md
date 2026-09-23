@@ -17,7 +17,7 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 ## **时间** : 2026-09-23
 
 **小记** :
-- 新增 SKILL `mindmap`，生成一个 `.md` 文件和一个 `.html` 文件
+- 新增 SKILL [mindmap](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=mindmap)，生成一个 `.md` 文件和一个 `.html` 文件
 - 一个利于 agent 阅读，一个利于人阅读，`.html` 完全由脚本生成，可指定到 ignore 目录下
 - 顺手优化了下 [skill-matrix](https://gitbyeos.github.io/open-part-skills/#skill-matrix) 细节
 

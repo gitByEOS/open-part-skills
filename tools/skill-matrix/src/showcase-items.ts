@@ -21,6 +21,7 @@ function skill(
     displayCommand: installCommand,
     installCommand,
     icon,
+    slug: folder,
     tag,
   };
 }
@@ -43,6 +44,7 @@ function mcp(
     displayCommand: repoUrl,
     installCommand: repoUrl,
     icon,
+    slug,
   };
 }
 

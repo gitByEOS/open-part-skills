@@ -1,4 +1,4 @@
-import { StrictMode, useCallback, useEffect, useRef, useState } from "react";
+import { StrictMode, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles/base.css";
@@ -31,6 +31,40 @@ function getTypeLabel(type: ShowcaseType) {
 
 function getCardVisualType(type: ShowcaseType) {
   return type === "mcp" ? "rule" : type;
+}
+
+function readItemQuery() {
+  const url = new URL(location.href);
+  const fromQuery = url.searchParams.get("item")?.trim();
+  if (fromQuery) return fromQuery;
+  const hash = url.hash.replace(/^#/, "").trim();
+  if (!hash || hash.includes("/")) return "";
+  if (hash.startsWith("item=")) return new URLSearchParams(hash).get("item")?.trim() ?? "";
+  return hash;
+}
+
+function findShowcaseItem(key: string) {
+  const token = key.trim().toLowerCase();
+  if (!token) return null;
+  return (
+    showcaseItems.find((item) => {
+      const slug = item.slug.toLowerCase();
+      const id = item.id.toLowerCase();
+      return slug === token || id === token || id === `skill-${token}` || id === `mcp-${token}`;
+    }) ?? null
+  );
+}
+
+function writeItemQuery(slug: string | null, mode: "push" | "replace") {
+  const url = new URL(location.href);
+  const current = url.searchParams.get("item") ?? "";
+  const nextSlug = slug ?? "";
+  if (current === nextSlug && !url.hash) return;
+  if (nextSlug) url.searchParams.set("item", nextSlug);
+  else url.searchParams.delete("item");
+  const next = `${url.pathname || "/"}${url.search}`;
+  if (mode === "push") history.pushState(null, "", next);
+  else history.replaceState(null, "", next);
 }
 
 function getSparkleStyle(baseAngle: number): SparkleStyle {
@@ -346,7 +380,9 @@ function App() {
   const mcpCount = items.length - skillCount;
   const hotCount = items.filter((item) => item.tag === "hot").length;
   const newCount = items.filter((item) => item.tag === "new").length;
-  const [selectedItem, setSelectedItem] = useState<ShowcaseItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<ShowcaseItem | null>(() =>
+    findShowcaseItem(readItemQuery()),
+  );
   const [selectedDocument, setSelectedDocument] = useState("");
   const [selectedFile, setSelectedFile] = useState<SkillFile | null>(null);
   const [skillFiles, setSkillFiles] = useState<SkillFile[]>([]);
@@ -360,6 +396,44 @@ function App() {
   useEffect(() => {
     document.documentElement.className = "theme-dark";
   }, []);
+
+  useLayoutEffect(() => {
+    const item = findShowcaseItem(readItemQuery());
+    setSelectedItem(item);
+    setSelectedFile(null);
+    if (item) writeItemQuery(item.slug, "replace");
+  }, []);
+
+  useEffect(() => {
+    let skipPopstate = true;
+    const unlock = window.setTimeout(() => {
+      skipPopstate = false;
+    }, 0);
+    function applyItemQuery() {
+      if (skipPopstate) return;
+      setSelectedItem(findShowcaseItem(readItemQuery()));
+      setSelectedFile(null);
+    }
+    window.addEventListener("popstate", applyItemQuery);
+    window.addEventListener("pageshow", applyItemQuery);
+    return () => {
+      window.clearTimeout(unlock);
+      window.removeEventListener("popstate", applyItemQuery);
+      window.removeEventListener("pageshow", applyItemQuery);
+    };
+  }, []);
+
+  function openItem(item: ShowcaseItem) {
+    setSelectedFile(null);
+    setSelectedItem(item);
+    writeItemQuery(item.slug, "push");
+  }
+
+  function closeItem() {
+    setSelectedItem(null);
+    setSelectedFile(null);
+    writeItemQuery(null, "push");
+  }
 
   useEffect(() => {
     if (!selectedItem) return;
@@ -477,10 +551,7 @@ function App() {
             data-item-id={item.id}
             onPointerEnter={handleCardPointerEnter}
             onPointerLeave={handleCardPointerLeave}
-            onClick={() => {
-              setSelectedFile(null);
-              setSelectedItem(item);
-            }}
+            onClick={() => openItem(item)}
           >
             {item.tag && <CardTag tag={item.tag} />}
             <header className="cardHeader">
@@ -509,7 +580,7 @@ function App() {
       </section>
 
       {selectedItem && (
-        <div className="modalBackdrop" onClick={() => setSelectedItem(null)}>
+        <div className="modalBackdrop" onClick={closeItem}>
           <section
             className={`detailModal ${getCardVisualType(selectedItem.type)}`}
             role="dialog"
@@ -526,7 +597,7 @@ function App() {
                 aria-label="关闭详情"
                 onClick={(event) => {
                   event.stopPropagation();
-                  setSelectedItem(null);
+                  closeItem();
                 }}
               />
             </header>
