@@ -197,11 +197,11 @@ code {
 }
 
 .detailHeader {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   min-height: 42px;
-  padding-right: 72px;
 }
 
 .detailType {
@@ -213,6 +213,68 @@ code {
   font-weight: 800;
   letter-spacing: 0.08em;
 }
+
+.skillExplorer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  align-items: stretch;
+  gap: 14px;
+  min-height: 0;
+}
+
+.skillPreviewPane,
+.skillFilePane {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+
+.skillFilePane {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.skillFilePane > .fileTree,
+.skillFilePane > .fileListStatus {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.paneTitle {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 0 9px;
+  overflow: hidden;
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileTree, .fileTree ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fileTree .fileTree { padding-left: 12px; }
+
+.fileTree button, .fileTree summary {
+  display: block;
+  width: 100%;
+  padding: 7px 8px;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.fileTree button span { margin-right: 6px; }
+.fileTree summary { list-style-position: inside; }
+.fileListStatus { margin: 12px; font-size: 0.8rem; line-height: 1.5; }
 
 .documentPreview {
   min-height: 0;
@@ -264,25 +326,42 @@ code {
 }
 
 .closeButton {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 2;
+  position: relative;
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  pointer-events: auto;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  line-height: 0;
+  font-size: 0;
+  cursor: pointer;
   transition:
-    border-color var(--transition-fast),
     background var(--transition-fast),
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast);
+    opacity var(--transition-fast);
 }
 
-.closeButton:hover {
-  transform: scale(1.05);
+.closeButton::before,
+.closeButton::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  content: "";
+}
+
+.closeButton::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.closeButton::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 /* ── 菜单 ── */
@@ -575,6 +654,12 @@ code {
     letter-spacing: 0.08em;
   }
 
+  .skillExplorer {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(110px, 27%);
+    gap: 10px;
+  }
+
   .modalCommand code {
     font-size: 0.62rem;
     padding: 10px 12px;
@@ -597,10 +682,7 @@ code {
   }
 
   .detailHeader {
-    flex-wrap: wrap;
     gap: 8px;
-    margin-right: 0;
-    padding-right: 48px;
     min-height: 0;
   }
 
@@ -623,10 +705,13 @@ code {
   }
 
   .closeButton {
-    top: max(12px, env(safe-area-inset-top));
-    right: max(12px, env(safe-area-inset-right));
-    width: 44px;
-    height: 44px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .closeButton::before,
+  .closeButton::after {
+    width: 10px;
   }
 
   .documentPreview code {

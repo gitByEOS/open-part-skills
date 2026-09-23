@@ -154,6 +154,13 @@ const skills = sortSkills([
     "忆",
   ),
   skill(
+    "skill-mindmap",
+    "Mindmap",
+    "mindmap",
+    "将缩进列表 Markdown 生成为可搜索、折叠与切换主题的单文件大纲网页。",
+    "图",
+  ),
+  skill(
     "skill-mock-ollama",
     "Mock Ollama",
     "mock-ollama",

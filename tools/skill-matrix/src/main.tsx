@@ -4,7 +4,9 @@ import { createRoot } from "react-dom/client";
 import "./styles/base.css";
 import "./styles/theme-dark.css";
 
-import { fetchShowcaseDocument } from "./fetch-document";
+import { fetchShowcaseDocument, fetchSkillFile, fetchSkillFiles } from "./fetch-document";
+import type { SkillFile } from "./fetch-document";
+import { HeroMeteor } from "./hero-meteor";
 import { showcaseItems } from "./showcase-items";
 import type { ShowcaseItem, ShowcaseType } from "./types";
 
@@ -293,10 +295,62 @@ function useMouseGlow(isModalOpen: boolean) {
   };
 }
 
+type FileNode = { name: string; path: string; children: FileNode[]; file?: SkillFile };
+
+function buildFileTree(files: SkillFile[]): FileNode[] {
+  const root: FileNode[] = [];
+  for (const file of files) {
+    const parts = file.path.split("/");
+    let siblings = root;
+    let currentPath = "";
+    for (const [index, name] of parts.entries()) {
+      currentPath = currentPath ? `${currentPath}/${name}` : name;
+      let node = siblings.find((entry) => entry.name === name);
+      if (!node) {
+        node = { name, path: currentPath, children: [] };
+        siblings.push(node);
+      }
+      if (index === parts.length - 1) node.file = file;
+      siblings = node.children;
+    }
+  }
+  const sort = (nodes: FileNode[]) => {
+    nodes.sort((left, right) => Number(Boolean(left.file)) - Number(Boolean(right.file)) || left.name.localeCompare(right.name, "en"));
+    nodes.forEach((node) => sort(node.children));
+  };
+  sort(root);
+  return root;
+}
+
+function FileTree({ nodes, activePath, onSelect }: { nodes: FileNode[]; activePath: string; onSelect: (file: SkillFile) => void }) {
+  return (
+    <ul className="fileTree">
+      {nodes.map((node) => (
+        <li key={node.path}>
+          {node.file ? (
+            <button type="button" className={node.path === activePath ? "active" : ""} onClick={() => onSelect(node.file!)} title={node.path}>
+              <span aria-hidden="true">{node.file.isPreviewable ? "◇" : "▫"}</span>{node.name}
+            </button>
+          ) : (
+            <details open><summary>{node.name}</summary><FileTree nodes={node.children} activePath={activePath} onSelect={onSelect} /></details>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function App() {
   const items = showcaseItems;
+  const skillCount = items.filter((item) => item.type === "skill").length;
+  const mcpCount = items.length - skillCount;
+  const hotCount = items.filter((item) => item.tag === "hot").length;
+  const newCount = items.filter((item) => item.tag === "new").length;
   const [selectedItem, setSelectedItem] = useState<ShowcaseItem | null>(null);
   const [selectedDocument, setSelectedDocument] = useState("");
+  const [selectedFile, setSelectedFile] = useState<SkillFile | null>(null);
+  const [skillFiles, setSkillFiles] = useState<SkillFile[]>([]);
+  const [fileListStatus, setFileListStatus] = useState("正在加载文件列表...");
   const [copiedItemId, setCopiedItemId] = useState<string | null>(null);
   const copiedResetTimerRef = useRef<number | null>(null);
   const isModalOpen = selectedItem !== null;
@@ -308,30 +362,53 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!selectedItem) {
-      setSelectedDocument("");
-      return;
-    }
+    if (!selectedItem) return;
 
     let isCurrent = true;
-    setSelectedDocument("正在加载文档...");
+    setSelectedFile(null);
+    setSkillFiles([]);
+    setFileListStatus("正在加载文件列表...");
+    if (selectedItem.type === "skill") {
+      fetchSkillFiles(selectedItem)
+        .then((files) => {
+          if (!isCurrent) return;
+          setSkillFiles(files);
+          setFileListStatus(files.length ? "" : "没有可展示的文件");
+        })
+        .catch(() => {
+          if (isCurrent) setFileListStatus("文件列表加载失败，请稍后重新打开");
+        });
+    }
 
-    fetchShowcaseDocument(selectedItem)
+    return () => { isCurrent = false; };
+  }, [selectedItem]);
+
+  useEffect(() => {
+    if (!selectedItem) return;
+
+    let isCurrent = true;
+    if (selectedFile && !selectedFile.isPreviewable) {
+      setSelectedDocument("该文件暂不支持预览（二进制文件或超过 1MB）");
+      return () => { isCurrent = false; };
+    }
+    setSelectedDocument("正在加载文档...");
+    const documentRequest = selectedFile
+      ? fetchSkillFile(selectedItem, selectedFile)
+      : fetchShowcaseDocument(selectedItem);
+    documentRequest
       .then((content) => {
-        if (isCurrent) {
-          setSelectedDocument(content);
-        }
+        if (isCurrent) setSelectedDocument(content);
       })
       .catch(() => {
-        if (isCurrent) {
-          setSelectedDocument("文档加载失败。");
-        }
+        if (isCurrent) setSelectedDocument("文档加载失败。");
       });
 
-    return () => {
-      isCurrent = false;
-    };
-  }, [selectedItem]);
+    return () => { isCurrent = false; };
+  }, [selectedItem, selectedFile]);
+
+  function selectFile(file: SkillFile) {
+    setSelectedFile(file);
+  }
 
   async function copyCommand(item: ShowcaseItem) {
     await copyText(item.installCommand);
@@ -377,9 +454,17 @@ function App() {
         <span className="sparkle sparkleThree" />
       </div>
       <section className="hero">
-        <p className="eyebrow">Ever-Evolving</p>
-        <h1>Open Skills & MCP</h1>
-        <p className="heroText">EOS. 部分 Skill 与 MCP 开源｜复制 · 一键安装</p>
+        <HeroMeteor />
+        <p className="eyebrow">Ever-Evolving · 山海之旅</p>
+        <h1>Open Skills &amp; MCP</h1>
+        <p className="heroText">山海之间，择术而行｜部分 Skill 与 MCP 开源，复制即用</p>
+        <dl className="heroStats">
+          <div><dt>全部收录 / TOTAL</dt><dd>{items.length}</dd></div>
+          <div><dt>技能 / SKILL</dt><dd>{skillCount}</dd></div>
+          <div><dt>协议 / MCP</dt><dd>{mcpCount}</dd></div>
+          <div><dt>热门 / HOT</dt><dd>{hotCount}</dd></div>
+          <div><dt>新作 / NEW</dt><dd>{newCount}</dd></div>
+        </dl>
       </section>
 
       <section className="cardGrid" aria-label="Skills and MCP">
@@ -392,7 +477,10 @@ function App() {
             data-item-id={item.id}
             onPointerEnter={handleCardPointerEnter}
             onPointerLeave={handleCardPointerLeave}
-            onClick={() => setSelectedItem(item)}
+            onClick={() => {
+              setSelectedFile(null);
+              setSelectedItem(item);
+            }}
           >
             {item.tag && <CardTag tag={item.tag} />}
             <header className="cardHeader">
@@ -429,20 +517,18 @@ function App() {
             aria-labelledby="detail-title"
             onClick={(event) => event.stopPropagation()}
           >
-            <button
-              className="closeButton"
-              type="button"
-              aria-label="关闭详情"
-              onClick={(event) => {
-                event.stopPropagation();
-                setSelectedItem(null);
-              }}
-            >
-              x
-            </button>
             <header className="detailHeader">
               <span className="detailType">{getTypeLabel(selectedItem.type)}</span>
               <h2 id="detail-title">{selectedItem.name}</h2>
+              <button
+                className="closeButton"
+                type="button"
+                aria-label="关闭详情"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setSelectedItem(null);
+                }}
+              />
             </header>
             <div className="modalCommand">
               <code>{selectedItem.displayCommand}</code>
@@ -454,9 +540,21 @@ function App() {
                 {copiedItemId === selectedItem.id ? "已复制" : "复制命令"}
               </button>
             </div>
-            <pre className="documentPreview">
-              <code>{selectedDocument}</code>
-            </pre>
+            {selectedItem.type === "skill" ? (
+              <div className="skillExplorer">
+                <div className="skillPreviewPane">
+                  <pre className="documentPreview"><code>{selectedDocument}</code></pre>
+                </div>
+                <aside className="skillFilePane" aria-label="Skill 文件列表">
+                  <div className="paneTitle">文件列表 <span>{skillFiles.length || ""}</span></div>
+                  {skillFiles.length ? (
+                    <FileTree nodes={buildFileTree(skillFiles)} activePath={selectedFile?.path ?? "SKILL.md"} onSelect={selectFile} />
+                  ) : <p className="fileListStatus">{fileListStatus}</p>}
+                </aside>
+              </div>
+            ) : (
+              <pre className="documentPreview"><code>{selectedDocument}</code></pre>
+            )}
           </section>
         </div>
       )}
