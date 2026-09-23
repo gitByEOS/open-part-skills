@@ -426,14 +426,23 @@ function App() {
   function openItem(item: ShowcaseItem) {
     setSelectedFile(null);
     setSelectedItem(item);
-    writeItemQuery(item.slug, "push");
   }
 
   function closeItem() {
     setSelectedItem(null);
     setSelectedFile(null);
-    writeItemQuery(null, "push");
   }
+
+  useEffect(() => {
+    if (!selectedItem) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      setSelectedItem(null);
+      setSelectedFile(null);
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [selectedItem]);
 
   useEffect(() => {
     if (!selectedItem) return;
