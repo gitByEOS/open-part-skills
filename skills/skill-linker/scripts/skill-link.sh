@@ -41,13 +41,30 @@ display_path() {
   fi
 }
 
+rule_target_basename() {
+  local source_name="$1"
+  local profile_dir="$2"
+  local base="${source_name%.md}"
+  base="${base%.mdc}"
+
+  if [[ "$profile_dir" == "$HOME/.cursor" ]]; then
+    echo "${base}.mdc"
+  else
+    echo "${base}.md"
+  fi
+}
+
 target_for() {
   local type="$1"
   local name="$2"
   local profile_dir="$3"
-  local target_dir="rules"
-  [[ "$type" == "skill" ]] && target_dir="skills"
-  echo "$profile_dir/$target_dir/$name"
+
+  if [[ "$type" == "skill" ]]; then
+    echo "$profile_dir/skills/$name"
+    return
+  fi
+
+  echo "$profile_dir/rules/$(rule_target_basename "$name" "$profile_dir")"
 }
 
 is_same_link() {
@@ -138,12 +155,24 @@ resolve_named_item() {
   fi
 
   local rule_name="$raw_name"
-  [[ "$rule_name" == *.mdc ]] || rule_name="$rule_name.mdc"
+  if [[ "$rule_name" == *.mdc ]]; then
+    rule_name="${rule_name%.mdc}.md"
+  elif [[ "$rule_name" != *.md ]]; then
+    rule_name="$rule_name.md"
+  fi
   local rule_source="$RULES_SOURCE_DIR/$rule_name"
 
   if [[ -f "$rule_source" ]]; then
     echo "rule"$'\t'"$rule_name"$'\t'"$rule_source"
     return
+  fi
+
+  if [[ "$rule_name" == *.md ]]; then
+    rule_source="${RULES_SOURCE_DIR}/${rule_name%.md}.mdc"
+    if [[ -f "$rule_source" ]]; then
+      echo "rule"$'\t'"$(basename "$rule_source")"$'\t'"$rule_source"
+      return
+    fi
   fi
 
   echo "skill/rule 不存在: $raw_name" >&2
@@ -162,8 +191,14 @@ collect_items() {
     fi
 
     if [[ -d "$RULES_SOURCE_DIR" ]]; then
+      shopt -s nullglob
+
+      for source in "$RULES_SOURCE_DIR"/*.md; do
+        echo "rule"$'\t'"$(basename "$source")"$'\t'"$source"
+      done
+
       for source in "$RULES_SOURCE_DIR"/*.mdc; do
-        [[ -f "$source" ]] || continue
+        [[ -f "${source%.mdc}.md" ]] && continue
         echo "rule"$'\t'"$(basename "$source")"$'\t'"$source"
       done
     fi

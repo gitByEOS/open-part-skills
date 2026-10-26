@@ -45,7 +45,7 @@ skill-link
 
 ```bash
 skill-link --list --target cursor
-skill-link --target cursor agents-chat-bridge chinese-language.mdc
+skill-link --target cursor agents-chat-bridge chinese-language
 ```
 
 ### Agent 流程

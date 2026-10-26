@@ -1,5 +1,19 @@
 # 往期小记
 
+## **时间** : 2026-09-23
+
+**小记** :
+- 新增 SKILL [mindmap](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=mindmap)，生成一个 `.md` 文件和一个 `.html` 文件
+- 一个利于 agent 阅读，一个利于人阅读，`.html` 完全由脚本生成，可指定到 ignore 目录下
+- 顺手优化了下 [skill-matrix](https://gitbyeos.github.io/open-part-skills/#skill-matrix) 细节
+
+### 解决了什么问题
+1. AI 总是生成总结性的文字，从而忽略细节和结构性
+2. 减少大段落文本，合适的结构，更少的token，带来更大信息量
+3. html 支持折叠，想看细节看细节，想看大纲看大纲
+4. 探索项目时，文件和代码用树形结构表达更简洁，远优于表格和段落
+5. 用拓扑深度硬要求，轻松解决 ai 看懂了，说不明白的问题
+
 ## **时间** : 2026-09-18
 
 **小记** :

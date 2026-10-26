@@ -14,19 +14,16 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-09-23
+## **时间** : 2026-10-26
 
 **小记** :
-- 新增 SKILL [mindmap](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=mindmap)，生成一个 `.md` 文件和一个 `.html` 文件
-- 一个利于 agent 阅读，一个利于人阅读，`.html` 完全由脚本生成，可指定到 ignore 目录下
-- 顺手优化了下 [skill-matrix](https://gitbyeos.github.io/open-part-skills/#skill-matrix) 细节
+- `ESNote` 更新到 v0.3.1，这次主要打磨预览和编辑之间的跳转体验
+- 看预览时双击，可以落到对应的代码行、表格行、引用行或段落行，并按预览选中的文字标出，减少切回源码后重新找位置的麻烦
+- 更换了 `Mermaid` 图表渲染插件
 
-### 解决了什么问题
-1. AI 总是生成总结性的文字，从而忽略细节和结构性
-2. 减少大段落文本，合适的结构，更少的token，带来更大信息量
-3. html 支持折叠，想看细节看细节，想看大纲看大纲
-4. 探索项目时，文件和代码用树形结构表达更简洁，远优于表格和段落
-5. 用拓扑深度硬要求，轻松解决 ai 看懂了，说不明白的问题
+**安装包** : [ESNote-v0.3.1](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.1.dmg)（仅 macOS）
+
+[完整更新日志](./tools/esnote/CHANGELOG.md)
 
 [更多小记](./docs/note.md)
 
@@ -117,7 +114,7 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 | [工具箱](./tools/) | 全部在线工具 | [工具箱入口](https://gitByEOS.github.io/open-part-skills/) |
 | [skill-matrix](./tools/skill-matrix/) | 为 Skill 增加可视化效果 | [Skills 矩阵](https://gitByEOS.github.io/open-part-skills/skill-matrix/dist/) |
 | [emoj](./tools/emoj/) | EMOJ 大全：搜索、分类浏览、点击复制 emoji | [emoj大全](https://gitByEOS.github.io/open-part-skills/emoj/) |
-| [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.3.0](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.0.dmg) |
+| [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.3.1](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.1.dmg) |
 | [codicon](./tools/codicon/) | 微软开源常用svg图标 | [codicon](https://gitByEOS.github.io/open-part-skills/codicon/) |
 | [pngya](./tools/pngya/) | 浏览器内图片压缩 | [图片压缩](https://gitByEOS.github.io/open-part-skills/pngya/) |
 | [videoya](./tools/videoya/) | 浏览器内视频压缩 | [videoya](https://gitByEOS.github.io/open-part-skills/videoya/) |
