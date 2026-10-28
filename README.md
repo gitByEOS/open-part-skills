@@ -14,16 +14,14 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-10-26
+## **时间** : 2026-10-28
 
 **小记** :
-- `ESNote` 更新到 v0.3.1，这次主要打磨预览和编辑之间的跳转体验
-- 看预览时双击，可以落到对应的代码行、表格行、引用行或段落行，并按预览选中的文字标出，减少切回源码后重新找位置的麻烦
-- 更换了 `Mermaid` 图表渲染插件
+- `ESNote` 更新到 v0.3.2，这次继续打磨长文档的阅读和滚动体验
+- 滚动条改为刻度条，只标出 `##` 与 `###` 标题，让定位更精确
+- 优化滚动体验，保持编辑与预览模式的滚动体验一致
 
-**安装包** : [ESNote-v0.3.1](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.1.dmg)（仅 macOS）
-
-[完整更新日志](./tools/esnote/CHANGELOG.md)
+**安装包** : [ESNote-v0.3.2](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.2.dmg)（仅 macOS）
 
 [更多小记](./docs/note.md)
 
@@ -114,7 +112,7 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 | [工具箱](./tools/) | 全部在线工具 | [工具箱入口](https://gitByEOS.github.io/open-part-skills/) |
 | [skill-matrix](./tools/skill-matrix/) | 为 Skill 增加可视化效果 | [Skills 矩阵](https://gitByEOS.github.io/open-part-skills/skill-matrix/dist/) |
 | [emoj](./tools/emoj/) | EMOJ 大全：搜索、分类浏览、点击复制 emoji | [emoj大全](https://gitByEOS.github.io/open-part-skills/emoj/) |
-| [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.3.1](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.1.dmg) |
+| [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.3.2](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.2.dmg) |
 | [codicon](./tools/codicon/) | 微软开源常用svg图标 | [codicon](https://gitByEOS.github.io/open-part-skills/codicon/) |
 | [pngya](./tools/pngya/) | 浏览器内图片压缩 | [图片压缩](https://gitByEOS.github.io/open-part-skills/pngya/) |
 | [videoya](./tools/videoya/) | 浏览器内视频压缩 | [videoya](https://gitByEOS.github.io/open-part-skills/videoya/) |
