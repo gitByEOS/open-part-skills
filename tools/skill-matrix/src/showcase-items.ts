@@ -148,6 +148,14 @@ const skills = sortSkills([
   ),
   skill("skill-juya", "Juya", "juya", "获取橘鸦 Juya AI 早报，生成早茶风格排版 HTML。", "报"),
   skill(
+    "skill-memory-card",
+    "Memory Card",
+    "memory-card",
+    "把课文拆成记忆卡，导出钉纸地图，点节点进入可滑动的叠卡。",
+    "背",
+    "new",
+  ),
+  skill(
     "skill-memory-graph",
     "Memory Graph",
     "memory-graph",

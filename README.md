@@ -14,6 +14,13 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
+## **时间** : 2026-10-29
+
+**小记** :
+- 新增 SKILL [memory-card](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=memory-card)，把课文写成记忆卡 JSON，再导出钉纸网页
+- 每段一张卡，标题写成「段落一 · 乌云先至」
+- 主界面是钉纸地图；点节点进入叠卡，只看串联和原文，左右滑都到下一张
+
 ## **时间** : 2026-10-28
 
 **小记** :
@@ -67,6 +74,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [holiday-of-12306](./skills/holiday-of-12306/SKILL.md) | 生成全年 12306 节假日抢票日历，又忘记抢票了！使用 Skill 一次性解决掉 | 1.1.0 | 2026-07-06 |
 | [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.3 | 2026-07-06 |
 | [meet-record-html](./skills/meet-record-html/SKILL.md) | 将面试/会谈问题 Markdown 生成为可现场填写总结、可临时追加问题的纪要 HTML | 1.0.0 | 2026-07-07 |
+| [memory-card](./skills/memory-card/SKILL.md) | 把课文拆成记忆卡，导出钉纸地图，点节点进入可滑动的叠卡 | 1.0.0 | 2026-10-29 |
 | [mindmap](./skills/mindmap/SKILL.md) | 将缩进列表 Markdown 生成为可搜索、折叠与切换主题的单文件大纲网页 | 1.0.0 | 2026-09-23 |
 | [okr-to-html](./skills/okr-to-html/SKILL.md) | 将 OKR Markdown 生成为可切换 Objective 的单页 HTML 看板 | 1.0.0 | 2026-07-06 |
 | [summary-user-said](./skills/summary-user-said/SKILL.md) | 只读汇总本机 Cursor、Claude Code、Codex 用户发言，生成带证据引用的总结与原文双产物 | 1.0.0 | 2026-07-27 |

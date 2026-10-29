@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>{{CSS}}</style>
+</head>
+<body>
+<header class="top">
+  <h1 id="piece-title"></h1>
+</header>
+<main>
+  <div id="board" class="board"></div>
+</main>
+<footer>{{FOOTER}}</footer>
+<div id="stack-layer" class="stack-layer" aria-hidden="true">
+  <div class="stack-top">
+    <button id="stack-back" type="button">返回</button>
+    <p id="card-count" class="card-count"></p>
+  </div>
+  <div class="stage">
+    <div id="deck" class="deck"></div>
+  </div>
+</div>
+<script type="application/json" id="card-data">{{DATA}}</script>
+<script>{{JS}}</script>
+</body>
+</html>
