@@ -14,21 +14,12 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-10-29
+## **时间** : 2026-11-02
 
 **小记** :
-- 新增 SKILL [memory-card](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=memory-card)，把课文写成记忆卡 JSON，再导出钉纸网页
-- 每段一张卡，标题写成「段落一 · 乌云先至」
-- 主界面是钉纸地图；点节点进入叠卡，只看串联和原文，左右滑都到下一张
-
-## **时间** : 2026-10-28
-
-**小记** :
-- `ESNote` 更新到 v0.3.2，这次继续打磨长文档的阅读和滚动体验
-- 滚动条改为刻度条，只标出 `##` 与 `###` 标题，让定位更精确
-- 优化滚动体验，保持编辑与预览模式的滚动体验一致
-
-**安装包** : [ESNote-v0.3.2](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.2.dmg)（仅 macOS）
+- 新增 SKILL [speak-7d](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=speak-7d)
+- 一句没头没尾的反馈丢过去，对方还得再问什么时间、问题细节是什么、找谁、要做什么
+- 补齐沟通中足够的信息，减少工作交流中的磨损
 
 [更多小记](./docs/note.md)
 
@@ -59,6 +50,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [similar-judge](./skills/similar-judge/SKILL.md) | 对比两份文本差异，输出相似度与词级差异 JSON，供 agent 量化产物与目标的文本差距，可以用来循环迭代提示词 | 1.0.0 | 2026-06-28 |
 | [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过 fzf 支持搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
 | [skill-publish-verify](./skills/skill-publish-verify/SKILL.md) | 发布前黑盒验证：隔离 venv + 路径，agent 以新用户身份自验任意 skill，产出可用性报告 | 1.1.0 | 2026-07-08 |
+| [speak-7d](./skills/speak-7d/SKILL.md) | 把工作事项的自由描述整理成固定文稿，再收成不带标签的白话 | 1.0.0 | 2026-11-02 |
 | [task-polling](./skills/task-polling/SKILL.md) | 以 docs/task.md 为唯一事实源，使用 /loop 自动领取、执行和完成单个本地任务 | 1.0.0 | 2026-09-04 |
 | [switch-chat](./skills/switch-chat/SKILL.md) | 切换会话交接任务时使用，生成可快速编辑网页，让新会话能无缝继承工作 | 1.0.0 | 2026-05-19 |
 | [testcase](./skills/testcase/SKILL.md) | 通过本skill的规则来完善用户测试用例的完整性和有效性 | 1.0.0 | 2026-05-19 |

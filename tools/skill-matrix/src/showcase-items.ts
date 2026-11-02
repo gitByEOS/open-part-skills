@@ -220,12 +220,19 @@ const skills = sortSkills([
     "验",
   ),
   skill(
+    "skill-speak-7d",
+    "Speak 7D",
+    "speak-7d",
+    "把工作事项的自由描述整理成固定文稿，再收成不带标签的白话。",
+    "七",
+    "new",
+  ),
+  skill(
     "skill-task-polling",
     "Task Polling",
     "task-polling",
     "以 docs/task.md 为唯一事实源，使用 /loop 自动领取、执行和完成单个本地任务。",
     "轮",
-    "new",
   ),
   skill("skill-testcase", "Testcase", "testcase", "按规则补全测试用例覆盖，提升完整性与有效性。", "测"),
   skill(

@@ -1,5 +1,21 @@
 # 往期小记
 
+## **时间** : 2026-10-29
+
+**小记** :
+- 新增 SKILL [memory-card](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=memory-card)，把课文写成记忆卡 JSON，再导出钉纸网页
+- 每段一张卡，标题写成「段落一 · 乌云先至」
+- 主界面是钉纸地图；点节点进入叠卡，只看串联和原文，左右滑都到下一张
+
+## **时间** : 2026-10-28
+
+**小记** :
+- `ESNote` 更新到 v0.3.2，这次继续打磨长文档的阅读和滚动体验
+- 滚动条改为刻度条，只标出 `##` 与 `###` 标题，让定位更精确
+- 优化滚动体验，保持编辑与预览模式的滚动体验一致
+
+**安装包** : [ESNote-v0.3.2](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.2.dmg)（仅 macOS）
+
 ## **时间** : 2026-10-26
 
 **小记** :

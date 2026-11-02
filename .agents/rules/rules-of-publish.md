@@ -95,6 +95,8 @@ README 登记位置：
 3. `tools/skill-matrix/src/main.tsx` 及相关组件：展示逻辑变化时更新
 4. `tools/skill-matrix/dist/`：构建后的静态站点产物
 
+新增 Skill 时，在 `showcase-items.ts` 给该技能加上 `new` 标签。带 `new` 的技能至多保留 4 个；已经有 4 个时，去掉 README 登记日期最早的那个，再给新技能加上。
+
 完成修改后在 `tools/skill-matrix/` 执行：
 
 ```bash
