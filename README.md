@@ -14,12 +14,13 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-11-02
+## **时间** : 2026-11-05
 
 **小记** :
-- 新增 SKILL [speak-7d](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=speak-7d)
-- 一句没头没尾的反馈丢过去，对方还得再问什么时间、问题细节是什么、找谁、要做什么
-- 补齐沟通中足够的信息，减少工作交流中的磨损
+- [task-polling](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=task-polling) 更新到 v1.1.0，继续围绕 `docs/task.md` 管理任务，这次引入轮次和初始环境概念
+- 领取时记录初始 commit，每轮记录 Agent 对任务的理解和改动目录，回头能看清是怎么理解、改了哪些地方
+- 验收没通过，原因留在上一轮，返工对照任务行上的目标和未通原因继续进行
+- 完成后如果一个任务轮次较多，则能够以`初始环境+轮次描述`为依据，做到`环境还原`迭代`spec`和`rule`，降低轮次
 
 [更多小记](./docs/note.md)
 
@@ -51,7 +52,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 | [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过 fzf 支持搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
 | [skill-publish-verify](./skills/skill-publish-verify/SKILL.md) | 发布前黑盒验证：隔离 venv + 路径，agent 以新用户身份自验任意 skill，产出可用性报告 | 1.1.0 | 2026-07-08 |
 | [speak-7d](./skills/speak-7d/SKILL.md) | 把工作事项的自由描述整理成固定文稿，再收成不带标签的白话 | 1.0.0 | 2026-11-02 |
-| [task-polling](./skills/task-polling/SKILL.md) | 以 docs/task.md 为唯一事实源，使用 /loop 自动领取、执行和完成单个本地任务 | 1.0.0 | 2026-09-04 |
+| [task-polling](./skills/task-polling/SKILL.md) | 以 docs/task.md 为唯一事实源，使用 /loop 逐个执行任务，记录初始 commit、每轮理解、改动目录与返工原因 | 1.1.0 | 2026-11-05 |
 | [switch-chat](./skills/switch-chat/SKILL.md) | 切换会话交接任务时使用，生成可快速编辑网页，让新会话能无缝继承工作 | 1.0.0 | 2026-05-19 |
 | [testcase](./skills/testcase/SKILL.md) | 通过本skill的规则来完善用户测试用例的完整性和有效性 | 1.0.0 | 2026-05-19 |
 | [tmux-serv](./skills/tmux-serv/SKILL.md) | 用全局脚本管理多项目 tmux 常驻服务，建立统一规范，提高管理效率 | 1.0.0 | 2026-07-23 |

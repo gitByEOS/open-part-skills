@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -16,7 +17,7 @@ QUEUE_SECTION_NAMES = ("未领取", "进行中", "已完成")
 STATIC_SECTION_NAMES = ("远期规划", "确认不做")
 SECTION_NAMES = (*QUEUE_SECTION_NAMES, *STATIC_SECTION_NAMES)
 TASK_PATTERN = re.compile(
-    r"^- \[([ x])\] ([A-Za-z0-9][A-Za-z0-9_-]*)\s*[:：]\s*(.+)$"
+    r"^- \[([ x])\] ([A-Za-z0-9][A-Za-z0-9_-]*)(?: \[([0-9a-f]{4,40})\])?\s*[:：]\s*(.+)$"
 )
 EMPTY_CHECKBOX_PATTERN = re.compile(r"^- \[ \](?:\s+无)?\s*$")
 
@@ -65,10 +66,11 @@ def get_arguments() -> argparse.Namespace:
     subparsers.add_parser("claim", help="领取首个未领取任务")
     complete = subparsers.add_parser("complete", help="完成当前进行中任务")
     complete.add_argument("--id", required=True, help="当前进行中任务 ID")
-    complete.add_argument("--summary", required=True, help="完成结果摘要")
-    reopen = subparsers.add_parser("reopen", help="验收失败，打回已完成任务")
+    complete.add_argument("--understanding", required=True, help="本轮任务理解")
+    reopen = subparsers.add_parser("reopen", help="把已完成任务拿回进行中")
     reopen.add_argument("--id", required=True, help="已完成任务 ID")
-    reopen.add_argument("--reason", required=True, help="验收失败原因")
+    reopen.add_argument("--understanding", required=True, help="本轮任务理解")
+    reopen.add_argument("--reason", required=True, help="未通过原因")
     return parser.parse_args()
 
 
@@ -118,7 +120,7 @@ def create_task(match: re.Match[str], lines: list[str]) -> Task:
         lines.pop()
     return Task(
         task_id=match.group(2),
-        title=match.group(3),
+        title=match.group(4),
         checked=match.group(1) == "x",
         lines=tuple(lines),
     )
@@ -221,6 +223,15 @@ def read_document(path: Path) -> TaskDocument:
     return validate_document(content)
 
 
+LEGACY_STATUS_PREFIXES = ("  - 完成结果：", "  - 返工原因：", "  - 验收打回：")
+ROUND_LINE = re.compile(r"^  - 轮次(\d+)：(.*)$")
+TASK_COMMIT = re.compile(r"^- \[[ x]\] [A-Za-z0-9][A-Za-z0-9_-]* \[([0-9a-f]{4,40})\]")
+COMMIT_ID = re.compile(r"^[0-9a-f]{4,40}$")
+DIRS_MARKER = re.compile(r"<dirs:(?:[A-Za-z0-9_./-]+;)*>")
+DEV_ROOTS = {"docs", "src", "scripts"}
+DEV_SUFFIXES = {".md", ".py", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".go", ".rs", ".vue", ".css", ".scss", ".html", ".sh"}
+
+
 def task_payload(task: Task) -> dict[str, object]:
     """返回任务标题及完整描述。"""
     return {
@@ -229,6 +240,195 @@ def task_payload(task: Task) -> dict[str, object]:
         "description": "\n".join(task.lines),
         "checked": task.checked,
     }
+
+
+def single_clause(text: str, empty_message: str) -> str:
+    """收成一行，分号只留给轮次分隔。"""
+    collapsed = " ".join(text.split())
+    if not collapsed:
+        fail(empty_message)
+    if "；" in collapsed or ";" in collapsed:
+        fail("理解和未通过原因不能包含分号")
+    return collapsed
+
+
+def without_legacy_status(lines: tuple[str, ...]) -> list[str]:
+    """去掉旧的完成结果、返工原因。"""
+    return [line for line in lines if not line.startswith(LEGACY_STATUS_PREFIXES)]
+
+
+def set_checkbox(line: str, checked: bool) -> str:
+    marker = "x" if checked else " "
+    updated, count = re.subn(r"^- \[[ x]\]", f"- [{marker}]", line, count=1)
+    if count != 1:
+        fail("任务首行缺少复选框")
+    return updated
+
+
+def latest_round(lines: list[str]) -> tuple[int, re.Match[str]] | None:
+    found = [
+        (index, match)
+        for index, line in enumerate(lines)
+        if (match := ROUND_LINE.match(line))
+    ]
+    if not found:
+        return None
+    return found[-1]
+
+
+def git_text(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def status_path(line: str) -> str:
+    payload = line[3:]
+    if " -> " in payload:
+        payload = payload.split(" -> ", 1)[1]
+    if len(payload) >= 2 and payload.startswith('"') and payload.endswith('"'):
+        payload = payload[1:-1]
+    return payload
+
+
+def repo_root(task_file: Path) -> Path:
+    top = git_text(task_file.parent, "rev-parse", "--show-toplevel")
+    if top.returncode != 0:
+        fail("任务不在 git 仓库中，无法记录初始环境")
+    return Path(top.stdout.strip())
+
+
+def short_head(repo: Path) -> str:
+    """读取初始环境的短 commit。"""
+    head = git_text(repo, "log", "-1", "--abbrev-commit", "--format=%h", "HEAD")
+    if head.returncode != 0:
+        fail("仓库还没有 commit，无法记录初始环境")
+    commit = head.stdout.strip()
+    if not COMMIT_ID.fullmatch(commit):
+        fail("无法解析初始环境 commit")
+    return commit
+
+
+def task_commit(line: str) -> str | None:
+    match = TASK_COMMIT.match(line)
+    if match is None:
+        return None
+    return match.group(1)
+
+
+def stamp_initial_commit(line: str, commit: str) -> str:
+    """初始环境只写一次，写在任务行。"""
+    if task_commit(line):
+        return line
+    updated, count = re.subn(
+        r"^(\- \[[ x]\] [A-Za-z0-9][A-Za-z0-9_-]*)",
+        rf"\1 [{commit}]",
+        line,
+        count=1,
+    )
+    if count != 1:
+        fail("任务首行无法写入初始环境")
+    return updated
+
+
+def is_dev_file(relative: str, task_path: Path, repo: Path) -> bool:
+    """开发文档和源码。任务文档本身不算改动。"""
+    path = Path(relative)
+    if (repo / path).resolve() == task_path.resolve():
+        return False
+    if not path.parts:
+        return False
+    if path.parts[0] in DEV_ROOTS:
+        return True
+    return len(path.parts) == 1 and path.suffix.lower() in DEV_SUFFIXES
+
+
+def format_dirs(names: list[str]) -> str:
+    if not names:
+        return "<dirs:>"
+    return "<dirs:" + "".join(f"{name};" for name in names) + ">"
+
+
+def pending_dev_dirs(repo: Path, task_path: Path) -> list[str]:
+    """本轮待添加的开发文档和源码目录。"""
+    status = git_text(repo, "status", "--porcelain")
+    if status.returncode != 0:
+        fail("无法读取工作区状态")
+    names = {
+        Path(relative).parts[0]
+        for line in status.stdout.splitlines()
+        if line.strip() and (relative := status_path(line)) and is_dev_file(relative, task_path, repo)
+    }
+    return sorted(names)
+
+
+def add_dev_dirs(repo: Path, names: list[str]) -> None:
+    if not names:
+        return
+    added = git_text(repo, "add", "-A", "--", *names)
+    if added.returncode != 0:
+        fail(f"无法添加改动目录：{added.stderr.strip()}")
+
+
+def dirty_dev_files(repo: Path, names: list[str], task_path: Path) -> list[str]:
+    """目录已 add 后，工作区里仍脏的开发文件。"""
+    if not names:
+        return []
+    status = git_text(repo, "status", "--porcelain", "--", *names)
+    if status.returncode != 0:
+        fail("无法读取改动目录状态")
+    dirty = []
+    for line in status.stdout.splitlines():
+        if not line.strip():
+            continue
+        relative = status_path(line)
+        if (repo / relative).resolve() == task_path.resolve():
+            continue
+        if line.startswith("??") or len(line) < 2 or line[1] != " ":
+            dirty.append(relative)
+    return dirty
+
+
+def previous_round(body: str) -> tuple[str, str]:
+    """拆出上一轮的理解和改动目录。"""
+    understanding, separator, rest = body.partition("；")
+    if not separator:
+        fail("上一轮没有改动目录")
+    marker, _separator, _reason = rest.partition("；")
+    if DIRS_MARKER.fullmatch(marker) is None:
+        fail("上一轮没有改动目录")
+    return understanding, marker
+
+
+def write_round_understanding(lines: list[str], understanding: str, dirs: str) -> list[str]:
+    """本轮写入理解和改动目录。未通过原因留在上一轮。"""
+    current = latest_round(lines)
+    if current is None:
+        lines.append(f"  - 轮次1：{understanding}；{dirs}")
+        return lines
+    index, match = current
+    lines[index] = f"  - 轮次{match.group(1)}：{understanding}；{dirs}"
+    return lines
+
+
+def reopen_next_round(lines: list[str], understanding: str, reason: str) -> list[str]:
+    """未通过原因写到上一轮改动目录之后，再追加本轮理解。"""
+    current = latest_round(lines)
+    if current is None:
+        fail("没有上一轮可写未通过原因")
+    index, match = current
+    previous_understanding, marker = previous_round(match.group(2))
+    lines[index] = f"  - 轮次{match.group(1)}：{previous_understanding}；{marker}；{reason}"
+    lines.append(f"  - 轮次{int(match.group(1)) + 1}：{understanding}")
+    return lines
+
+
+def with_checkbox(task: Task, checked: bool, lines: list[str]) -> Task:
+    lines[0] = set_checkbox(lines[0], checked)
+    return Task(task.task_id, task.title, checked, tuple(lines))
 
 
 def print_result(result: dict[str, object], as_json: bool) -> None:
@@ -259,14 +459,17 @@ def run_claim(path: Path, document: TaskDocument) -> dict[str, object]:
         return {"state": "idle"}
 
     task = document.tasks["未领取"].pop(0)
-    document.tasks["进行中"].append(task)
+    commit = task_commit(task.lines[0]) or short_head(repo_root(path))
+    claimed = Task(task.task_id, task.title, task.checked, tuple(
+        [stamp_initial_commit(task.lines[0], commit), *task.lines[1:]]
+    ))
+    document.tasks["进行中"].append(claimed)
     atomic_write(path, render_document(document))
-    return {"state": "claimed", "task": task_payload(task)}
+    return {"state": "claimed", "task": task_payload(claimed)}
 
 
-def run_complete(path: Path, document: TaskDocument, task_id: str, summary: str) -> dict[str, object]:
-    if not summary.strip():
-        fail("完成摘要不能为空")
+def run_complete(path: Path, document: TaskDocument, task_id: str, understanding: str) -> dict[str, object]:
+    understanding_text = single_clause(understanding, "任务理解不能为空")
     if not document.tasks["进行中"]:
         fail("没有可完成的进行中任务")
 
@@ -274,19 +477,34 @@ def run_complete(path: Path, document: TaskDocument, task_id: str, summary: str)
     if task.task_id != task_id:
         fail(f"只能完成当前任务：{task.task_id}")
 
-    completed_lines = list(task.lines)
-    completed_lines[0] = completed_lines[0].replace("- [ ]", "- [x]", 1)
-    completed_lines.append(f"  - 完成结果：{summary.strip()}")
-    completed_task = Task(task.task_id, task.title, True, tuple(completed_lines))
+    repo = repo_root(path)
+    body = without_legacy_status(task.lines)
+    commit = task_commit(body[0]) or short_head(repo)
+    body[0] = stamp_initial_commit(body[0], commit)
+    names = pending_dev_dirs(repo, path.resolve())
+    add_dev_dirs(repo, names)
+    dirty = dirty_dev_files(repo, names, path.resolve())
+    if dirty:
+        shown = "、".join(dirty[:5])
+        suffix = "等" if len(dirty) > 5 else ""
+        fail(f"改动目录还没添加干净：{shown}{suffix}")
+    body = write_round_understanding(body, understanding_text, format_dirs(names))
+    completed_task = with_checkbox(task, True, body)
     document.tasks["进行中"].clear()
     document.tasks["已完成"].append(completed_task)
     atomic_write(path, render_document(document))
     return {"state": "completed", "task": task_payload(completed_task)}
 
 
-def run_reopen(path: Path, document: TaskDocument, task_id: str, reason: str) -> dict[str, object]:
-    if not reason.strip():
-        fail("验收打回原因不能为空")
+def run_reopen(
+    path: Path,
+    document: TaskDocument,
+    task_id: str,
+    understanding: str,
+    reason: str,
+) -> dict[str, object]:
+    understanding_text = single_clause(understanding, "任务理解不能为空")
+    reason_text = single_clause(reason, "未通过原因不能为空")
     if document.tasks["进行中"]:
         fail(f"已有进行中任务：{document.tasks['进行中'][0].task_id}")
 
@@ -299,10 +517,8 @@ def run_reopen(path: Path, document: TaskDocument, task_id: str, reason: str) ->
         fail(f"已完成中不存在任务：{task_id}")
 
     task = completed_tasks.pop(task_index)
-    reopened_lines = list(task.lines)
-    reopened_lines[0] = reopened_lines[0].replace("- [x]", "- [ ]", 1)
-    reopened_lines.append(f"  - 验收打回：{reason.strip()}")
-    reopened_task = Task(task.task_id, task.title, False, tuple(reopened_lines))
+    body = reopen_next_round(without_legacy_status(task.lines), understanding_text, reason_text)
+    reopened_task = with_checkbox(task, False, body)
     document.tasks["进行中"].append(reopened_task)
     atomic_write(path, render_document(document))
     return {"state": "reopened", "task": task_payload(reopened_task)}
@@ -317,9 +533,15 @@ def main() -> int:
         elif arguments.command == "claim":
             result = run_claim(arguments.file, document)
         elif arguments.command == "complete":
-            result = run_complete(arguments.file, document, arguments.id, arguments.summary)
+            result = run_complete(arguments.file, document, arguments.id, arguments.understanding)
         else:
-            result = run_reopen(arguments.file, document, arguments.id, arguments.reason)
+            result = run_reopen(
+                arguments.file,
+                document,
+                arguments.id,
+                arguments.understanding,
+                arguments.reason,
+            )
         print_result(result, arguments.json)
         return 0
     except TaskConflictError as error:

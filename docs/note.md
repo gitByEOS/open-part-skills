@@ -1,5 +1,12 @@
 # 往期小记
 
+## **时间** : 2026-11-02
+
+**小记** :
+- 新增 SKILL [speak-7d](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=speak-7d)
+- 一句没头没尾的反馈丢过去，对方还得再问什么时间、问题细节是什么、找谁、要做什么
+- 补齐沟通中足够的信息，减少工作交流中的磨损
+
 ## **时间** : 2026-10-29
 
 **小记** :
