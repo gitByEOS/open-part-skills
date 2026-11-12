@@ -1,5 +1,13 @@
 # 往期小记
 
+## **时间** : 2026-11-05
+
+**小记** :
+- [task-polling](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=task-polling) 更新到 v1.1.0，继续围绕 `docs/task.md` 管理任务，这次引入轮次和初始环境概念
+- 领取时记录初始 commit，每轮记录 Agent 对任务的理解和改动目录，回头能看清是怎么理解、改了哪些地方
+- 验收没通过，原因留在上一轮，返工对照任务行上的目标和未通原因继续进行
+- 完成后如果一个任务轮次较多，则能够以`初始环境+轮次描述`为依据，做到`环境还原`迭代`spec`和`rule`，降低轮次
+
 ## **时间** : 2026-11-02
 
 **小记** :
@@ -20,8 +28,6 @@
 - `ESNote` 更新到 v0.3.2，这次继续打磨长文档的阅读和滚动体验
 - 滚动条改为刻度条，只标出 `##` 与 `###` 标题，让定位更精确
 - 优化滚动体验，保持编辑与预览模式的滚动体验一致
-
-**安装包** : [ESNote-v0.3.2](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.2.dmg)（仅 macOS）
 
 ## **时间** : 2026-10-26
 

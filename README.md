@@ -14,13 +14,15 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-11-05
+## **时间** : 2026-11-12
 
 **小记** :
-- [task-polling](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=task-polling) 更新到 v1.1.0，继续围绕 `docs/task.md` 管理任务，这次引入轮次和初始环境概念
-- 领取时记录初始 commit，每轮记录 Agent 对任务的理解和改动目录，回头能看清是怎么理解、改了哪些地方
-- 验收没通过，原因留在上一轮，返工对照任务行上的目标和未通原因继续进行
-- 完成后如果一个任务轮次较多，则能够以`初始环境+轮次描述`为依据，做到`环境还原`迭代`spec`和`rule`，降低轮次
+- `ESNote` 更新到 v0.4.0，这次调整了针对项目级别的使用体验
+- 统一了 `⌘W` 体验
+- 欢迎页改版，能更好的快速打开之前看的文件
+- 修复了一些已知bug
+
+**安装包** : [ESNote-v0.4.0](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.4.0.dmg)（仅 macOS）
 
 [更多小记](./docs/note.md)
 
@@ -113,7 +115,7 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 | [工具箱](./tools/) | 全部在线工具 | [工具箱入口](https://gitByEOS.github.io/open-part-skills/) |
 | [skill-matrix](./tools/skill-matrix/) | 为 Skill 增加可视化效果 | [Skills 矩阵](https://gitByEOS.github.io/open-part-skills/skill-matrix/dist/) |
 | [emoj](./tools/emoj/) | EMOJ 大全：搜索、分类浏览、点击复制 emoji | [emoj大全](https://gitByEOS.github.io/open-part-skills/emoj/) |
-| [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.3.2](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.3.2.dmg) |
+| [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.4.0](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.4.0.dmg) |
 | [codicon](./tools/codicon/) | 微软开源常用svg图标 | [codicon](https://gitByEOS.github.io/open-part-skills/codicon/) |
 | [pngya](./tools/pngya/) | 浏览器内图片压缩 | [图片压缩](https://gitByEOS.github.io/open-part-skills/pngya/) |
 | [videoya](./tools/videoya/) | 浏览器内视频压缩 | [videoya](https://gitByEOS.github.io/open-part-skills/videoya/) |
