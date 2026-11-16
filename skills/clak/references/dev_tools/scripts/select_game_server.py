@@ -30,5 +30,5 @@ class SelectGameServerScript(Script):
                 save,
             )
 
-        self.add_step(True, ask_game_server, "ask_game_server")
+        self.add_step(True, ask_game_server, "选择后端服")
         self.run_steps()

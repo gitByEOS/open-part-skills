@@ -142,12 +142,12 @@ class PackUploadScript(Script):
             self.output.push("已校验 Windows 资源清单")
             return 0
 
-        self.add_step(True, ask_version, "ask_version")
-        self.add_step(True, ask_targets, "ask_targets")
-        self.add_step(True, pack_and_upload, "pack_and_upload")
+        self.add_step(True, ask_version, "选择资源版本")
+        self.add_step(True, ask_targets, "选择打包目标")
+        self.add_step(True, pack_and_upload, "打包并上传")
         self.add_step(
             lambda: "win" in (state.targets or frozenset()),
             verify_windows_artifact,
-            "verify_windows_artifact",
+            "校验Windows清单",
         )
         self.run_steps()

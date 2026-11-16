@@ -30,5 +30,5 @@ class SelectResServerScript(Script):
                 save,
             )
 
-        self.add_step(True, ask_res_server, "ask_res_server")
+        self.add_step(True, ask_res_server, "选择资源服")
         self.run_steps()

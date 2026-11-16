@@ -7,7 +7,7 @@
 这是新项目的推荐路径：将本目录复制为业务仓库中的 `dev_tools/` 包，并在其父目录执行。无需取得或安装 `esclak` 源码仓库。
 
 ```bash
-python -m pip install esclak pytest
+python -m pip install "esclak>=0.2.0" pytest
 python -m dev_tools
 python -m dev_tools exec /pack-upload \
   --set version=1.2.3 \
@@ -28,7 +28,11 @@ python -m pytest
 - `/pack-upload`：询问版本和目标，运行子进程生成临时产物，按条件校验 Windows 清单，上传后清理临时目录。
 - `/select-res-server`：过滤选择资源服，完成后 `/status` 立即更新。
 - `/select-game-server`：过滤选择后端服，完成后 footer 立即更新。
-- `/verify-release`：运行可控子进程，演示成功及退出码为 1 的业务失败。
+- `/verify-release`：读取已选服务器，执行六项本地模拟检查与最终子进程验证，约 4 秒完成；步骤进度自动显示，支持停止和成功/失败退出码。
+
+所有检查均为本地模拟，不连接或修改真实服务器。依次运行服务器选择与发布检查即可观察自动进度；共 8 步包含提问、六项检查与最终验证，业务代码不另算计数。`Ctrl+C` 请求停止，当前调用结束后才收尾；`subprocess.run()` 不会自动被终止，应设置超时。完成、失败或取消收尾后进度区域清空，业务日志保留。
+
+空主输入按 `↑` 回填已执行命令，再用 `↑`/`↓` 浏览，`Enter` 再执行，`Esc` 取消清空；历史只在当前进程保存，问答答案不会写入。
 
 可以直接验证失败路径：
 
@@ -72,7 +76,9 @@ dev_tools/
 5. 需要用户输入时返回 `self.ask_tool(AskRequest(...), on_answer)`，框架会在得到答案后恢复下一项。
 6. `AskRequest.default` 是必填构造参数；空字符串不会被无头 CLI 自动采用。
 7. 业务失败抛出 `ScriptError`；输入格式错误抛出 `ValueError`。
-8. 临时文件、子进程等资源在 `on_exit()` 清理，完成、失败和用户中断都会调用它。
+8. 临时资源在 `on_exit()` 清理，完成、失败或停止请求后的安全边界会调用一次，不提前释放当前步骤仍在使用的资源。
+9. `add_step()` 名称直接显示给使用者，应写业务描述；进度由框架维护，输出只记录必要业务信息。
+10. TUI 脚本在工作线程串行运行，不直接操作 Textual Widget；无头模式仍同步执行。
 
 候选、多选和过滤字段由框架统一校验。只有包含 `AskChoice(value=None)` 的单选问题允许用户输入候选之外的自定义文本，业务格式仍应在答案回调中校验。
 

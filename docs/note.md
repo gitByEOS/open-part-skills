@@ -1,5 +1,15 @@
 # 往期小记
 
+## **时间** : 2026-11-12
+
+**小记** :
+- `ESNote` 更新到 v0.4.1，这次调整了针对项目级别的使用体验
+- 统一了 `⌘W` 体验
+- 欢迎页改版，能更好的快速打开之前看的文件
+- 修复了一些已知bug
+
+**安装包** : [ESNote-v0.4.1](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.4.1.dmg)（仅 macOS）
+
 ## **时间** : 2026-11-05
 
 **小记** :

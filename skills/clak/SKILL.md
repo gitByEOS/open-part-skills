@@ -1,7 +1,7 @@
 ---
 name: clak
 description: 使用 clak 创建、修改、调试和测试固定流程业务脚本，适用于编排步骤、收集交互输入、提供 TUI 与无头 CLI 或测试业务脚本的场景
-version: 1.0.0
+version: 1.1.0
 dependencies:
   - python3
   - esclak
@@ -18,7 +18,7 @@ repository: https://github.com/gitByEOS/esclak
 运行及测试本 skill 的示例均需要以下依赖：
 
 ```bash
-python -m pip install esclak pytest
+python -m pip install "esclak>=0.2.0" pytest
 ```
 
 生产项目若不运行 pytest，可以只安装 `esclak`；但本文“测试”和“提交前检查”章节的命令要求安装 `pytest`。
@@ -32,7 +32,7 @@ python -m pip install esclak pytest
 - `references/dev_tools/__main__.py`：项目级 CLI 入口
 - `references/dev_tools/scripts/select_res_server.py`：过滤选择和共享状态
 - `references/dev_tools/scripts/pack_upload.py`：多步编排、子进程、条件步骤和资源清理
-- `references/dev_tools/scripts/verify_release.py`：业务失败与退出码
+- `references/dev_tools/scripts/verify_release.py`：数据驱动检查、自动步骤进度、停止边界、业务失败与退出码
 - `references/testing.py`：`ScriptTester` 与 `ScriptRun` 测试夹具
 
 不要将参考项目作为依赖导入。复制其结构和模式到业务项目；目标项目只需安装 `esclak` 包即可使用本 skill。
@@ -91,17 +91,27 @@ class DeployScript(Script):
             self.output.push("发布完成")
             return 0
 
-        self.add_step(True, deploy, "deploy")
+        self.add_step(True, deploy, "发布服务")
         self.run_steps()
 ```
 
 - `name` 必须是 slash 命令，如 `/deploy`
 - `run(self)` 内定义并编排本次执行的步骤
 - `self.add_step(can_do, task, name)` 添加步骤，`can_do` 为布尔值或无参判断函数
-- 步骤返回 `0` 继续，非 `0` 表示等待输入后恢复，不是业务失败
+- 步骤返回 `0` 继续，非 `0` 表示挂起等待恢复，不是业务失败；交互输入由 `ask_tool()` 挂起和恢复
 - 以 `self.run_steps()` 结束 `run`，不要直接操作 `Session` 的执行队列
 - `self.output.push()` 自动加 `[script-name] ` 前缀
 - 预期业务失败抛 `ScriptError(message, exit_code=1)`；参数格式不合法抛 `ValueError`
+
+## 步骤进度与交互
+
+- `add_step()` 的名称直接显示给使用者，应写清楚业务动作，不用内部函数名；提问、条件步骤和最终验证均计入总步数
+- 会话自动维护步骤状态与进度，脚本只定义步骤，不另建计数、动画或重复打印进度行
+- TUI 默认显示当前附近五项，完成名称灰色删除线；收尾后进度区域清空，业务日志保留
+- 耗时步骤在工作线程执行，不阻塞界面；Script 构造、生命周期、步骤与答案回调串行执行，不直接修改 Textual Widget
+- `Ctrl+C` 请求停止，当前调用返回后跳过后续步骤再清理；`Ctrl+Q` 等待收尾后退出，不会强杀任意线程或 `subprocess.run()`
+- 主输入为空时 `↑` 回填已执行命令，`↑`/`↓` 浏览，`Enter` 再次执行，`Esc` 取消清空；命令候选和 Ask 仍保留自己的方向键选择
+- 自定义 OutputView 修改内容后调用 `notify_changed()`，普通日志使用 `push()`；不要借自定义视图复制通用进度状态
 
 ## 收集输入
 
@@ -152,7 +162,7 @@ def ask_environment() -> int:
 
 - 临时目录、文件句柄和外部资源在 `on_enter` 创建，在 `on_exit` 清理；清理必须覆盖完成、失败和取消
 - 跨脚本的进程内状态放入显式 `context.py`，并提供 `reset()` 供测试隔离
-- 调外部命令使用 `subprocess.run(..., check=False, timeout=...)`，将启动异常和非零退出码转换成 `ScriptError`
+- 调外部命令使用 `subprocess.run(..., check=False, timeout=...)`，将启动异常和非零退出码转换成 `ScriptError`；停止不会自动终止该调用，必须设置超时或自行管理终止
 - 路径、用户输入和权限参数先校验；不要把失败退出码误写成步骤挂起
 
 ## 测试

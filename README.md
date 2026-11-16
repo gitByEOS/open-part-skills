@@ -14,15 +14,13 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-11-12
+## **时间** : 2026-11-16
 
 **小记** :
-- `ESNote` 更新到 v0.4.1，这次调整了针对项目级别的使用体验
-- 统一了 `⌘W` 体验
-- 欢迎页改版，能更好的快速打开之前看的文件
-- 修复了一些已知bug
+- 新增 [closure-graph](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=closure-graph)，用于初步检测策划需求文档的漏洞
+- 把流程、特效与 UI 的衔接画成可点击的图，定位断点、冲突与缺失参数
 
-**安装包** : [ESNote-v0.4.1](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.4.1.dmg)（仅 macOS）
+<img src="docs/images/closure-graph-demo.png" alt="closure-graph 策划需求文档闭环检查演示" width="600">
 
 [更多小记](./docs/note.md)
 
@@ -42,38 +40,83 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 
 ### 开发类
 
+#### 方案与质量审查
+
 | 技能 | 说明 | 版本 | 上次更新 |
 |------|------|------|----------|
 | [bad-solution](./skills/bad-solution/SKILL.md) | 反思方案结构性缺陷，输出失败链与最小替代设计 | 1.0.0 | 2026-08-25 |
-| [clak](./skills/clak/SKILL.md) | 教会 Agent 如何使用 [clak](https://github.com/gitByEOS/esclak) 构建固定流程业务脚本，覆盖 TUI、无头 CLI、交互输入与生命周期测试 | 1.0.0 | 2026-07-27 |
-| [esflow](./skills/esflow/SKILL.md) | 教会 Agent 如何使用 [esflow](https://github.com/gitByEOS/esflow)，简化学习成本，直接从需求到落地 | 0.1.4 | 2026-07-09 |
+| [closure-graph](./skills/closure-graph/SKILL.md) | 检查流程、特效与 UI 的衔接闭环和文档缺口，生成可点击查看依据的单文件 HTML | 1.1.1 | 2026-11-16 |
 | [git-review](./skills/git-review/SKILL.md) | 审查指定范围内 Git 提交，Agent 逐 commit 评估风险，双索引聚合输出可视化安全审查报告 | 1.2.0 | 2026-07-08 |
-| [memory-graph](./skills/memory-graph/SKILL.md) | 开发了一套 Agent 外挂记忆，关联历史记忆、沉淀会话记忆、提供 web-ui 查看或管理记忆；优化组合搜索适配 Agent 使用方式 | 0.2.2 | 2026-08-06 |
-| [mock-ollama](./skills/mock-ollama/SKILL.md) | 代理 Chat、Anthropic、Responses 三协议，支持 Claude Code、Codex/GPT-5.6、Cursor BYOK | 1.1.0 | 2026-07-22 |
-| [similar-judge](./skills/similar-judge/SKILL.md) | 对比两份文本差异，输出相似度与词级差异 JSON，供 agent 量化产物与目标的文本差距，可以用来循环迭代提示词 | 1.0.0 | 2026-06-28 |
-| [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过 fzf 支持搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
+| [testcase](./skills/testcase/SKILL.md) | 通过本skill的规则来完善用户测试用例的完整性和有效性 | 1.0.0 | 2026-05-19 |
 | [skill-publish-verify](./skills/skill-publish-verify/SKILL.md) | 发布前黑盒验证：隔离 venv + 路径，agent 以新用户身份自验任意 skill，产出可用性报告 | 1.1.0 | 2026-07-08 |
-| [speak-7d](./skills/speak-7d/SKILL.md) | 把工作事项的自由描述整理成固定文稿，再收成不带标签的白话 | 1.0.0 | 2026-11-02 |
+| [similar-judge](./skills/similar-judge/SKILL.md) | 对比两份文本差异，输出相似度与词级差异 JSON，供 agent 量化产物与目标的文本差距，可以用来循环迭代提示词 | 1.0.0 | 2026-06-28 |
+
+#### 开发工具与环境
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
+| [clak](./skills/clak/SKILL.md) | 教会 Agent 如何使用 [clak](https://github.com/gitByEOS/esclak) 构建固定流程业务脚本，覆盖 TUI、无头 CLI、交互输入、自动步骤进度、停止控制、历史命令与生命周期测试 | 1.1.0 | 2026-11-16 |
+| [esflow](./skills/esflow/SKILL.md) | 教会 Agent 如何使用 [esflow](https://github.com/gitByEOS/esflow)，简化学习成本，直接从需求到落地 | 0.1.4 | 2026-07-09 |
+| [vite-plus](./skills/vite-plus/SKILL.md) | 最新的适合 Agent 开发 Web 前端工具链，一体化开发/构建/测试/发布/格式化 | 1.0.0 | 2026-05-19 |
+| [mock-ollama](./skills/mock-ollama/SKILL.md) | 代理 Chat、Anthropic、Responses 三协议，支持 Claude Code、Codex/GPT-5.6、Cursor BYOK | 1.1.0 | 2026-07-22 |
+| [tmux-serv](./skills/tmux-serv/SKILL.md) | 用全局脚本管理多项目 tmux 常驻服务，建立统一规范，提高管理效率 | 1.0.0 | 2026-07-23 |
+| [skill-linker](./skills/skill-linker/SKILL.md) | 软链[安装/卸载]本地 skill/rule，通过 fzf 支持搜索、多选；用于多项目不同 skill 体系切换，或者不常用技能临时开启 | 1.0.0 | 2026-06-03 |
+
+#### 任务执行与协作
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
 | [task-polling](./skills/task-polling/SKILL.md) | 以 docs/task.md 为唯一事实源，使用 /loop 逐个执行任务，记录初始 commit、每轮理解、改动目录与返工原因 | 1.1.0 | 2026-11-05 |
 | [switch-chat](./skills/switch-chat/SKILL.md) | 切换会话交接任务时使用，生成可快速编辑网页，让新会话能无缝继承工作 | 1.0.0 | 2026-05-19 |
-| [testcase](./skills/testcase/SKILL.md) | 通过本skill的规则来完善用户测试用例的完整性和有效性 | 1.0.0 | 2026-05-19 |
-| [tmux-serv](./skills/tmux-serv/SKILL.md) | 用全局脚本管理多项目 tmux 常驻服务，建立统一规范，提高管理效率 | 1.0.0 | 2026-07-23 |
-| [vite-plus](./skills/vite-plus/SKILL.md) | 最新的适合 Agent 开发 Web 前端工具链，一体化开发/构建/测试/发布/格式化 | 1.0.0 | 2026-05-19 |
+
+#### 记忆管理
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
+| [memory-graph](./skills/memory-graph/SKILL.md) | 开发了一套 Agent 外挂记忆，关联历史记忆、沉淀会话记忆、提供 web-ui 查看或管理记忆；优化组合搜索适配 Agent 使用方式 | 0.2.2 | 2026-08-06 |
+
+#### 网页抓取
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
 | [webfetch-plus](./skills/webfetch-plus/SKILL.md) | 使用 Browser 抓取普通 WebFetch 失败网页，自动复用本地会话，支持隐身抓取与启动器人工验证 | 1.2.0 | 2026-08-05 |
 
+#### 工作汇报
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
+| [speak-7d](./skills/speak-7d/SKILL.md) | 把工作事项的自由描述整理成固定文稿，再收成不带标签的白话 | 1.0.0 | 2026-11-02 |
+
 ### 生活类
+
+#### 学习与知识整理
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
+| [memory-card](./skills/memory-card/SKILL.md) | 把课文拆成记忆卡，导出钉纸地图，点节点进入可滑动的叠卡 | 1.0.0 | 2026-10-29 |
+| [mindmap](./skills/mindmap/SKILL.md) | 将缩进列表 Markdown 生成为可搜索、折叠与切换主题的单文件大纲网页 | 1.0.0 | 2026-09-23 |
+| [summary-user-said](./skills/summary-user-said/SKILL.md) | 只读汇总本机 Cursor、Claude Code、Codex 用户发言，生成带证据引用的总结与原文双产物 | 1.0.0 | 2026-07-27 |
+
+#### 会议与目标管理
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
+| [meet-record-html](./skills/meet-record-html/SKILL.md) | 将面试/会谈问题 Markdown 生成为可现场填写总结、可临时追加问题的纪要 HTML | 1.0.0 | 2026-07-07 |
+| [okr-to-html](./skills/okr-to-html/SKILL.md) | 将 OKR Markdown 生成为可切换 Objective 的单页 HTML 看板 | 1.0.0 | 2026-07-06 |
+
+#### 内容演示与语音
 
 | 技能 | 说明 | 版本 | 上次更新 |
 |------|------|------|----------|
 | [blog-narrator](./skills/blog-narrator/SKILL.md) | 把博客 Markdown 导出为逐行披露演示 HTML，支持轻量预览和 Edge TTS 分段配音合并 | 1.1.0 | 2026-07-07 |
-| [holiday-of-12306](./skills/holiday-of-12306/SKILL.md) | 生成全年 12306 节假日抢票日历，又忘记抢票了！使用 Skill 一次性解决掉 | 1.1.0 | 2026-07-06 |
-| [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.3 | 2026-07-06 |
-| [meet-record-html](./skills/meet-record-html/SKILL.md) | 将面试/会谈问题 Markdown 生成为可现场填写总结、可临时追加问题的纪要 HTML | 1.0.0 | 2026-07-07 |
-| [memory-card](./skills/memory-card/SKILL.md) | 把课文拆成记忆卡，导出钉纸地图，点节点进入可滑动的叠卡 | 1.0.0 | 2026-10-29 |
-| [mindmap](./skills/mindmap/SKILL.md) | 将缩进列表 Markdown 生成为可搜索、折叠与切换主题的单文件大纲网页 | 1.0.0 | 2026-09-23 |
-| [okr-to-html](./skills/okr-to-html/SKILL.md) | 将 OKR Markdown 生成为可切换 Objective 的单页 HTML 看板 | 1.0.0 | 2026-07-06 |
-| [summary-user-said](./skills/summary-user-said/SKILL.md) | 只读汇总本机 Cursor、Claude Code、Codex 用户发言，生成带证据引用的总结与原文双产物 | 1.0.0 | 2026-07-27 |
 | [voice-clone](./skills/voice-clone/SKILL.md) | 使用 Confucius4-TTS Gradio API 做参考音色克隆和文本转语音 | 1.0.0 | 2026-06-23 |
+
+#### 资讯与出行
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
+| [juya](./skills/juya/SKILL.md) | 获取橘鸦Juya每日更新的AI早报内容，生成早茶风格排版的早报 HTML | 1.0.3 | 2026-07-06 |
+| [holiday-of-12306](./skills/holiday-of-12306/SKILL.md) | 生成全年 12306 节假日抢票日历，又忘记抢票了！使用 Skill 一次性解决掉 | 1.1.0 | 2026-07-06 |
 | [weather-search](./skills/weather-search/SKILL.md) | 按地点与活动半径查周边天气与空气质量，输出报告与出门防护建议 | 1.0.0 | 2026-07-09 |
 
 ## Qbot Skills
@@ -90,15 +133,27 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 
 详细部署指南点击：👉🏻 [这里](https://gitByEOS.github.io/open-part-skills/qbot/) 
 
+### 音视频提取与总结
+
 | 技能 | 说明 | 版本 | 上次更新 |
 |------|------|------|----------|
 | [fetch-what-say](./skills/fetch-what-say/SKILL.md) | 把网站媒体或本地视频，提取文本内容并生成摘要 | 1.0.0 | 2026-06-20 |
-| [html-cut](./skills/html-cut/SKILL.md) | 将网页或本地 HTML 渲染为高清 PNG 截图，支持全页、视口、分辨率与加载等待控制，给 Agent用方便手机查看 | 1.0.0 | 2026-07-19 |
-| [lan-chat](./skills/lan-chat/SKILL.md) | 局域网聊天室，支持文件传输，方便把产物发到主力机 | 1.0.1 | 2026-07-31 |
-| [md-to-png](./skills/md-to-png/SKILL.md) | 把 Markdown 渲染成 HTML，再调用 html-cut 截图，方便手机查看 | 1.0.0 | 2026-07-21 |
 | [meet-digest](./skills/meet-digest/SKILL.md) | 把会议录音转写成带时间轴全文，再提炼可追溯的会议总结与待办 | 1.0.0 | 2026-09-18 |
-| [port-to-public](./skills/port-to-public/SKILL.md) | 临时通过 Cloudflare Quick Tunnel 将本机 loopback HTTP(S) 服务暴露到公网 | 1.0.0 | 2026-07-20 |
+
+### 图片与语音输出
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
+| [html-cut](./skills/html-cut/SKILL.md) | 将网页或本地 HTML 渲染为高清 PNG 截图，支持全页、视口、分辨率与加载等待控制，给 Agent用方便手机查看 | 1.0.0 | 2026-07-19 |
+| [md-to-png](./skills/md-to-png/SKILL.md) | 把 Markdown 渲染成 HTML，再调用 html-cut 截图，方便手机查看 | 1.0.0 | 2026-07-21 |
 | [voice-to-me](./skills/voice-to-me/SKILL.md) | 将回复合成语音并通过 QQ 格式发送  | 1.0.0 | 2026-07-21 |
+
+### 文件传输与公网访问
+
+| 技能 | 说明 | 版本 | 上次更新 |
+|------|------|------|----------|
+| [lan-chat](./skills/lan-chat/SKILL.md) | 局域网聊天室，支持文件传输，方便把产物发到主力机 | 1.0.1 | 2026-07-31 |
+| [port-to-public](./skills/port-to-public/SKILL.md) | 临时通过 Cloudflare Quick Tunnel 将本机 loopback HTTP(S) 服务暴露到公网 | 1.0.0 | 2026-07-20 |
 
 ## MCPs
 
@@ -127,9 +182,9 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 
 ## 交流 & 赞助
 
-[![请我喝杯瑞幸](https://img.shields.io/badge/请我-喝杯瑞幸-blue?style=flat&logo=buy-me-a-coffee)](docs/Coffee_QRCode.png)    [![企鹅基地](https://img.shields.io/badge/跟我-一起进步-blue?style=flat&logo=qq)](docs/QGourp_QRCode.png)    
+[![请我喝杯瑞幸](https://img.shields.io/badge/请我-喝杯瑞幸-blue?style=flat&logo=buy-me-a-coffee)](docs/images/Coffee_QRCode.png)    [![企鹅基地](https://img.shields.io/badge/跟我-一起进步-blue?style=flat&logo=qq)](docs/images/QGourp_QRCode.png)
 
-![一起玩AI](docs/Coffee_QRCode.png)    ![企鹅基地](docs/QGourp_QRCode.png)
+![一起玩AI](docs/images/Coffee_QRCode.png)    ![企鹅基地](docs/images/QGourp_QRCode.png)
 
 ## 许可
 

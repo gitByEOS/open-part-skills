@@ -90,6 +90,14 @@ const skills = sortSkills([
     "省",
   ),
   skill(
+    "skill-closure-graph",
+    "Closure Graph",
+    "closure-graph",
+    "检查流程、特效与 UI 的衔接闭环和文档缺口，生成可点击查看依据的单文件 HTML。",
+    "环",
+    "new",
+  ),
+  skill(
     "skill-html-cut",
     "HTML Cut",
     "html-cut",
@@ -283,7 +291,6 @@ const skills = sortSkills([
     "meet-digest",
     "把会议录音 wav 转写成带时间轴全文，再提炼可追溯的结构化会议总结。",
     "会",
-    "new",
   ),
 ]);
 

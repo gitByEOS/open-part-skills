@@ -62,7 +62,7 @@ class ScriptRun:
 
     def _set_failure(self, error: Exception) -> None:
         self._exception = error
-        self.exit_code = 1 if isinstance(error, ScriptError) else 2
+        self.exit_code = error.exit_code if isinstance(error, ScriptError) else 2
         self.error_text = str(error)
         self.session.cancel()
 
