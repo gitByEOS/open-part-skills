@@ -11,28 +11,16 @@ const REST_POSE = [
   { x: 0, y: 0, rot: 0, scale: 1 },
   { x: -8, y: -18, rot: -6.5, scale: 0.965 },
   { x: 14, y: -34, rot: 7, scale: 0.93 },
+  { x: 14, y: -22, rot: 5, scale: 0.91 },
 ];
 
 function poseTransform(pose) {
-  /** 叠卡位姿，第三张和滑走进度共用同一套插值 */
   return `translateX(calc(-50% + ${pose.x}px)) translateY(${pose.y}px) rotate(${pose.rot}deg) scale(${pose.scale})`;
-}
-
-function mixPose(from, to, amount) {
-  return {
-    x: from.x + (to.x - from.x) * amount,
-    y: from.y + (to.y - from.y) * amount,
-    rot: from.rot + (to.rot - from.rot) * amount,
-    scale: from.scale + (to.scale - from.scale) * amount,
-  };
 }
 
 let cursor = 0;
 let faceMode = "point";
-let frontSlot = null;
-let backSlot = null;
-let farSlot = null;
-let incomingSlot = null;
+let slots = [];
 
 pieceTitle.textContent = data.title;
 
@@ -182,7 +170,6 @@ function paintFace(slot, offset, mode) {
   const index = indexAt(offset);
   const card = data.cards[index];
   const showingPoint = mode !== "full";
-  slot.dataset.offset = String(offset);
   const face = slot.querySelector(".face");
   face.className = `face tone-${index % 3} mode-${showingPoint ? "point" : "full"}`;
   face.querySelector(".num").textContent = String(index + 1).padStart(2, "0");
@@ -196,127 +183,104 @@ function makeSlot() {
   const slot = document.createElement("div");
   slot.className = "slot";
   slot.innerHTML = `<article class="face"><span class="num"></span><span class="card-title"></span><span class="kicker"></span><span class="body"></span></article>`;
+  bindSlot(slot);
   return slot;
 }
 
-function place(slot, depth, animate) {
-  /** 前三张静止时都可见，第四张藏在第三张后面等着补位 */
-  const hidden = depth >= 3;
-  slot.style.zIndex = String(4 - depth);
-  slot.style.transition = animate
-    ? "transform .42s cubic-bezier(.2, .8, .2, 1), opacity .2s cubic-bezier(.45, 0, 1, 1)"
-    : "none";
-  slot.style.transform = poseTransform(REST_POSE[Math.min(depth, 2)]);
-  slot.style.opacity = hidden ? "0" : "1";
+function place(slot, depth, isSettling = false) {
+  /** 前三张可见，回收的第四张藏在最后 */
+  const isHidden = depth === REST_POSE.length - 1;
+  slot.style.zIndex = String(REST_POSE.length - depth);
+  slot.classList.toggle("settling", isSettling);
+  slot.style.transform = poseTransform(REST_POSE[depth]);
+  slot.style.opacity = isHidden ? "0" : "1";
 }
 
 function showCount() {
   cardCount.textContent = `${cursor + 1} / ${data.cards.length}`;
 }
 
-function syncBack(dx) {
-  /** 拖动时透明度只动一截；补进第三张的是 1 减前方透明度 */
-  if (backSlot.dataset.offset !== "1") paintFace(backSlot, 1, "point");
-  if (farSlot.dataset.offset !== "2") paintFace(farSlot, 2, "point");
-  if (incomingSlot.dataset.offset !== "3") paintFace(incomingSlot, 3, "point");
-  const travel = Math.min(1, Math.abs(dx) / 160);
-  const fade = travel * 0.18;
-  frontSlot.style.opacity = String(1 - fade);
-  backSlot.style.opacity = "1";
-  backSlot.style.transition = "none";
-  backSlot.style.transform = poseTransform(mixPose(REST_POSE[1], REST_POSE[0], travel));
-  farSlot.style.opacity = "1";
-  farSlot.style.transition = "none";
-  farSlot.style.transform = poseTransform(mixPose(REST_POSE[2], REST_POSE[1], travel));
-  incomingSlot.style.opacity = String(fade);
-  incomingSlot.style.transition = "none";
-  incomingSlot.style.transform = poseTransform(REST_POSE[2]);
-}
-
 function renderStack() {
-  /** 重铺三张叠卡，并绑住最前面一张的拖拽 */
-  deck.replaceChildren();
-  incomingSlot = makeSlot();
-  farSlot = makeSlot();
-  backSlot = makeSlot();
-  frontSlot = makeSlot();
-  paintFace(incomingSlot, 3, "point");
-  paintFace(farSlot, 2, "point");
-  paintFace(backSlot, 1, "point");
-  paintFace(frontSlot, 0, faceMode);
-  place(incomingSlot, 3);
-  place(farSlot, 2);
-  place(backSlot, 1);
-  place(frontSlot, 0);
-  deck.append(incomingSlot, farSlot, backSlot, frontSlot);
-  bindFront(frontSlot);
+  /** 从地图进入时预铺叠卡，切卡时直接轮转 */
+  slots = REST_POSE.map((_, depth) => {
+    const slot = makeSlot();
+    paintFace(slot, depth, depth === 0 ? faceMode : "point");
+    place(slot, depth);
+    return slot;
+  });
+  deck.replaceChildren(...[...slots].reverse());
   showCount();
 }
 
-function bindFront(slot) {
-  /** 轻点在串联和原文间切换，拖过阈值就斜着飞出 */
+function advanceStack() {
+  /** 下一张已铺好，松手即换；只重绘回收的卡槽 */
+  const recycled = slots.shift();
+  const depth = slots.push(recycled) - 1;
+  cursor = indexAt(1);
+  faceMode = "point";
+  deck.prepend(recycled);
+  slots.forEach((slot, index) => place(slot, index, index < depth));
+  paintFace(recycled, depth, faceMode);
+  recycled.querySelector(".face").scrollTop = 0;
+  showCount();
+}
+
+function gestureDirection(dx, dy) {
+  if (Math.hypot(dx, dy) < 8) return "pending";
+  return Math.abs(dx) > Math.abs(dy) * 1.25 ? "horizontal" : "vertical";
+}
+
+function bindSlot(slot) {
+  /** 纵滑交给浏览器，横滑时只移动最上面的卡 */
   let drag = null;
 
-  function onMove(event) {
-    if (!drag || event.pointerId !== drag.pointerId) return;
-    const dx = event.clientX - drag.x;
-    const tilt = Math.max(-22, Math.min(22, dx / 14));
-    slot.style.transform = `translateX(-50%) rotate(${tilt}deg)`;
-    syncBack(dx);
+  function isActivePointer(event) {
+    return drag?.pointerId === event.pointerId;
   }
 
-  function onUp(event) {
-    if (!drag || event.pointerId !== drag.pointerId) return;
-    const dx = event.clientX - drag.x;
-    const dy = event.clientY - drag.y;
+  function cancel(event) {
+    if (!isActivePointer(event)) return;
+    if (drag.state === "horizontal") place(slot, 0, true);
     drag = null;
-    window.removeEventListener("pointermove", onMove);
-    window.removeEventListener("pointerup", onUp);
-    window.removeEventListener("pointercancel", onUp);
-    if (Math.hypot(dx, dy) < 8) {
-      place(slot, 0, true);
-      place(backSlot, 1, true);
-      place(farSlot, 2, true);
-      place(incomingSlot, 3, true);
-      faceMode = faceMode === "point" ? "full" : "point";
-      paintFace(slot, 0, faceMode);
-      return;
-    }
-    if (Math.abs(dx) > 72) {
-      fly(slot, dx > 0 ? 1 : -1);
-      return;
-    }
-    place(slot, 0, true);
-    place(backSlot, 1, true);
-    place(farSlot, 2, true);
-    place(incomingSlot, 3, true);
   }
 
   slot.addEventListener("pointerdown", (event) => {
-    if (drag) return;
-    drag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
-    slot.style.transition = "none";
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
-    window.addEventListener("pointercancel", onUp);
+    if (slot !== slots[0] || drag || !event.isPrimary || event.button !== 0) return;
+    drag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, state: "pending" };
+    slot.setPointerCapture(event.pointerId);
   });
-}
 
-function fly(slot, dir) {
-  /** dir 只决定飞出方向，落点始终是下一张 */
-  const x = dir * Math.max(280, window.innerWidth * 0.72);
-  slot.style.pointerEvents = "none";
-  slot.style.transition = "transform .42s cubic-bezier(.2, .75, .2, 1), opacity .2s cubic-bezier(.45, 0, 1, 1)";
-  slot.style.opacity = "0";
-  slot.style.transform = `translateX(calc(-50% + ${x}px)) translateY(-110px) rotate(${dir * 36}deg)`;
-  place(backSlot, 0, true);
-  place(farSlot, 1, true);
-  place(incomingSlot, 2, true);
-  window.setTimeout(() => {
-    cursor = indexAt(1);
-    faceMode = "point";
-    renderStack();
-  }, 430);
+  slot.addEventListener("pointermove", (event) => {
+    if (!isActivePointer(event)) return;
+    const dx = event.clientX - drag.x;
+    const dy = event.clientY - drag.y;
+    if (drag.state === "pending") drag.state = gestureDirection(dx, dy);
+    if (drag.state !== "horizontal") return;
+    const tilt = Math.max(-8, Math.min(8, dx / 18));
+    slot.classList.remove("settling");
+    slot.style.transform = poseTransform({ ...REST_POSE[0], rot: tilt });
+  });
+
+  slot.addEventListener("pointerup", (event) => {
+    if (!isActivePointer(event)) return;
+    const dx = event.clientX - drag.x;
+    const direction = gestureDirection(dx, event.clientY - drag.y);
+    const { state } = drag;
+    drag = null;
+    if (state === "pending" && direction === "pending") {
+      faceMode = faceMode === "point" ? "full" : "point";
+      paintFace(slot, 0, faceMode);
+    }
+    if (state !== "horizontal") return;
+    if (direction === "horizontal" && Math.abs(dx) > 72) {
+      advanceStack();
+      return;
+    }
+    place(slot, 0, true);
+  });
+
+  slot.addEventListener("pointercancel", cancel);
+  slot.addEventListener("lostpointercapture", cancel);
 }
 
 function openStack(index) {
@@ -325,7 +289,7 @@ function openStack(index) {
   faceMode = "point";
   stackLayer.classList.add("open");
   stackLayer.setAttribute("aria-hidden", "false");
-  document.body.classList.add("stack-open");
+  document.documentElement.classList.add("stack-open");
   renderStack();
 }
 
@@ -333,7 +297,7 @@ function closeStack() {
   /** 收起叠卡，回到地图 */
   stackLayer.classList.remove("open");
   stackLayer.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("stack-open");
+  document.documentElement.classList.remove("stack-open");
   drawWires();
 }
 

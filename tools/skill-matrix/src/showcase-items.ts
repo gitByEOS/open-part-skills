@@ -159,7 +159,7 @@ const skills = sortSkills([
     "skill-memory-card",
     "Memory Card",
     "memory-card",
-    "把课文拆成记忆卡，导出钉纸地图，点节点进入可滑动的叠卡。",
+    "把课文拆成记忆卡并导出钉纸地图，纵滑读长文，横滑换卡。",
     "背",
     "new",
   ),

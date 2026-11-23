@@ -27,7 +27,13 @@ body {
     );
 }
 
-body.stack-open { overflow: hidden; }
+html.stack-open,
+.stack-open body {
+  overflow: hidden;
+  overscroll-behavior-x: none;
+}
+
+.stack-open .wires path { animation-play-state: paused; }
 
 .top {
   max-width: 720px;
@@ -207,9 +213,13 @@ footer {
 
 .stack-layer {
   position: fixed;
-  inset: 0;
+  inset: 0 0 auto;
+  height: 100dvh;
   z-index: 4;
-  overflow: auto;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: clip;
+  touch-action: pan-y pinch-zoom;
   background-color: #f5f0e5;
   background-image:
     var(--noise),
@@ -239,7 +249,7 @@ footer {
 }
 
 .stack-top {
-  max-width: 480px;
+  width: min(600px, 100%);
   margin: 0 auto;
   padding: 20px 24px 0;
   display: flex;
@@ -276,29 +286,35 @@ footer {
 }
 
 .stage {
-  max-width: 480px;
+  width: min(600px, 100%);
   margin: 0 auto;
-  padding: 8px 20px 24px;
+  padding: 4px 20px 24px;
 }
 
 .deck {
   position: relative;
-  height: min(520px, calc(100dvh - 120px));
+  height: min(688px, 100%);
 }
 
 .slot {
   position: absolute;
   left: 50%;
   bottom: 0;
-  width: min(340px, 100%);
-  height: min(400px, 78%);
+  width: min(500px, 100%);
+  height: calc(100% - 48px);
   transform-origin: center bottom;
-  touch-action: none;
+  pointer-events: none;
 }
+
+.slot:last-child { pointer-events: auto; }
+.slot.settling { transition: transform .14s ease-out, opacity .14s ease-out; }
 
 .face {
   height: 100%;
-  overflow: auto;
+  overflow: hidden auto;
+  overscroll-behavior-y: contain;
+  overflow-anchor: none;
+  touch-action: pan-y pinch-zoom;
   border: 0;
   border-radius: 28px;
   padding: 28px 24px 22px;
@@ -365,6 +381,7 @@ footer {
   .top,
   .stack-layer .deck { animation: none; }
   .wires path { animation: none; }
+  .slot.settling { transition: none; }
 }
 
 @media (max-width: 640px) {
@@ -373,8 +390,8 @@ footer {
   .card-title { font-size: 20px; }
   .stack-top { padding-left: 16px; padding-right: 16px; }
   .stage { padding: 4px 16px 16px; }
-  .deck { height: min(560px, calc(100dvh - 96px)); }
-  .slot { height: min(430px, 70%); }
+  .deck { height: 100%; }
+  .slot { width: min(310px, 100%); }
   .face { padding: 24px 20px 18px; }
   .face .card-title { font-size: 22px; }
 }

@@ -1,7 +1,7 @@
 ---
 name: memory-card
 description: 把课文拆成记忆卡并导出钉纸地图，点节点进入可左右滑动的叠卡，底部弹出串联和原文。用户提到记忆卡、背诵课文、课文背诵、串联点时使用。
-version: 1.0.0
+version: 1.0.1
 dependencies:
   - python3
 repository: https://github.com/gitByEOS/open-part-skills
@@ -17,7 +17,7 @@ repository: https://github.com/gitByEOS/open-part-skills
 python3 <skill>/scripts/cards2html.py <输入.cards.json> [-o 输出.html]
 ```
 
-- 默认输出到源文件同目录，已存在会覆盖；仅依赖 Python 标准库，产物双击即开
+- 默认输出到源文件同目录，已存在会覆盖
 - 校验失败会指出第几张、违反哪条规则；改 JSON 重跑，直到退出码为 0
 - 脚本只校验和导出，不替你抽取锚点
 
