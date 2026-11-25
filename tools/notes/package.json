@@ -1,0 +1,11 @@
+{
+  "name": "open-part-notes",
+  "private": true,
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "markdown-it": "15.0.3"
+  }
+}

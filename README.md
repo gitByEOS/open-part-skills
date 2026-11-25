@@ -14,15 +14,13 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-11-16
+## **时间** : 2026-11-25
 
 **小记** :
-- 新增 [closure-graph](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=closure-graph)，用于初步检测策划需求文档的漏洞
-- 把流程、特效与 UI 的衔接画成可点击的图，定位断点、冲突与缺失参数
+- [hy-mt-server](https://github.com/gitByEOS/hy-mt-server) 更新 Hy-MT3-1.8B，准确更高，支持语种更多
+- 补充了如何接入沉浸式翻译
+- 新增 [小记可视化](https://gitbyeos.github.io/open-part-skills/#notes)
 
-<img src="docs/images/closure-graph-demo.png" alt="closure-graph 策划需求文档闭环检查演示" width="600">
-
-[更多小记](./docs/note.md)
 
 ## 安装
 
@@ -168,6 +166,7 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 | 工具 | 说明 | 在线使用 |
 |------|------|----------|
 | [工具箱](./tools/) | 全部在线工具 | [工具箱入口](https://gitByEOS.github.io/open-part-skills/) |
+| [修炼笔记](./docs/note.md) | 按日期浏览工具更新与开发随记 | [在线阅读](https://gitbyeos.github.io/open-part-skills/#notes) |
 | [skill-matrix](./tools/skill-matrix/) | 为 Skill 增加可视化效果 | [Skills 矩阵](https://gitByEOS.github.io/open-part-skills/skill-matrix/dist/) |
 | [emoj](./tools/emoj/) | EMOJ 大全：搜索、分类浏览、点击复制 emoji | [emoj大全](https://gitByEOS.github.io/open-part-skills/emoj/) |
 | [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.4.1](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.4.1.dmg) |

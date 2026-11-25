@@ -1,4 +1,19 @@
-# 往期小记
+# 修炼笔记
+
+## **时间** : 2026-11-25
+
+**小记** :
+- [hy-mt-server](https://github.com/gitByEOS/hy-mt-server) 从 Hy-MT2 更新 Hy-MT3，准确更高，支持语种更多
+- 补充了如何接入沉浸式翻译
+- 新增 [小记可视化](https://gitbyeos.github.io/open-part-skills/#notes)
+
+## **时间** : 2026-11-16
+
+**小记** :
+- 新增 [closure-graph](https://gitbyeos.github.io/open-part-skills/skill-matrix/dist/?item=closure-graph)，用于初步检测策划需求文档的漏洞
+- 把流程、特效与 UI 的衔接画成可点击的图，定位断点、冲突与缺失参数
+
+![closure-graph 策划需求文档闭环检查演示](images/closure-graph-demo.png)
 
 ## **时间** : 2026-11-12
 

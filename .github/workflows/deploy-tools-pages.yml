@@ -9,6 +9,8 @@ on:
       - 'tools/**'
       - '!tools/esnote/**'
       - 'skills/**'
+      - 'docs/note.md'
+      - 'docs/images/**'
       - '.github/workflows/deploy-tools-pages.yml'
   workflow_dispatch:
 
