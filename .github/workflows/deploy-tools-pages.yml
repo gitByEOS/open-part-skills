@@ -14,21 +14,17 @@ on:
       - '.github/workflows/deploy-tools-pages.yml'
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 concurrency:
   group: pages-tools
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact_id }}
     steps:
       - uses: actions/checkout@v4
 
@@ -72,9 +68,41 @@ jobs:
             fi
           done
 
-      - uses: actions/upload-pages-artifact@v3
+      - id: upload
+        uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: _publish
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 等待本次发布产物可查询
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ needs.build.outputs.artifact-id }}
+        run: |
+          set -euo pipefail
+          [[ "$ARTIFACT_ID" =~ ^[0-9]+$ ]] || { echo '未获得发布产物 ID'; exit 1; }
+          expected=$(printf '%s\tgithub-pages\tfalse' "$GITHUB_RUN_ID")
+          for attempt in {1..8}; do
+            if metadata=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID" \
+              --jq '[.workflow_run.id, .name, .expired] | @tsv') && [[ "$metadata" == "$expected" ]]; then
+              echo "发布产物 $ARTIFACT_ID 已可查询"
+              exit 0
+            fi
+            echo "发布产物 $ARTIFACT_ID 暂不可用（$attempt/8）"
+            if (( attempt < 8 )); then sleep 3; fi
+          done
+          echo '发布产物未就绪，停止部署'
+          exit 1
+
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5.0.1
