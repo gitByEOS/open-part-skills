@@ -166,7 +166,6 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 | 工具 | 说明 | 在线使用 |
 |------|------|----------|
 | [工具箱](./tools/) | 全部在线工具 | [工具箱入口](https://gitByEOS.github.io/open-part-skills/) |
-| [修炼笔记](./docs/note.md) | 按日期浏览工具更新与开发随记 | [在线阅读](https://gitbyeos.github.io/open-part-skills/#notes) |
 | [skill-matrix](./tools/skill-matrix/) | 为 Skill 增加可视化效果 | [Skills 矩阵](https://gitByEOS.github.io/open-part-skills/skill-matrix/dist/) |
 | [emoj](./tools/emoj/) | EMOJ 大全：搜索、分类浏览、点击复制 emoji | [emoj大全](https://gitByEOS.github.io/open-part-skills/emoj/) |
 | [ESNote](./tools/esnote/) | 聚焦性能的 macOS 原生 Markdown 编辑与预览应用 | [下载 v0.4.1](https://github.com/gitByEOS/open-part-skills/raw/refs/heads/main/tools/esnote/ESNote-v0.4.1.dmg) |

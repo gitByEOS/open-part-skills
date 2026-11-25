@@ -63,6 +63,13 @@ function initScale() {
   const tooltip = scale.querySelector('.scale-tooltip');
   const date = tooltip.querySelector('.scale-date');
   const summary = tooltip.querySelector('.scale-summary');
+  const visibilityObserver = new IntersectionObserver(entries => {
+    for (const { target, isIntersecting } of entries) {
+      target.toggleAttribute('data-in-view', isIntersecting);
+    }
+  });
+  document.querySelectorAll('main > article').forEach(card => visibilityObserver.observe(card));
+  let selectedTick;
 
   function showSlot(slot) {
     const selected = Math.round(slot);
@@ -72,6 +79,8 @@ function initScale() {
       tick.toggleAttribute('data-active', index === selected);
     });
     const tick = ticks[selected];
+    if (tick === selectedTick) return;
+    selectedTick = tick;
     tooltip.hidden = !tick;
     if (!tick) return;
     date.textContent = tick.getAttribute('aria-label');
