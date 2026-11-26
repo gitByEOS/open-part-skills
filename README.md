@@ -14,12 +14,27 @@ AI交流群：**1105239118**，有新内容更新会在里边通知，也可以�
 
 ## 更新日记
 
-## **时间** : 2026-11-25
+## **时间** : 2026-11-26
 
 **小记** :
-- [hy-mt-server](https://github.com/gitByEOS/hy-mt-server) 更新 Hy-MT3-1.8B，准确更高，支持语种更多
-- 补充了如何接入沉浸式翻译
-- 新增 [小记可视化](https://gitbyeos.github.io/open-part-skills/#notes)
+- 升级 Mac Mini 上的语音转写，从 mlx-whisper 换成 Qwen3-ASR-0.6B
+- 项目放到了 [qwen3-asr-server](https://github.com/gitByEOS/qwen3-asr-server)，有兴趣可以看看
+- 以下是拿一段视频做的测试
+
+**性能** :
+- 视频时长：111.666 秒；文件大小：5.8 MB
+- 分段：23.0、29.8、29.2、27.0 秒
+- ffmpeg 预处理：0.574 秒；MLX 4-bit 推理：9.402 秒
+- 总耗时：9.982 秒；速度：11.19 倍实时；RTF：0.089
+- 第一段含模型冷加载：5.485 秒；后续约 30 秒分段：每段约 1.3 秒
+- 输出：671 字，415 次增量更新
+
+**仅有误识别** :
+- “赤金子” → “斥巨资”（视频咬字不清）
+- “这几根影视” → “自己的影音室”（视频吞字）
+- “玩金山花” → “玩健身环”（视频吞字）
+
+[往期小记](https://gitbyeos.github.io/open-part-skills/#notes)
 
 
 ## 安装
@@ -176,6 +191,7 @@ qbot dashboard            # 3.进入界面，根据引导完成配置
 | [FastRead](https://github.com/gitByEOS/FastRead) | 精选离线文字转语音，微软edge可选 | [需要下载](https://github.com/gitByEOS/FastRead/releases) |
 | [VideoCaptor](https://github.com/gitByEOS/VideoCaptor) | 从视频提取GIF，从录屏中截取动图 | [需要下载](https://github.com/gitByEOS/VideoCaptor/releases) |
 | [hy-mt-server](https://github.com/gitByEOS/hy-mt-server) | 离线启动腾讯 HY-MT 翻译模型 | [需要部署](https://github.com/gitByEOS/hy-mt-server) |
+| [qwen3-asr-server](https://github.com/gitByEOS/qwen3-asr-server) | 基于 Qwen3-ASR 的语音转写服务 | [需要部署](https://github.com/gitByEOS/qwen3-asr-server) |
 | [offline-confucius4-tts](https://github.com/gitByEOS/offline-confucius4-tts) | 离线启动 confucius4-tts 语音模型，定制更个性化音色 | [需要部署](https://github.com/gitByEOS/offline-confucius4-tts) |
 
 ## 交流 & 赞助
