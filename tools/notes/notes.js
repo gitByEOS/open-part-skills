@@ -133,7 +133,12 @@ function initScale() {
   ticks.forEach(tick => tick.addEventListener('click', event => {
     event.preventDefault();
     const card = document.getElementById(tick.hash.slice(1));
-    if (location.hash !== tick.hash) location.hash = tick.hash;
+    if (location.hash !== tick.hash) {
+      history.pushState(null, '', tick.hash);
+      focusOnly(card);
+      expandCard(card);
+      card.scrollIntoView();
+    }
     focusCard(card);
   }));
 

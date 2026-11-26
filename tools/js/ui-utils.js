@@ -92,16 +92,5 @@ const UIUtils = {
         requestAnimationFrame(switchContent);
       });
     });
-
-    const hash = window.location.hash.replace(/^#/, '');
-    if (hash) {
-      const tab = Array.from(navLinks).find(link => link.getAttribute('data-tab') === hash);
-      if (tab) {
-        setTimeout(() => {
-          if (!tab.classList.contains('active')) tab.click();
-          else activateContent(hash);
-        }, 50);
-      }
-    }
   }
 };
