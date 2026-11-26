@@ -21,8 +21,10 @@ const UIUtils = {
     const loadTabIframe = (panel) => {
       const iframe = panel.querySelector('iframe');
       if (iframe && iframe.hasAttribute('data-src')) {
-        iframe.src = UIUtils.resolveToolPath(iframe.getAttribute('data-src'));
-        iframe.removeAttribute('data-src');
+        const src = iframe.getAttribute('data-src');
+        const reload = iframe.hasAttribute('data-reload-on-show');
+        iframe.src = UIUtils.resolveToolPath(src + (reload ? '?t=' + Math.floor(Date.now() / 1e8) : ''));
+        if (!reload) iframe.removeAttribute('data-src');
       }
     };
 

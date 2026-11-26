@@ -6,6 +6,7 @@ const vm = require('node:vm');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const uiUtils = fs.readFileSync(path.join(__dirname, 'ui-utils.js'), 'utf8');
+const cacheStamp = now => Math.floor(now / 1e8);
 
 class Element {
   constructor(tagName, document) {
@@ -55,8 +56,9 @@ class Element {
     const iframe = value.match(/<iframe\b([^>]*)>/i);
     if (iframe) {
       const element = new Element('iframe', this.document);
-      const dataSrc = iframe[1].match(/data-src=["']([^"']*)["']/i);
-      if (dataSrc) element.dataset.src = dataSrc[1];
+      for (const match of iframe[1].matchAll(/\b(data-[\w-]+)(?:=["']([^"']*)["'])?/g)) {
+        element.dataset[match[1].slice(5)] = match[2] ?? '';
+      }
       this.appendChild(element);
     }
   }
@@ -110,15 +112,20 @@ function createPage(hash) {
   document.querySelector = selector => root.querySelector(selector);
   document.addEventListener = () => {};
   const timers = [];
+  const clock = { now: 1700000000000 };
+  class FrozenDate extends Date {
+    static now() { return clock.now; }
+  }
   const location = { hash, pathname: '/tools/index.html', origin: 'https://example.com' };
   const context = vm.createContext({
     document, location, URL,
+    Date: FrozenDate,
     history: { replaceState() {} },
     setTimeout: callback => timers.push(callback),
     requestAnimationFrame: callback => callback(),
   });
   context.window = context;
-  return { context, document, timers };
+  return { context, document, timers, clock };
 }
 
 const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
@@ -161,7 +168,7 @@ for (const [hash, expected, blocked] of [
   ['#tool-count', 'overview', true],
 ]) {
   test(`首屏初始化 ${hash || '空 hash'}`, () => {
-    const { context, document, timers, initiallyBlocked, beforeReveal } = runBeforeExternal(hash);
+    const { context, document, timers, initiallyBlocked, beforeReveal, clock } = runBeforeExternal(hash);
     assert.equal(initiallyBlocked, blocked, 'head 阶段遮挡状态错误');
     if (blocked) {
       assert.deepEqual(beforeReveal?.nav, [expected], '解除遮挡前必须激活正确导航');
@@ -182,15 +189,53 @@ for (const [hash, expected, blocked] of [
     } else {
       assert.equal(loaded.length, 1, '仅加载目标工具');
       assert.equal(loaded[0], activePanels[0].querySelector('iframe'));
-      const expectedPath = expected === 'notes' ? 'notes/dist/index.html' : 'pngya/index.html';
-      assert.equal(new URL(loaded[0].src, 'https://example.com/tools/index.html').href,
-        new URL(expectedPath, 'https://example.com/tools/index.html').href);
+      if (expected === 'notes') {
+        assert.equal(loaded[0].src, `notes/dist/index.html?t=${cacheStamp(clock.now)}`);
+        assert.equal(loaded[0].getAttribute('data-src'), 'notes/dist/index.html');
+      } else {
+        assert.equal(new URL(loaded[0].src, 'https://example.com/tools/index.html').href,
+          new URL('pngya/index.html', 'https://example.com/tools/index.html').href);
+        assert.equal(loaded[0].hasAttribute('data-src'), false);
+      }
     }
     vm.runInContext(`${uiUtils}\nUIUtils.initTabs();`, context);
     assert.equal(timers.length, 0, '外链脚本不应安排延迟初始切换');
     assert.equal(document.querySelector('.tab-content.active').id, expected);
   });
 }
+
+test('笔记缓存戳按 1e8 毫秒分桶，其它工具只加载一次', () => {
+  const page = runBeforeExternal('#notes');
+  const { context, document, timers, clock } = page;
+  const iframe = document.getElementById('notes').querySelector('iframe');
+  const notesUrl = now => `https://example.com/tools/notes/dist/index.html?t=${cacheStamp(now)}`;
+  assert.equal(iframe.src, `notes/dist/index.html?t=${cacheStamp(clock.now)}`);
+  vm.runInContext(`${uiUtils}\nUIUtils.initTabs();`, context);
+
+  document.querySelector('.nav-link[data-tab="notes"]').click();
+  assert.equal(iframe.src, notesUrl(clock.now));
+  assert.equal(iframe.getAttribute('data-src'), 'notes/dist/index.html');
+
+  clock.now += 1;
+  document.querySelector('.nav-link[data-tab="notes"]').click();
+  assert.equal(iframe.src, notesUrl(clock.now));
+
+  document.querySelector('.nav-link[data-tab="pngya"]').click();
+  timers.splice(0).forEach(callback => callback());
+  const pngya = document.getElementById('pngya').querySelector('iframe');
+  const pngyaSrc = pngya.src;
+  assert.ok(pngyaSrc);
+  assert.equal(pngya.hasAttribute('data-src'), false);
+
+  clock.now += 1e8;
+  document.querySelector('.nav-link[data-tab="notes"]').click();
+  timers.splice(0).forEach(callback => callback());
+  assert.equal(iframe.src, notesUrl(clock.now));
+
+  document.querySelector('.nav-link[data-tab="pngya"]').click();
+  timers.splice(0).forEach(callback => callback());
+  assert.equal(pngya.src, pngyaSrc);
+});
 
 test('首屏遮挡样式覆盖总览导航和面板', () => {
   const styles = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)].map(match => match[1]).join('\n');

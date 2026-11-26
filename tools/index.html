@@ -152,7 +152,7 @@ const TOOLS=[
 {id:'videoya',label:'视频压缩',path:'videoya/index.html',code:'VIDEO',tag:'LOCAL · VIDEO',place:'VIDEO · RED',desc:'在浏览器本地压缩视频，无需上传',icon:'video'},
 {id:'qbot',label:'机器人部署指南',path:'qbot/index.html',code:'GUIDE',tag:'DEPLOY · AGENT',place:'GUIDE · CYAN',desc:'查看 QBot 安装、配置与部署步骤',icon:'terminal'},
 {id:'mock-ollama',label:'mock-ollama',path:'mock-ollama/index.html',code:'LLM',tag:'BRIDGE · MONITOR',place:'LLM · CYAN',desc:'桥接第三方 LLM 协议并监控请求与 Token',icon:'bridge'},
-{id:'notes',label:'修炼笔记',path:'notes/dist/index.html',code:'NOTES',tag:'开发随记',place:'笔记 · 暖金',desc:'按日期翻阅工具更新与开发随记',icon:'notes'}];
+{id:'notes',label:'修炼笔记',path:'notes/dist/index.html',code:'NOTES',tag:'开发随记',place:'笔记 · 暖金',desc:'按日期翻阅工具更新与开发随记',icon:'notes',reloadOnShow:true}];
 const ICONS={
 matrix:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4v16M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>',
 emoji:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><path d="M8.5 14.5c2 2 5 2 7 0M8.5 9h.01M15.5 9h.01" stroke-linecap="round"/></svg>',
@@ -163,7 +163,7 @@ terminal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-widt
 bridge:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="7" height="6" rx="1.5"/><rect x="14" y="13" width="7" height="6" rx="1.5"/><path d="M10 8h4m-2-2 2 2-2 2M14 16h-4m2-2-2 2 2 2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 notes:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm1 0v16m3-11h6m-6 4h6"/></svg>'};
 document.getElementById('tool-count').textContent=String(TOOLS.length).padStart(2,'0');
-function build(){const nav=document.getElementById('tool-nav'),panels=document.getElementById('panels'),list=document.getElementById('mechanism-list');TOOLS.forEach((t,i)=>{const a=document.createElement('a');a.className='nav-link';a.href='#'+t.id;a.dataset.tab=t.id;a.title=t.label;a.innerHTML='<span class="nav-icon" aria-hidden="true">'+ICONS[t.icon]+'</span><span class="nav-label">'+t.label+'</span><span class="nav-num">0'+(i+1)+'</span>';nav.appendChild(a);const panel=document.createElement('section');panel.id=t.id;panel.className='tab-content tool-panel';panel.setAttribute('aria-label',t.label);panel.innerHTML='<div class="loading"><span>正在打开 · '+t.label+'</span></div><iframe data-src="'+t.path+'" title="'+t.label+'" loading="lazy"></iframe>';panel.querySelector('iframe').addEventListener('load',()=>panel.classList.add('loaded'));panels.appendChild(panel);const b=document.createElement('button');b.type='button';b.className='mechanism m'+(i+1);b.dataset.open=t.id;b.setAttribute('aria-label','打开'+t.label);b.innerHTML='<span class="card-tag">'+t.place+'</span><i class="card-pin" aria-hidden="true"></i><span class="device"><i class="device-ring"></i>'+ICONS[t.icon]+'</span><span class="mechanism-copy"><small>0'+(i+1)+' · '+t.tag+'</small><strong>'+t.label+'</strong><p>'+t.desc+'</p><span class="enter">打开工具</span></span>';list.appendChild(b)})}build();
+function build(){const nav=document.getElementById('tool-nav'),panels=document.getElementById('panels'),list=document.getElementById('mechanism-list');TOOLS.forEach((t,i)=>{const a=document.createElement('a');a.className='nav-link';a.href='#'+t.id;a.dataset.tab=t.id;a.title=t.label;a.innerHTML='<span class="nav-icon" aria-hidden="true">'+ICONS[t.icon]+'</span><span class="nav-label">'+t.label+'</span><span class="nav-num">0'+(i+1)+'</span>';nav.appendChild(a);const panel=document.createElement('section');panel.id=t.id;panel.className='tab-content tool-panel';panel.setAttribute('aria-label',t.label);panel.innerHTML='<div class="loading"><span>正在打开 · '+t.label+'</span></div><iframe data-src="'+t.path+'"'+(t.reloadOnShow?' data-reload-on-show':'')+' title="'+t.label+'" loading="lazy"></iframe>';panel.querySelector('iframe').addEventListener('load',()=>panel.classList.add('loaded'));panels.appendChild(panel);const b=document.createElement('button');b.type='button';b.className='mechanism m'+(i+1);b.dataset.open=t.id;b.setAttribute('aria-label','打开'+t.label);b.innerHTML='<span class="card-tag">'+t.place+'</span><i class="card-pin" aria-hidden="true"></i><span class="device"><i class="device-ring"></i>'+ICONS[t.icon]+'</span><span class="mechanism-copy"><small>0'+(i+1)+' · '+t.tag+'</small><strong>'+t.label+'</strong><p>'+t.desc+'</p><span class="enter">打开工具</span></span>';list.appendChild(b)})}build();
 const initialTool=TOOLS.find(t=>'#'+t.id===location.hash);
 if(initialTool){
   document.querySelector('.nav-link.active').classList.remove('active');
@@ -173,8 +173,10 @@ if(initialTool){
   panel.classList.add('active');
   const iframe=panel.querySelector('iframe');
   iframe.loading='eager';
-  iframe.src=iframe.getAttribute('data-src');
-  iframe.removeAttribute('data-src');
+  const src=iframe.getAttribute('data-src');
+  const reload=iframe.hasAttribute('data-reload-on-show');
+  iframe.src=src+(reload?'?t='+Math.floor(Date.now()/1e8):'');
+  if(!reload)iframe.removeAttribute('data-src');
 }
 document.documentElement.classList.remove('initial-tab');
 </script>
