@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>给孩子讲题</title>
+<style id="q-style"></style>
+<style>
+  :root{
+    --ink:#1e293b; --sub:#64748b; --line:#e2e8f0; --card:#fff;
+    --brand:#4f46e5; --brand2:#7c3aed; --gold:#f59e0b; --ok:#059669;
+    --blue:#2563eb; --amber:#d97706; --violet:#7c3aed; --red:#e11d48;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:16px 14px 44px;color:var(--ink);overflow-x:hidden;
+    background:linear-gradient(165deg,#eef2ff 0%,#f8fafc 40%,#ecfdf5 100%);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:640px;margin:0 auto}
+  .wrap.shake{animation:shake .45s cubic-bezier(.36,.07,.19,.97)}
+  @keyframes shake{
+    0%,100%{transform:translate3d(0,0,0)}
+    20%{transform:translate3d(-10px,0,0)}
+    40%{transform:translate3d(10px,0,0)}
+    60%{transform:translate3d(-6px,0,0)}
+    80%{transform:translate3d(6px,0,0)}
+  }
+  h1{font-size:20px;margin:4px 0 6px;letter-spacing:.4px}
+  .lead{font-size:12.5px;color:var(--sub);line-height:1.65;margin:0 0 13px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 8px 24px rgba(30,41,59,.06);padding:13px;margin-bottom:11px}
+
+  /* 切题：单行标签 */
+  .opt-line{margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+  .opts{display:flex;gap:6px;flex-wrap:wrap}
+  .opt{padding:5px 12px;border-radius:99px;border:1px solid var(--line);background:#fff;
+    cursor:pointer;font:inherit;font-size:12.5px;font-weight:700;color:var(--ink);
+    line-height:1.2;white-space:nowrap}
+  .opt:active{transform:scale(.97)}
+  .opt.on{background:var(--brand);border-color:var(--brand);color:#fff;
+    box-shadow:0 4px 10px rgba(79,70,229,.25)}
+
+  /* ② 题目描述 */
+  .zone-head{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+  .zone-no{width:19px;height:19px;border-radius:6px;color:#fff;font-size:10.5px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .zone-title{font-size:12.5px;font-weight:700;letter-spacing:.3px}
+  .zone-hint{font-size:10.5px;color:#94a3b8;margin-left:auto;font-variant-numeric:tabular-nums}
+  .qhead .zone-no{background:var(--blue)}
+  .qhead .zone-title{color:var(--blue)}
+  .qbody{display:flex;gap:11px;align-items:stretch}
+  .qtext{flex:1 1 auto;min-width:0}
+  .qtag{display:inline-block;font-size:10.5px;font-weight:700;border-radius:99px;
+    padding:3px 9px;margin-bottom:8px;background:#ecfdf5;color:var(--ok)}
+  .qtag.ext{background:#fff7ed;color:#c2410c}
+  .qstem{font-size:14px;font-weight:700;line-height:1.65;color:var(--ink);margin-bottom:8px}
+  .qconds{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  .cond{font-size:10.5px;color:#475569;background:#f1f5f9;border:1px solid var(--line);
+    border-radius:7px;padding:4px 8px;white-space:nowrap}
+  .qtip{font-size:11px;color:var(--amber);background:#fffbeb;border:1px solid #fde68a;
+    border-radius:8px;padding:6px 9px;line-height:1.55}
+  .qthumb{flex:0 0 92px;width:92px;min-height:96px;max-height:132px;align-self:center;
+    background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;padding:5px}
+  .qthumb svg{width:100%;height:auto}
+
+  /* ③ 三区 */
+  .z1 .zone-no{background:var(--blue)} .z1 .zone-title{color:var(--blue)}
+  .z2 .zone-no{background:var(--amber)} .z2 .zone-title{color:var(--amber)}
+  .z3 .zone-no{background:var(--violet)} .z3 .zone-title{color:var(--violet)}
+  .viz{min-height:132px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg,#f8fafc,#f1f5f9);border:1px dashed #cbd5e1;
+    border-radius:12px;padding:12px 8px;overflow:hidden}
+  /* 只给显隐过渡；全量 * 会拖慢 SVG。到位后极弱呼吸 */
+  .viz .hide,.viz .show{transition:opacity .5s ease}
+  .viz .hide{opacity:0}
+  .viz .show{opacity:1}
+  #viz > div{animation:viz-idle 5.2s ease-in-out infinite}
+  @keyframes viz-idle{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-1px,0)}}
+  @keyframes nudge{0%,100%{transform:translateX(0)}45%{transform:translateX(5px)}}
+  .nudge{animation:nudge .8s ease 1}
+  @media (prefers-reduced-motion:reduce){
+    #viz > div,.nudge,.diff-row,.d-new,.krow,.wrap.shake{animation:none}
+    .viz .hide,.viz .show{transition:none}
+  }
+  .change{font-size:13.5px;font-weight:700;line-height:1.6;margin:0 0 9px;color:var(--ink)}
+  .diffs{display:flex;flex-direction:column;gap:5px}
+  .diff-row{display:flex;align-items:center;gap:6px;background:#f8fafc;border:1px solid var(--line);
+    border-radius:9px;padding:6px 8px;font-size:11.5px;animation:slidein .35s ease both}
+  @keyframes slidein{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+  .diff-row:nth-child(2){animation-delay:.05s}.diff-row:nth-child(3){animation-delay:.1s}
+  .diff-row:nth-child(4){animation-delay:.15s}
+  .d-key{color:var(--sub);min-width:56px;flex:0 0 auto}
+  .d-old{color:#94a3b8;text-decoration:line-through;font-family:monospace;flex:1;text-align:right}
+  .d-arrow{color:#cbd5e1;flex:0 0 auto}
+  .d-new{font-family:monospace;font-weight:800;color:var(--ok);background:#ecfdf5;
+    border-radius:6px;padding:2px 7px;flex:0 0 auto;
+    animation:pop .4s cubic-bezier(.34,1.56,.64,1) both}
+  @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+  .why{font-size:12.5px;line-height:1.7;color:#475569;margin:0}
+  .formula{display:inline-block;margin-top:9px;background:#f5f3ff;border:1px solid #ddd6fe;
+    color:#5b21b6;border-radius:9px;padding:6px 11px;font-size:12.5px;font-weight:800;
+    font-family:"SFMono-Regular",Consolas,monospace}
+
+  /* ④ 控件 */
+  .dots{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:2px 0 11px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#d8dfea;border:none;padding:0;
+    cursor:pointer;transition:.3s}
+  .dot.on{background:var(--brand);transform:scale(1.45)}
+  .dot.past{background:#c7d2fe}
+  .ctrl{display:flex;gap:7px;justify-content:center;align-items:center;flex-wrap:wrap}
+  .ctrl button{flex:1 1 auto;min-width:78px;font:inherit;font-size:12.5px;padding:9px 10px;
+    border:1px solid var(--line);background:#fff;border-radius:10px;cursor:pointer;color:var(--ink)}
+  .ctrl button:active{transform:scale(.96)}
+  .ctrl button.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}
+  .ctrl button.mini{flex:0 0 auto;min-width:38px;color:var(--sub)}
+
+  /* ⑤ 原理篇：上蓝定理，下灰解读 */
+  .kcard .zone-no{background:var(--red)}
+  .kcard .zone-title{color:var(--red)}
+  .krows{display:flex;flex-direction:column;gap:8px}
+  .krow{border:1px solid var(--line);border-radius:10px;padding:8px 10px;
+    animation:slidein .35s ease both}
+  .krow:nth-child(2){animation-delay:.05s}.krow:nth-child(3){animation-delay:.1s}
+  .krow:nth-child(4){animation-delay:.15s}
+  .k-theorem{font-size:12.5px;font-weight:800;color:var(--blue);line-height:1.55}
+  .k-read{margin-top:5px;font-size:11.5px;line-height:1.65;color:#64748b}
+  .k-theorem em,.k-read em{font-style:normal;font-weight:800;color:var(--brand2);
+    font-family:"SFMono-Regular",Consolas,monospace}
+  .fn{font-size:10.5px;color:#94a3b8;text-align:center;margin-top:11px;line-height:1.6}
+
+  /* ⑥ 理顺原理卡 */
+  .game-lead{font-size:12.5px;color:var(--sub);line-height:1.65;margin:0 0 10px}
+  .slots,.deck{display:flex;flex-direction:column;gap:8px}
+  .deck-label{font-size:10px;font-weight:800;color:#94a3b8;letter-spacing:.5px;margin:14px 0 7px}
+  .slot{min-height:52px;border:1.5px dashed #cbd5e1;border-radius:12px;background:#f8fafc;
+    display:flex;align-items:stretch;padding:4px}
+  .slot.filled{border-style:solid;border-color:#c7d2fe;background:#eef2ff;padding:0}
+  .slot-ph{margin:auto;font-size:12px;color:#94a3b8;font-weight:700}
+  .gcard{width:100%;text-align:left;padding:10px 12px;border:1px solid var(--line);
+    border-radius:12px;background:#fff;cursor:pointer;font:inherit;font-size:13px;
+    font-weight:700;color:var(--blue);line-height:1.55}
+  .gcard:active{transform:scale(.98)}
+  .slot .gcard{border:none;background:transparent}
+  #gamebox.won .slot{border-color:#a7f3d0;background:#ecfdf5}
+  #gamebox.won .gcard{color:var(--ok);cursor:default}
+  #fxwrap{position:fixed;inset:0;pointer-events:none;z-index:90;display:none}
+  #fxwrap.on{display:block}
+  #fx{position:absolute;inset:0;width:100%;height:100%}
+  #judge{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s}
+  #judge.show{opacity:1;transform:scale(1)}
+  #judge svg{width:96px;height:96px;filter:drop-shadow(0 10px 24px rgba(225,29,72,.45))}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="title"></h1>
+  <p class="lead" id="lead"></p>
+
+  <!-- 题目描述卡：选项在顶部 -->
+  <div class="card">
+    <div class="zone-head qhead"><span class="zone-no">题</span><span class="zone-title">题目描述</span>
+      <span class="zone-hint"><span id="optno"></span> · <span id="qno"></span></span></div>
+    <div class="opt-line" id="optline">
+      <div class="opts" id="opts"></div>
+    </div>
+    <div class="qbody" id="qbody">
+      <div class="qtext">
+        <span class="qtag" id="qtag"></span>
+        <div class="qstem" id="qstem"></div>
+        <div class="qconds" id="qconds"></div>
+        <div class="qtip" id="qtip"></div>
+      </div>
+      <div class="qthumb" id="qthumb"></div>
+    </div>
+  </div>
+
+  <!-- 理顺原理卡 -->
+  <div class="card" id="gamebox" style="display:none">
+    <div class="zone-head"><span class="zone-no" style="background:var(--red)">牌</span>
+      <span class="zone-title">原理巩固</span>
+      <span class="zone-hint">点卡入框 · 点框回落</span></div>
+    <p class="game-lead" id="gamelead"></p>
+    <div class="slots" id="slots"></div>
+    <div class="deck-label" id="decklabel">还没放上去的卡</div>
+    <div class="deck" id="deck"></div>
+  </div>
+
+  <!-- 三区 -->
+  <div class="card z1">
+    <div class="zone-head"><span class="zone-no">1</span><span class="zone-title">动画展示区</span>
+      <span class="zone-hint" id="stepno"></span></div>
+    <div class="viz" id="viz"></div>
+  </div>
+  <div class="card z2">
+    <div class="zone-head"><span class="zone-no">2</span><span class="zone-title">变化描述区</span>
+      <span class="zone-hint">这一步，什么变了</span></div>
+    <p class="change" id="change"></p>
+    <div class="diffs" id="diffs"></div>
+  </div>
+  <div class="card z3">
+    <div class="zone-head"><span class="zone-no">3</span><span class="zone-title">变化讲解区</span>
+      <span class="zone-hint">为什么这样变</span></div>
+    <p class="why" id="why"></p>
+    <div class="formula" id="formula"></div>
+  </div>
+
+  <!-- 控件 -->
+  <div class="card" id="ctrlcard">
+    <div class="dots" id="dots"></div>
+    <div class="ctrl">
+      <button id="prev" title="也可按 ←">‹ 上一步</button>
+      <button class="primary" id="play">▶ 自动播放</button>
+      <button id="next" title="也可按 →">下一步 ›</button>
+      <button class="mini" id="replay" title="重播">↺</button>
+    </div>
+  </div>
+
+  <!-- 原理篇 -->
+  <div class="card kcard">
+    <div class="zone-head"><span class="zone-no">篇</span><span class="zone-title">原理归纳</span>
+      <span class="zone-hint">上为定理 · 下结合题目</span></div>
+    <div class="krows" id="krows"></div>
+  </div>
+  <div class="fn" id="fn"></div>
+</div>
+<div id="fxwrap">
+  <canvas id="fx"></canvas>
+  <div id="judge">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M5 5l14 14M19 5L5 19" stroke="#e11d48" stroke-width="2.8" stroke-linecap="round"/></svg>
+  </div>
+</div>
+
+<script>
+/* ---------- 全局 helper：题目数据里可直接使用 ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const el=(t,c,h)=>{const n=document.createElement(t);if(c)n.className=c;if(h!=null)n.textContent=h;return n;};
+const pad=n=>String(n).padStart(2,'0');
+function setEm(node, html){
+  node.textContent='';
+  String(html||'').split(/(<em>[^<]*<\/em>)/g).forEach(part=>{
+    const m=part.match(/^<em>([^<]*)<\/em>$/);
+    if(!m){if(part)node.append(document.createTextNode(part));return;}
+    const em=document.createElement('em');em.textContent=m[1];node.append(em);
+  });
+}
+function setThumb(html){
+  const box=$('#qthumb');
+  box.replaceChildren();
+  if(!html){box.style.display='none';return;}
+  const doc=new DOMParser().parseFromString(String(html),'image/svg+xml');
+  const svg=doc.documentElement;
+  if(!svg||svg.tagName.toLowerCase()!=='svg'||svg.querySelector('parsererror')){
+    box.style.display='none';return;
+  }
+  svg.querySelectorAll('script').forEach(n=>n.remove());
+  [...svg.querySelectorAll('*')].concat(svg).forEach(n=>{
+    [...n.attributes].forEach(a=>{
+      if(/^on/i.test(a.name))n.removeAttribute(a.name);
+      if(/href$/i.test(a.name)&&/^\s*javascript:/i.test(a.value))n.removeAttribute(a.name);
+    });
+  });
+  box.append(document.importNode(svg,true));
+  box.style.display='';
+}
+function reveal(node){if(!node)return;node.classList.add('show');node.classList.remove('hide');node.style.opacity='1';}
+function conceal(node){if(!node)return;node.classList.add('hide');node.classList.remove('show');node.style.opacity='0';}
+function moveTo(node,dest){
+  if(!node||!dest)return;
+  const a=node.getBoundingClientRect();
+  dest.append(node);
+  const b=node.getBoundingClientRect();
+  const dx=a.left-b.left,dy=a.top-b.top;
+  if(!dx&&!dy)return;
+  node.style.transition='none';
+  node.style.transform=`translate(${dx}px,${dy}px)`;
+  requestAnimationFrame(()=>{
+    node.style.transition='transform .45s ease';
+    node.style.transform='';
+  });
+}
+
+/* ---------- 数据注入点 ---------- */
+/* __LESSON_DATA__ */
+if (typeof LESSON === 'undefined') throw new Error('缺少 LESSON：先把 lesson.js 注入 __LESSON_DATA__');
+
+/* ---------- 通用播放器（换题不用改这部分） ---------- */
+let state='lesson',active=0,idx=0,built=null,timer=null,playing=false;
+let gameSlots=[],gameDeck=[],gamePhase='play';
+const TABS=['原题讲解','触类旁通','原理巩固'];
+const Q=()=>LESSON.questions[active];
+const points=()=>LESSON.points||[];
+const pointText=i=>{
+  const p=points()[i];return p.theorem||p[0]||'';
+};
+
+function shuffle(list){
+  const a=list.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function renderOpts(){
+  const box=$('#opts');box.innerHTML='';
+  TABS.slice(0,2).forEach((label,i)=>{
+    const on=state==='lesson'&&i===active;
+    const b=el('button','opt'+(on?' on':''),label);
+    b.onclick=()=>load(i);box.append(b);
+  });
+  const g=el('button','opt'+(state==='game'?' on':''),TABS[2]);
+  g.onclick=loadGame;box.append(g);
+}
+function renderDesc(k){
+  const q=LESSON.questions[k];
+  $('#title').textContent=LESSON.title;
+  document.title=LESSON.title;
+  $('#lead').textContent=LESSON.lead||'';
+  $('#fn').textContent=LESSON.footnote||'';
+  $('#optno').textContent=`${k+1} / 3`;
+  $('#qno').textContent=TABS[k];
+  const t=$('#qtag');t.textContent=q.tag||'';t.className='qtag'+(q.tagExt?' ext':'');
+  t.style.display=q.tag?'':'none';
+  $('#qstem').textContent=q.stem;
+  const c=$('#qconds');c.innerHTML='';(q.conds||[]).forEach(x=>c.append(el('span','cond',x)));
+  $('#qtip').textContent=q.tip||'';$('#qtip').style.display=q.tip?'':'none';
+  setThumb(q.thumb);
+}
+function renderPoints(){
+  const pts=LESSON.points||[];
+  if(state==='game'){$('.kcard').style.display='none';return;}
+  $('.kcard').style.display=pts.length?'':'none';
+  const box=$('#krows');
+  if(box.children.length)return;
+  pts.forEach(item=>{
+    const theorem=item.theorem||'';
+    const r=el('div','krow');
+    r.append(el('div','k-theorem',theorem));
+    if(item.read){const rd=el('div','k-read');setEm(rd,item.read);r.append(rd);}
+    box.append(r);
+  });
+}
+function renderDots(){
+  const box=$('#dots');box.innerHTML='';
+  Q().steps.forEach((_,i)=>{const d=el('button','dot'+(i===idx?' on':i<idx?' past':''));
+    d.onclick=()=>goto(i);box.append(d);});
+}
+function renderStep(s,i,n){
+  $('#stepno').textContent=pad(i+1)+' / '+pad(n);
+  $('#change').textContent=s.change;
+  const db=$('#diffs');db.innerHTML='';
+  (s.diff||[]).forEach(([k,o,v])=>{
+    const r=el('div','diff-row');
+    r.append(el('span','d-key',k),el('span','d-old',String(o)),
+      el('span','d-arrow','→'),el('span','d-new',String(v)));
+    db.append(r);
+  });
+  $('#why').textContent=s.why;
+  $('#formula').textContent=s.formula;
+  renderDots();
+}
+function show(i){
+  const steps=Q().steps||[];
+  if(i<0||i>=steps.length)return;
+  idx=i;const s=steps[i];
+  if(s.run)s.run(built.viz);
+  renderStep(s,i,steps.length);
+}
+function stop(){playing=false;if(timer)clearInterval(timer);timer=null;$('#play').textContent='▶ 自动播放';}
+/* 回退/跳步：reset 后重放 0..i。正向下一步只跑新一步，CSS 过渡才接得上 */
+function goto(i){
+  stop();built.reset();
+  for(let k=0;k<=i;k++)show(k);
+}
+function nextStep(){
+  if(idx>=Q().steps.length-1)return;
+  stop();show(idx+1);
+}
+function prevStep(){
+  if(idx<=0)return;
+  goto(idx-1);
+}
+function play(){
+  if(playing){stop();return;}
+  if(idx>=Q().steps.length-1)goto(0);
+  playing=true;$('#play').textContent='⏸ 暂停';
+  timer=setInterval(()=>{
+    if(idx<Q().steps.length-1)show(idx+1);else stop();
+  },Q().speed||1000);
+}
+function applyStage(){
+  const isGame=state==='game';
+  $('#qbody').style.display=isGame?'none':'';
+  $('#gamebox').style.display=isGame?'':'none';
+  $$('.z1,.z2,.z3,#ctrlcard').forEach(n=>n.style.display=isGame?'none':'');
+  if(isGame)$('.kcard').style.display='none';
+}
+
+function load(k){
+  if(!LESSON.questions[k])return;
+  stop();state='lesson';active=k;
+  const q=Q();
+  $('#q-style').textContent=q.style||'';
+  const root=el('div');root.style.width='100%';
+  $('#viz').replaceChildren(root);
+  built=Object.assign({viz:root,reset:()=>{}},q.build(root)||{});
+  built.viz=root;
+  applyStage();renderOpts();renderDesc(k);renderPoints();
+  built.reset();show(0);          // 必须挂载后再 reset
+}
+
+function initGame(){
+  gamePhase='play';
+  const n=points().length;
+  gameSlots=Array(n).fill(null);
+  gameDeck=shuffle([...Array(n).keys()]);
+  $('#gamebox').classList.remove('won');
+}
+
+function makeCard(ord,onClick){
+  const b=el('button','gcard',pointText(ord));
+  b.dataset.ord=String(ord);
+  if(gamePhase==='play')b.onclick=onClick;
+  return b;
+}
+
+function renderGame(){
+  const slots=$('#slots');slots.innerHTML='';
+  gameSlots.forEach((ord,i)=>{
+    const s=el('div','slot'+(ord==null?'':' filled'));
+    if(ord==null)s.append(el('span','slot-ph','第 '+(i+1)+' 步'));
+    else s.append(makeCard(ord,()=>fromSlot(i)));
+    slots.append(s);
+  });
+  const deck=$('#deck');deck.innerHTML='';
+  $('#decklabel').style.display=(gamePhase!=='play'||!gameDeck.length)?'none':'';
+  if(gamePhase==='won'){
+    $('#gamelead').textContent='答对了！这就是讲解顺序。';
+    return;
+  }
+  $('#gamelead').textContent='按讲解顺序，点下面的卡放进上面的空位。点空位里的卡可以放回去。';
+  gameDeck.forEach(ord=>deck.append(makeCard(ord,()=>toSlot(ord))));
+}
+
+function toSlot(ord){
+  if(gamePhase!=='play')return;
+  const i=gameSlots.indexOf(null);
+  if(i<0)return;
+  gameSlots[i]=ord;
+  gameDeck=gameDeck.filter(x=>x!==ord);
+  renderGame();
+  if(gameSlots.every(x=>x!=null))judgeGame();
+}
+
+function fromSlot(i){
+  if(gamePhase!=='play')return;
+  const ord=gameSlots[i];
+  if(ord==null)return;
+  gameSlots[i]=null;
+  gameDeck.push(ord);
+  renderGame();
+}
+
+function judgeGame(){
+  if(gameSlots.every((ord,i)=>ord===i)){
+    gamePhase='won';$('#gamebox').classList.add('won');renderGame();burst();return;
+  }
+  gamePhase='checking';
+  flashX();shake();
+  setTimeout(()=>{initGame();renderGame();},520);
+}
+
+function shake(){
+  const w=$('.wrap');
+  w.classList.remove('shake');
+  void w.offsetWidth;
+  w.classList.add('shake');
+  w.addEventListener('animationend',()=>w.classList.remove('shake'),{once:true});
+}
+
+function flashX(){
+  const wrap=$('#fxwrap'),j=$('#judge');
+  wrap.classList.add('on');j.classList.add('show');
+  setTimeout(()=>{
+    j.classList.remove('show');
+    if(!wrap.classList.contains('burst'))wrap.classList.remove('on');
+  },520);
+}
+
+function burst(){
+  const wrap=$('#fxwrap'),canvas=$('#fx');
+  wrap.classList.add('on','burst');
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const w=innerWidth,h=innerHeight;
+  canvas.width=w*dpr;canvas.height=h*dpr;
+  canvas.style.width=w+'px';canvas.style.height=h+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const colors=['#4f46e5','#7c3aed','#2563eb','#f59e0b','#e11d48','#10b981','#ffffff'];
+  const ps=[];
+  const spawn=(x,dir)=>{
+    for(let i=0;i<52;i++){
+      ps.push({
+        x,y:h-6,
+        vx:dir*(2.4+Math.random()*7)+(Math.random()-.5)*1.8,
+        vy:-(7+Math.random()*12),
+        g:.2+Math.random()*.1,
+        rw:3+Math.random()*6,rh:3+Math.random()*5,
+        rot:Math.random()*6,vr:(Math.random()-.5)*.42,
+        color:colors[i%colors.length],a:1,
+        circle:Math.random()<.22
+      });
+    }
+  };
+  spawn(32,1);spawn(w-32,-1);
+  const t0=performance.now();
+  (function frame(t){
+    ctx.clearRect(0,0,w,h);
+    ps.forEach(p=>{
+      p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.a-=.0075;
+      if(p.a<=0)return;
+      ctx.save();ctx.globalAlpha=Math.max(0,p.a);
+      ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.color;
+      if(p.circle){ctx.beginPath();ctx.arc(0,0,p.rw/2,0,6.28);ctx.fill();}
+      else ctx.fillRect(-p.rw/2,-p.rh/2,p.rw,p.rh);
+      ctx.restore();
+    });
+    if(t-t0<2100)requestAnimationFrame(frame);
+    else{ctx.clearRect(0,0,w,h);wrap.classList.remove('on','burst');}
+  })(t0);
+}
+
+function loadGame(){
+  stop();state='game';
+  initGame();
+  applyStage();renderOpts();
+  $('#title').textContent=LESSON.title;
+  document.title=LESSON.title;
+  $('#lead').textContent=LESSON.lead||'';
+  $('#fn').textContent=LESSON.footnote||'';
+  $('#optno').textContent='3 / 3';
+  $('#qno').textContent=TABS[2];
+  renderGame();
+}
+
+$('#prev').onclick=prevStep;
+$('#next').onclick=nextStep;
+$('#play').onclick=play;
+$('#replay').onclick=()=>{goto(0);play();};
+document.addEventListener('keydown',e=>{
+  if(state!=='lesson')return;
+  if(e.key==='ArrowLeft'){e.preventDefault();prevStep();}
+  if(e.key==='ArrowRight'){e.preventDefault();nextStep();}
+});
+renderOpts();load(0);
+</script>
+</body>
+</html>

@@ -108,6 +108,7 @@ npx skills add https://github.com/gitByEOS/open-part-skills --skill <skill-name>
 |------|------|------|----------|
 | [memory-card](./skills/memory-card/SKILL.md) | 把课文拆成记忆卡，导出钉纸地图，点节点进入可滑动的叠卡 | 1.0.1 | 2026-11-23 |
 | [mindmap](./skills/mindmap/SKILL.md) | 将缩进列表 Markdown 生成为可搜索、折叠与切换主题的单文件大纲网页 | 1.0.0 | 2026-09-23 |
+| [teach-my-child](./skills/teach-my-child/SKILL.md) | 把题目做成给 15 岁以下孩子看的三区讲解页，讲法简单直接 | 1.0.2 | 2026-11-28 |
 | [summary-user-said](./skills/summary-user-said/SKILL.md) | 只读汇总本机 Cursor、Claude Code、Codex 用户发言，生成带证据引用的总结与原文双产物 | 1.0.0 | 2026-07-27 |
 
 #### 会议与目标管理
